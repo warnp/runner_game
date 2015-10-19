@@ -6,6 +6,8 @@ use std::io::Cursor;
 extern crate image;
 extern crate glium;
 
+use glium::{DisplayBuild, Surface};
+
 
 pub trait GraphicItem {
     fn get_position(&self) -> [f32; 2];
@@ -16,7 +18,7 @@ pub trait GraphicItem {
 }
 
 pub trait ImageManager {
-    fn set_image(&self, display: &glium::backend::glutin_backend::GlutinFacade, image_path: &str) -> glium::texture::Texture2d;
+    fn set_image(&self, display: &glium::backend::glutin_backend::GlutinFacade, image_path: &str) -> image::ImageResult<image::DynamicImage>;
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -42,13 +44,13 @@ impl Sprite {
 }
 
 impl ImageManager for Sprite {
-    fn set_image(&self, display: &glium::backend::glutin_backend::GlutinFacade,image_path: &str) ->glium::texture::Texture2d{
+    fn set_image(&self, display: &glium::backend::glutin_backend::GlutinFacade,image_path: &str) ->image::ImageResult<image::DynamicImage>{
 
 
-        let image_to_load = image::load(Cursor::new(&include_bytes!("../content/NatureForests.png")[..]),
-            image::PNG).unwrap();
+        image::load(Cursor::new(&include_bytes!("../content/NatureForests.png")[..]),
+            image::PNG).unwrap()
 
-        glium::texture::Texture2d::new(display, &image_to_load).unwrap()
+        // Box::new(glium::Texture2d::new(display, &image_to_load).unwrap())
     }
 }
 

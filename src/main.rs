@@ -75,7 +75,8 @@ fn main() {
 
             let vertex_buffer = glium::VertexBuffer::new(&display, &v.vertices).unwrap();
             let indices = glium::index::IndexBuffer::new(&display, glium::index::PrimitiveType::TrianglesList, &v.indices).unwrap();
-            let texture = v.set_image(&display,"");
+            let toto = image::load(Cursor::new(&include_bytes!("../content/NatureForests.png")[..]), image::PNG).unwrap();
+            let texture = glium::texture::Texture2d::new(&display, toto).unwrap();
 
             let uniforms = uniform! {
                 matrix: [
