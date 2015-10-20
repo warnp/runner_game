@@ -18,7 +18,7 @@ pub trait GraphicItem {
 }
 
 pub trait ImageManager {
-    fn set_image(&self, display: &glium::backend::glutin_backend::GlutinFacade, image_path: &str) -> image::ImageResult<image::DynamicImage>;
+    fn set_image(&self, image_path: &str) -> image::ImageResult<image::DynamicImage> ;
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -44,11 +44,11 @@ impl Sprite {
 }
 
 impl ImageManager for Sprite {
-    fn set_image(&self, display: &glium::backend::glutin_backend::GlutinFacade,image_path: &str) ->image::ImageResult<image::DynamicImage>{
+    fn set_image(&self,image_path: &str) ->image::ImageResult<image::DynamicImage>{
 
 
         image::load(Cursor::new(&include_bytes!("../content/NatureForests.png")[..]),
-            image::PNG).unwrap()
+            image::PNG)
 
         // Box::new(glium::Texture2d::new(display, &image_to_load).unwrap())
     }
