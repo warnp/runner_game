@@ -48,7 +48,8 @@ fn main() {
     // let vert8 = Vertex { position: [0.0, 0.0], normal: [0.0,0.0,-1.0]};
 
 
-    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0]), Sprite::new(0.5,0.5,[0.0,1.0,0.0,1.0])];
+    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
+                    Sprite::new(0.5,0.5,[0.0,1.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
 
 
     // let vertex_shader = vert[0].get_vertex_shader();
@@ -75,7 +76,7 @@ fn main() {
 
             let vertex_buffer = glium::VertexBuffer::new(&display, &v.vertices).unwrap();
             let indices = glium::index::IndexBuffer::new(&display, glium::index::PrimitiveType::TrianglesList, &v.indices).unwrap();
-            let img = v.set_image(&include_bytes!("../content/NatureForests.png")[..]).unwrap();
+            let img = v.set_image().unwrap();
             let texture = glium::texture::Texture2d::new(&display, img).unwrap();
 
             let uniforms = uniform! {

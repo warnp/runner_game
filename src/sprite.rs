@@ -23,16 +23,16 @@ pub trait ImageManager {
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct Sprite{
+pub struct Sprite<'a>{
     pub vertices: [vertex::Vertex; 4],
     pub indices: [u16; 6],
-    pub texture: &[u8],
+    pub texture: &'a [u8],
     // pub transform: [[f32; 4]; 4],
     // pub display: &glium::glutin::WindowBuilder,
 }
 
-impl Sprite {
-    pub fn new(x: f32, y: f32,color: [f32; 4]) -> Sprite {
+impl <'a>Sprite<'a> {
+    pub fn new(x: f32, y: f32,color: [f32; 4], texture: &[u8]) -> Sprite {
 
         Sprite {
             vertices : [   vertex::Vertex { position: [-0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,0.0]},
@@ -40,23 +40,24 @@ impl Sprite {
                             vertex::Vertex { position: [0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,0.0]},
                             vertex::Vertex { position: [-0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,1.0]}],
             indices : [0,1,2,0,2,3],
+            texture: texture,
             }
 
     }
 }
 
-impl ImageManager for Sprite {
+impl <'a>ImageManager for Sprite<'a> {
     fn set_image(&self) ->image::ImageResult<image::DynamicImage>{
 
         // let string = format!("{}", image_path);
-        image::load(Cursor::new(texture),
+        image::load(Cursor::new(self.texture),
             image::PNG)
 
     }
 }
 
 
-impl GraphicItem for Sprite {
+impl <'a>GraphicItem for Sprite<'a> {
 
     fn get_position(&self) -> [f32; 2] {
 
