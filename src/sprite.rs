@@ -6,6 +6,7 @@ use std::io::Cursor;
 extern crate image;
 extern crate glium;
 
+// use vec::Vec;
 use glium::{DisplayBuild, Surface};
 
 
@@ -18,13 +19,14 @@ pub trait GraphicItem {
 }
 
 pub trait ImageManager {
-    fn set_image(&self, image_path: &str) -> image::ImageResult<image::DynamicImage> ;
+    fn set_image(&self) -> image::ImageResult<image::DynamicImage> ;
 }
 
 #[derive(Copy, Clone, Debug)]
 pub struct Sprite{
     pub vertices: [vertex::Vertex; 4],
     pub indices: [u16; 6],
+    pub texture: &[u8],
     // pub transform: [[f32; 4]; 4],
     // pub display: &glium::glutin::WindowBuilder,
 }
@@ -44,13 +46,12 @@ impl Sprite {
 }
 
 impl ImageManager for Sprite {
-    fn set_image(&self,image_path: &str) ->image::ImageResult<image::DynamicImage>{
+    fn set_image(&self) ->image::ImageResult<image::DynamicImage>{
 
-
-        image::load(Cursor::new(&include_bytes!("../content/NatureForests.png")[..]),
+        // let string = format!("{}", image_path);
+        image::load(Cursor::new(texture),
             image::PNG)
 
-        // Box::new(glium::Texture2d::new(display, &image_to_load).unwrap())
     }
 }
 
@@ -103,31 +104,7 @@ impl GraphicItem for Sprite {
         }
         "#
     }
-
-    // fn get_vertex_buffer<F>(&self,facade: &F, display: &glium::glutin::WindowBuilder) -> glium::VertexBuffer<vertex::Vertex>
-    //         where F : Facade
-    // {
-    //     glium::VertexBuffer::new(display, &self.vertices).unwrap()
-    // }
-
-
-    //
-    // fn get_index_buffer(&self, display: &glium::glutin::WindowBuilder) -> glium::IndexBuffer<u32>{
-    //     glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList)
-    // }
 }
-
-
-// impl fmt::Debug for Sprite {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(f, "Hi")
-//     }
-// }
-
-
-
-
-
 
 
 #[cfg(test)]

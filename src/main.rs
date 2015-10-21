@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate glium;
-extern crate image;
 
 mod vertex;
 use vertex::Vertex;
@@ -11,7 +10,6 @@ mod graphic_item;
 
 use sprite::GraphicItem;
 use sprite::ImageManager;
-use std::io::Cursor;
 use glium::{DisplayBuild, Surface};
 
 
@@ -77,16 +75,15 @@ fn main() {
 
             let vertex_buffer = glium::VertexBuffer::new(&display, &v.vertices).unwrap();
             let indices = glium::index::IndexBuffer::new(&display, glium::index::PrimitiveType::TrianglesList, &v.indices).unwrap();
-
-            let tex = v.set_image("../content/NatureForests.png").unwrap();
-            let texture = glium::texture::Texture2d::new(&display, tex).unwrap();
+            let img = v.set_image(&include_bytes!("../content/NatureForests.png")[..]).unwrap();
+            let texture = glium::texture::Texture2d::new(&display, img).unwrap();
 
             let uniforms = uniform! {
                 matrix: [
                     [1.0, 0.0, 0.0, 0.0],
                     [0.0, 1.0, 0.0, 0.0],
                     [0.0, 0.0, 1.0, 0.0],
-                    [0.0, 0.0, 0.0, 1.0f32],
+                    [ 0.0 , 0.0, 0.0, 1.0f32],
                 ],
                 tex: &texture,
             };
