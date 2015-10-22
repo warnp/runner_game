@@ -14,8 +14,9 @@ pub trait GraphicItem {
     fn get_position(&self) -> [f32; 2];
     fn get_vertex_shader(&self) -> &str;
     fn get_fragment_shader(&self) -> &str;
-    // fn get_vertex_buffer<F>(&self,facade: &F,display: &glium::glutin::WindowBuilder) -> glium::VertexBuffer<vertex::Vertex> where F: Facade;
-    // fn get_index_buffer(&self,display: &glium::glutin::WindowBuilder) -> glium::IndexBuffer<u32>;
+    fn get_vertex_buffer(&self,display: &glium::backend::glutin_backend::GlutinFacade) ->  Result<glium::VertexBuffer<vertex::Vertex>, glium::vertex::BufferCreationError>;
+    fn get_index_buffer(&self,display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::IndexBuffer<u16>, glium::index::BufferCreationError>;
+    fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>;
 }
 
 pub trait ImageManager {
@@ -41,6 +42,8 @@ impl <'a>Sprite<'a> {
                             vertex::Vertex { position: [-0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,1.0]}],
             indices : [0,1,2,0,2,3],
             texture: texture,
+            // transform: transform,
+
             }
 
     }
@@ -105,6 +108,19 @@ impl <'a>GraphicItem for Sprite<'a> {
         }
         "#
     }
+
+    fn get_vertex_buffer(&self,display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::VertexBuffer<vertex::Vertex>, glium::vertex::BufferCreationError> {
+        glium::VertexBuffer::new(display, &self.vertices)
+    }
+
+    fn get_index_buffer(&self, display:&glium::backend::glutin_backend::GlutinFacade) -> Result<glium::IndexBuffer<u16>, glium::index::BufferCreationError>{
+        glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &self.indices)
+    }
+
+    fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>{
+        glium::texture::Texture2d::new(display, self.set_image().unwrap())
+    }
+
 }
 
 

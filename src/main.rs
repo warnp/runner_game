@@ -57,12 +57,13 @@ fn main() {
     // let index_buffer = vec![0,1,2,0,2,3u16];
     // let (vertex_buffer,index_buffer) = generate_sprite(&display, &vert);
 
-
+    let mut t : f32 = 0.0;
 
     loop{
         let mut target = display.draw();
         target.clear_color(0.0,0.0,1.0,1.0);
 
+        t = t + 0.01;
         // let ib_slice = index_buffer.slice(0..vert.len() * 6).unwrap();
 
 
@@ -74,17 +75,17 @@ fn main() {
             let program = glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap();
 
 
-            let vertex_buffer = glium::VertexBuffer::new(&display, &v.vertices).unwrap();
-            let indices = glium::index::IndexBuffer::new(&display, glium::index::PrimitiveType::TrianglesList, &v.indices).unwrap();
-            let img = v.set_image().unwrap();
-            let texture = glium::texture::Texture2d::new(&display, img).unwrap();
+            let vertex_buffer = v.get_vertex_buffer(&display).unwrap();
+            let indices = v.get_index_buffer(&display).unwrap();
+            // let img = v.set_image().unwrap();
+            let texture = v.get_texture(&display).unwrap();
 
             let uniforms = uniform! {
                 matrix: [
                     [1.0, 0.0, 0.0, 0.0],
                     [0.0, 1.0, 0.0, 0.0],
                     [0.0, 0.0, 1.0, 0.0],
-                    [ 0.0 , 0.0, 0.0, 1.0f32],
+                    [ t , 0.0, 0.0, 1.0f32],
                 ],
                 tex: &texture,
             };
