@@ -6,3 +6,4 @@ authors = ["romain <romain.assie@supinfo.com>"]
 [dependencies]
 glium="*"
 image="*"
+time = "0.1"

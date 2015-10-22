@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate glium;
+extern crate time;
 
 mod vertex;
 use vertex::Vertex;
@@ -7,7 +8,7 @@ mod sprite;
 use sprite::Sprite;
 mod graphic_item;
 
-
+use time::{Duration, PreciseTime};
 use sprite::GraphicItem;
 use sprite::ImageManager;
 use glium::{DisplayBuild, Surface};
@@ -37,34 +38,30 @@ fn main() {
                                 .build_glium()
                                 .unwrap();
 
-    // let vert1 = Vertex { position: [-0.5, 0.5], normal: [0.0,0.0,-1.0]};
-    // let vert2 = Vertex { position: [0.5, 0.5], normal: [0.0,0.0,-1.0]};
-    // let vert3 = Vertex { position: [0.5, -0.5], normal: [0.0,0.0,-1.0]};
-    // let vert4 = Vertex { position: [-0.5, -0.5], normal: [0.0,0.0,-1.0]};
-    //
-    // let vert5 = Vertex { position: [0.0, 1.0], normal: [0.0,0.0,-1.0]};
-    // let vert6 = Vertex { position: [1.0, 1.0], normal: [0.0,0.0,-1.0]};
-    // let vert7 = Vertex { position: [1.0, 0.0], normal: [0.0,0.0,-1.0]};
-    // let vert8 = Vertex { position: [0.0, 0.0], normal: [0.0,0.0,-1.0]};
 
 
     let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
                     Sprite::new(0.5,0.5,[0.0,1.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
 
 
-    // let vertex_shader = vert[0].get_vertex_shader();
-    // let fragment_shader = vert[0].get_fragment_shader();
-    // let index_buffer = vec![0,1,2,0,2,3u16];
-    // let (vertex_buffer,index_buffer) = generate_sprite(&display, &vert);
 
     let mut t : f32 = 0.0;
-
+    let mut time = time::precise_time_ns();
+    let mut old_time = time;
     loop{
         let mut target = display.draw();
+
         target.clear_color(0.0,0.0,1.0,1.0);
 
         t = t + 0.01;
-        // let ib_slice = index_buffer.slice(0..vert.len() * 6).unwrap();
+        
+        time = time::precise_time_ns();
+        let time_between = time - old_time;
+        let fps = 1 / time_between;
+        println!("FPS : {}", fps);
+
+        old_time = time;
+
 
 
 
