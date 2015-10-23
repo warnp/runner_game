@@ -7,6 +7,7 @@ use vertex::Vertex;
 mod sprite;
 use sprite::Sprite;
 mod graphic_item;
+mod shader_manager;
 
 use time::{Duration, PreciseTime};
 use sprite::GraphicItem;
@@ -40,42 +41,42 @@ fn main() {
 
 
 
-    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
-                    Sprite::new(0.5,0.5,[0.0,1.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
+    let vert = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]);
+
+    let vertex_shader = vert.get_vertex_shader();
+    let fragment_shader = vert.get_fragment_shader();
+    let program = glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap();
+
+
+    let vertex_buffer = vert.get_vertex_buffer(&display).unwrap();
+    let indices = vert.get_index_buffer(&display).unwrap();
+    // let img = v.set_image().unwrap();
+    let texture = vert.get_texture(&display).unwrap();
 
 
 
     let mut t : f32 = 0.0;
-    let mut time = time::precise_time_ns();
-    let mut old_time = time;
+    // let mut time : f32 = time::precise_time_ns() as f32;
+    let mut old_time = 0.0;
     loop{
         let mut target = display.draw();
 
         target.clear_color(0.0,0.0,1.0,1.0);
 
         t = t + 0.01;
-        
-        time = time::precise_time_ns();
-        let time_between = time - old_time;
-        let fps = 1 / time_between;
-        println!("FPS : {}", fps);
 
+        let time = time::precise_time_ns() as f32;
+        let time_between = time/1000000000.0 - old_time/1000000000.0;
+        let fps = 1.0/time_between;
+        println!("FPS : {}", fps);
         old_time = time;
 
 
 
 
-        for v in &vert{
-
-            let vertex_shader = v.get_vertex_shader();
-            let fragment_shader = v.get_fragment_shader();
-            let program = glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap();
+        // for v in &vert{
 
 
-            let vertex_buffer = v.get_vertex_buffer(&display).unwrap();
-            let indices = v.get_index_buffer(&display).unwrap();
-            // let img = v.set_image().unwrap();
-            let texture = v.get_texture(&display).unwrap();
 
             let uniforms = uniform! {
                 matrix: [
@@ -89,7 +90,7 @@ fn main() {
 
             target.draw(&vertex_buffer, &indices, &program, &uniforms,
                     &Default::default()).unwrap();
-        }
+        // }
 
         target.finish().unwrap();
 
