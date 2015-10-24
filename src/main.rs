@@ -8,6 +8,7 @@ mod sprite;
 use sprite::Sprite;
 mod graphic_item;
 mod shader_manager;
+use shader_manager::{Shaders, ShaderCouple};
 
 use time::{Duration, PreciseTime};
 use sprite::GraphicItem;
@@ -43,9 +44,17 @@ fn main() {
 
     let vert = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]);
 
-    let vertex_shader = vert.get_vertex_shader();
-    let fragment_shader = vert.get_fragment_shader();
-    let program = glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap();
+    // let vertex_shader = vert.get_vertex_shader();
+    // let fragment_shader = vert.get_fragment_shader();
+    // let program = glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap();
+    let shaders = shader_manager::Shaders::new();
+    let mut program : &glium::program::program::Program;
+    match shaders.compile_shaders(&display).get(&"simple_shader"){
+        Some(prog) => program = prog,
+        None => panic!("Shader not found!")
+    }
+
+    let program = program;
 
 
     let vertex_buffer = vert.get_vertex_buffer(&display).unwrap();
@@ -63,7 +72,7 @@ fn main() {
 
         target.clear_color(0.0,0.0,1.0,1.0);
 
-        t = t + 0.01;
+        t = t + 0.00001;
 
         let time = time::precise_time_ns() as f32;
         let time_between = time/1000000000.0 - old_time/1000000000.0;

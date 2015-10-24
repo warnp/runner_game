@@ -41,6 +41,7 @@ impl <'a>Shaders<'a> {
                 gl_Position = matrix * vec4(position, 0.0,1.0);
             }
             "#,
+
             pixel_shader: r#"
             #version 140
 
