@@ -9,6 +9,8 @@ use sprite::Sprite;
 mod graphic_item;
 mod shader_manager;
 use shader_manager::{Shaders, ShaderCouple};
+mod sprite_manager;
+use sprite_manager::SpriteManager;
 
 use time::{Duration, PreciseTime};
 use sprite::GraphicItem;
@@ -42,8 +44,10 @@ fn main() {
 
 
 
-    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
-                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
+    // let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
+    //                 Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
+
+    let vert = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]);
 
     let shaders = shader_manager::Shaders::new();
     let mut shaders_list = shaders.compile_shaders(&display);

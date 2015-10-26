@@ -23,39 +23,6 @@ pub trait ImageManager {
     fn set_image(&self) -> image::ImageResult<image::DynamicImage> ;
 }
 
-pub struct SpriteManager {
-    sprite_list: Vec<Sprite<'a>>,
-}
-
-impl SpriteManager {
-    fn new(&self,sprites: Vec<Sprite<'a>>) -> SpriteManager {
-        self.sprite_list = sprites;
-    }
-
-    fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::VertexBuffer<vertex::Vertex>, glium::vertex::BufferCreationError> {
-        let vertex_list = Vec::new();
-        for s in &self.sprite_list{
-            for v in &s.vertices {
-                vertex_list.push(v);
-            }
-        }
-
-        glium::VertexBuffer::new(display, vertex_list)
-    }
-
-    fn get_index_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::IndexBuffer<u16>, glium::index::BufferCreationError> {
-        let index_list = Vec::new();
-
-        for s in &self.sprite_list {
-            let array_size = s.len();
-            for (iterator,i) in &s.indices {
-                index_list.push(i + iterator * array_size);
-            }
-        }
-        glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, index_list)
-    }
-}
-
 
 #[derive(Copy, Clone, Debug)]
 pub struct Sprite<'a>{
