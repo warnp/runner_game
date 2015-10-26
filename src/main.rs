@@ -42,19 +42,18 @@ fn main() {
 
 
 
-    let vert = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]);
+    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
+                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
 
-    // let vertex_shader = vert.get_vertex_shader();
-    // let fragment_shader = vert.get_fragment_shader();
-    // let program = glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap();
     let shaders = shader_manager::Shaders::new();
-    let mut program : &glium::program::program::Program;
-    match shaders.compile_shaders(&display).get(&"simple_shader"){
-        Some(prog) => program = prog,
-        None => panic!("Shader not found!")
-    }
+    let mut shaders_list = shaders.compile_shaders(&display);
+    // let matcher = shaders_list.get(&"simple_shader");
+    // let toto = match matcher {
+    //     Some(prog) => prog,
+    //     None => &Box::new(glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap())
+    // };
+    let program = shaders_list.remove(&"simple_shader").unwrap();
 
-    let program = program;
 
 
     let vertex_buffer = vert.get_vertex_buffer(&display).unwrap();
@@ -77,7 +76,7 @@ fn main() {
         let time = time::precise_time_ns() as f32;
         let time_between = time/1000000000.0 - old_time/1000000000.0;
         let fps = 1.0/time_between;
-        println!("FPS : {}", fps);
+        // println!("FPS : {}", fps);
         old_time = time;
 
 

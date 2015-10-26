@@ -9,6 +9,7 @@ pub struct ShaderCouple<'a> {
     pub pixel_shader: &'a str,
 }
 
+#[derive(Debug)]
 pub struct Shaders<'a> {
     pub shaders_list: HashMap<&'a str, ShaderCouple<'a>>,
 
@@ -65,10 +66,10 @@ impl <'a>Shaders<'a> {
 
     }
 
-    pub fn compile_shaders(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> HashMap<&&str,glium::program::Program> {
+    pub fn compile_shaders(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> HashMap<&&str,Box<glium::program::Program>> {
         let mut hash = HashMap::new();
         for (name, s) in self.shaders_list.iter() {
-            hash.insert(name, glium::Program::from_source(display, s.vertex_shader, s.pixel_shader, None).unwrap());
+            hash.insert(name, Box::new(glium::Program::from_source(display, s.vertex_shader, s.pixel_shader, None).unwrap()));
         }
 
         hash
