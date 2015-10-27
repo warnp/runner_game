@@ -9,6 +9,8 @@ use sprite::Sprite;
 mod graphic_item;
 mod shader_manager;
 use shader_manager::{Shaders, ShaderCouple};
+mod sprite_manager;
+use sprite_manager::SpriteManager;
 
 use time::{Duration, PreciseTime};
 use sprite::GraphicItem;
@@ -42,23 +44,20 @@ fn main() {
 
 
 
-    let vert = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]);
+    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
+                    Sprite::new(0.0,0.0,[0.5,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
 
     let mut shaders = shader_manager::Shaders::new();
     shaders.compile_shaders(&display);
-    // let matcher = shaders_list.get(&"simple_shader");
-    // let toto = match matcher {
-    //     Some(prog) => prog,
-    //     None => &Box::new(glium::Program::from_source(&display, vertex_shader, fragment_shader, None).unwrap())
-    // };
+
     let program = shaders.get_compiled_shader("simple_shader");
 
+    let sprite_manager = SpriteManager::new(vert);
 
-
-    let vertex_buffer = vert.get_vertex_buffer(&display).unwrap();
-    let indices = vert.get_index_buffer(&display).unwrap();
+    let vertex_buffer = sprite_manager.get_vertex_buffer(&display);
+    let indices = sprite_manager.get_index_buffer(&display).unwrap();
     // let img = v.set_image().unwrap();
-    let texture = vert.get_texture(&display).unwrap();
+    let texture = vert[0].get_texture(&display).unwrap();
 
 
 

@@ -16,23 +16,32 @@ impl <'a>SpriteManager<'a> {
         self.sprite_list = sprites;
     }
 
-    fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::VertexBuffer<vertex::Vertex>, glium::vertex::BufferCreationError> {
-        let vertex_list = Vec::new();
-        for s in &self.sprite_list{
-            for v in &s.vertices {
-                vertex_list.push(v);
-            }
+    fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex>{
+
+        let mut vb : glium::VertexBuffer<vertex::Vertex> = glium::VertexBuffer::empty_dynamic(display, self.sprite_list.len() * 4).unwrap();
+
+        for (num, sprite) in vb.map().chunks_mut(4).enumerate() {
+            sprite[0].position[0] = self.sprite_list[num * 4].vertices[0].position[0];
+            sprite[0].position[1] = self.sprite_list[num * 4].vertices[0].position[1];
+
+            sprite[1].position[0] = self.sprite_list[num * 4 + 1].vertices[1].position[0];
+            sprite[1].position[1] = self.sprite_list[num * 4 + 1].vertices[1].position[1];
+
+            sprite[2].position[0] = self.sprite_list[num * 4 + 2].vertices[2].position[0];
+            sprite[2].position[1] = self.sprite_list[num * 4 + 2].vertices[2].position[1];
+
+            sprite[3].position[0] = self.sprite_list[num * 4 + 3].vertices[3].position[0];
+            sprite[3].position[1] = self.sprite_list[num * 4 + 3].vertices[3].position[1];
         }
 
-        glium::VertexBuffer::new(display, &vertex_list.slice(0,vertex_list.len()))
+        vb
     }
 
     fn get_index_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::IndexBuffer<u16>, glium::index::BufferCreationError> {
         let index_list = Vec::new();
 
-//a revoir
-        for s in &self.sprite_list {
-            let array_size = &self.sprite_list.len();
+        for (spi, s) in &self.sprite_list {
+            let array_size = spi;
             for (iterator,i) in &s.indices {
                 index_list.push(i + iterator * array_size);
             }
