@@ -12,6 +12,7 @@ pub struct ShaderCouple<'a> {
 #[derive(Debug)]
 pub struct Shaders<'a> {
     pub shaders_list: HashMap<&'a str, ShaderCouple<'a>>,
+    compiled_shaders: HashMap<&'a str, glium::program::Program>,
 
 }
 
@@ -62,18 +63,20 @@ impl <'a>Shaders<'a> {
         Shaders
             {
                 shaders_list: hash,
+                compiled_shaders: HashMap::new(),
             }
 
     }
 
-    pub fn compile_shaders(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> HashMap<&&str,Box<glium::program::Program>> {
-        let mut hash = HashMap::new();
+    pub fn compile_shaders(&mut self, display: &glium::backend::glutin_backend::GlutinFacade) {
         for (name, s) in self.shaders_list.iter() {
-            hash.insert(name, Box::new(glium::Program::from_source(display, s.vertex_shader, s.pixel_shader, None).unwrap()));
+            self.compiled_shaders.insert(name, glium::Program::from_source(display, s.vertex_shader, s.pixel_shader, None).unwrap());
         }
 
-        hash
+    }
 
+    pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> glium::program::Program {
+            self.compiled_shaders.remove(&shader_name).unwrap()
     }
 }
 
