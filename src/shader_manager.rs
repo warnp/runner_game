@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use glium::backend::Facade;
 
 extern crate glium;
 
@@ -12,7 +11,7 @@ pub struct ShaderCouple<'a> {
 #[derive(Debug)]
 pub struct Shaders<'a> {
     pub shaders_list: HashMap<&'a str, ShaderCouple<'a>>,
-    compiled_shaders: HashMap<&'a str, glium::program::Program>,
+    compiled_shaders: HashMap<&'a str, Box<glium::program::Program>>,
 
 }
 
@@ -70,13 +69,13 @@ impl <'a>Shaders<'a> {
 
     pub fn compile_shaders(&mut self, display: &glium::backend::glutin_backend::GlutinFacade) {
         for (name, s) in self.shaders_list.iter() {
-            self.compiled_shaders.insert(name, glium::Program::from_source(display, s.vertex_shader, s.pixel_shader, None).unwrap());
+            self.compiled_shaders.insert(name, Box::new(glium::Program::from_source(display, s.vertex_shader, s.pixel_shader, None).unwrap()));
         }
 
     }
 
     pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> glium::program::Program {
-            self.compiled_shaders.remove(&shader_name).unwrap()
+            *self.compiled_shaders.remove(&shader_name).unwrap()
     }
 }
 

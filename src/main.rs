@@ -12,12 +12,10 @@ use shader_manager::{Shaders, ShaderCouple};
 mod sprite_manager;
 use sprite_manager::SpriteManager;
 
-use time::{Duration, PreciseTime};
 use sprite::GraphicItem;
-use sprite::ImageManager;
 use glium::{DisplayBuild, Surface};
 
-
+#[warn(dead_code)]
 fn generate_sprite(display: &glium::backend::glutin_backend::GlutinFacade, sprites: &Vec<Sprite>) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>){
 
     let mut vb : glium::VertexBuffer<Vertex> = glium::VertexBuffer::empty_dynamic(display, sprites.len() * 4).unwrap();
@@ -45,19 +43,19 @@ fn main() {
 
 
     let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
-                    Sprite::new(0.0,0.0,[0.5,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
+                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
 
     let mut shaders = shader_manager::Shaders::new();
     shaders.compile_shaders(&display);
 
     let program = shaders.get_compiled_shader("simple_shader");
 
+    let texture = vert[0].get_texture(&display).unwrap();
     let sprite_manager = SpriteManager::new(vert);
 
     let vertex_buffer = sprite_manager.get_vertex_buffer(&display);
     let indices = sprite_manager.get_index_buffer(&display).unwrap();
     // let img = v.set_image().unwrap();
-    let texture = vert[0].get_texture(&display).unwrap();
 
 
 

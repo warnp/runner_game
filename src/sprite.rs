@@ -1,13 +1,9 @@
 use vertex;
 
-use glium::backend::Facade;
-
 use std::io::Cursor;
 extern crate image;
 extern crate glium;
 
-// use vec::Vec;
-use glium::{DisplayBuild, Surface};
 
 
 pub trait GraphicItem {
