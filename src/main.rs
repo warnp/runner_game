@@ -36,14 +36,16 @@ fn generate_sprite(display: &glium::backend::glutin_backend::GlutinFacade, sprit
 }
 
 fn main() {
+    let mut show_fps = false;
     let display = glium::glutin::WindowBuilder::new()
+                                // .with_vsync()
                                 .build_glium()
                                 .unwrap();
 
 
 
     let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
-                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..])];
+                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/11532.png")[..])];
 
     let mut shaders = shader_manager::Shaders::new();
     shaders.compile_shaders(&display);
@@ -51,9 +53,10 @@ fn main() {
     let program = shaders.get_compiled_shader("simple_shader");
 
     let texture = vert[0].get_texture(&display).unwrap();
+
     let sprite_manager = SpriteManager::new(vert);
 
-    let vertex_buffer = sprite_manager.get_vertex_buffer(&display);
+    let mut vertex_buffer = sprite_manager.get_vertex_buffer(&display);
     let indices = sprite_manager.get_index_buffer(&display).unwrap();
     // let img = v.set_image().unwrap();
 
@@ -70,30 +73,43 @@ fn main() {
         t = t + 0.00001;
 
         let time = time::precise_time_ns() as f32;
-        let time_between = time/1000000000.0 - old_time/1000000000.0;
-        let fps = 1.0/time_between;
-        // println!("FPS : {}", fps);
+        let time_between = time/100000000.0 - old_time/100000000.0;
+        println!("{:?}", time_between);
+        let fps = 1.0/(time_between / 10.0);
+        if show_fps {
+            println!("FPS : {}", fps);
+        }
         old_time = time;
 
 
+        {
+            let mut mapping = vertex_buffer.map();
+
+            for sp in mapping.chunks_mut(4){
+                sp[0].position[0] = 0.00001 * time_between + sp[0].position[0];
+                sp[1].position[0] = 0.00001 * time_between + sp[1].position[0];
+                sp[2].position[0] = 0.00001 * time_between + sp[2].position[0];
+                sp[3].position[0] = 0.00001 * time_between + sp[3].position[0];
+            }
 
 
-        // for v in &vert{
+        }
 
 
 
-            let uniforms = uniform! {
-                matrix: [
-                    [1.0, 0.0, 0.0, 0.0],
-                    [0.0, 1.0, 0.0, 0.0],
-                    [0.0, 0.0, 1.0, 0.0],
-                    [ t , 0.0, 0.0, 1.0f32],
-                ],
-                tex: &texture,
-            };
 
-            target.draw(&vertex_buffer, &indices, &program, &uniforms,
-                    &Default::default()).unwrap();
+        let uniforms = uniform! {
+            matrix: [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [ 0.0 , 0.0, 0.0, 1.0f32],
+            ],
+            tex: &texture,
+        };
+
+        target.draw(&vertex_buffer, &indices, &program, &uniforms,
+                &Default::default()).unwrap();
         // }
 
         target.finish().unwrap();

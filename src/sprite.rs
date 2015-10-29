@@ -10,8 +10,7 @@ pub trait GraphicItem {
     fn get_position(&self) -> [f32; 2];
     // fn get_vertex_shader(&self) -> &str;
     // fn get_fragment_shader(&self) -> &str;
-    fn get_vertex_buffer(&self,display: &glium::backend::glutin_backend::GlutinFacade) ->  Result<glium::VertexBuffer<vertex::Vertex>, glium::vertex::BufferCreationError>;
-    fn get_index_buffer(&self,display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::IndexBuffer<u16>, glium::index::BufferCreationError>;
+
     fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>;
 }
 
@@ -33,10 +32,10 @@ impl <'a>Sprite<'a> {
     pub fn new(x: f32, y: f32,color: [f32; 4], texture: &[u8]) -> Sprite {
 
         Sprite {
-            vertices : [   vertex::Vertex { position: [-0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,0.0]},
-                            vertex::Vertex { position: [0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,1.0]},
+            vertices : [   vertex::Vertex { position: [-0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,1.0]},
+                            vertex::Vertex { position: [0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,1.0]},
                             vertex::Vertex { position: [0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,0.0]},
-                            vertex::Vertex { position: [-0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,1.0]}],
+                            vertex::Vertex { position: [-0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,0.0]}],
             indices : [0,1,2,0,2,3],
             texture: texture,
             // transform: transform,
@@ -64,14 +63,6 @@ impl <'a>GraphicItem for Sprite<'a> {
         let x = (self.vertices[0].position[0] + self.vertices[1].position[0] + self.vertices[2].position[0] + self.vertices[3].position[0]) as f32 / 4.0;
         let y = (self.vertices[0].position[1] + self.vertices[1].position[1] + self.vertices[2].position[1] + self.vertices[3].position[1]) as f32;
         [x,y]
-    }
-
-    fn get_vertex_buffer(&self,display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::VertexBuffer<vertex::Vertex>, glium::vertex::BufferCreationError> {
-        glium::VertexBuffer::new(display, &self.vertices)
-    }
-
-    fn get_index_buffer(&self, display:&glium::backend::glutin_backend::GlutinFacade) -> Result<glium::IndexBuffer<u16>, glium::index::BufferCreationError>{
-        glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &self.indices)
     }
 
     fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>{
