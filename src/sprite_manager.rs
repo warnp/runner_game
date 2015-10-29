@@ -23,7 +23,6 @@ impl <'a>SpriteManager<'a> {
 
         for (num, sprite) in vb.map().chunks_mut(4).enumerate() {
 
-            println!("{:?}", self.sprite_list[num].vertices[0].position);
 
             sprite[0].position[0] = self.sprite_list[num].vertices[0].position[0];
             sprite[0].position[1] = self.sprite_list[num].vertices[0].position[1];
@@ -52,9 +51,13 @@ impl <'a>SpriteManager<'a> {
             index_list.push(s.indices[4] + 6 * iterator);
             index_list.push(s.indices[5] + 6 * iterator);
 
+
+
             iterator = iterator + 1;
 
         }
+
+        println!("{:?}", index_list);
 
 
         glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list)
