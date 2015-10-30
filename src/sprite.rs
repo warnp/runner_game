@@ -1,7 +1,5 @@
 use vertex;
 
-use std::io::Cursor;
-extern crate image;
 extern crate glium;
 
 
@@ -11,33 +9,28 @@ pub trait GraphicItem {
     // fn get_vertex_shader(&self) -> &str;
     // fn get_fragment_shader(&self) -> &str;
 
-    fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>;
+    // fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>;
 }
 
-pub trait ImageManager {
-    fn set_image(&self) -> image::ImageResult<image::DynamicImage> ;
-}
 
 
 #[derive(Copy, Clone, Debug)]
-pub struct Sprite<'a>{
+pub struct Sprite{
     pub vertices: [vertex::Vertex; 4],
     pub indices: [u16; 6],
-    pub texture: &'a [u8],
     // pub transform: [[f32; 4]; 4],
     // pub display: &glium::glutin::WindowBuilder,
 }
 
-impl <'a>Sprite<'a> {
-    pub fn new(x: f32, y: f32,color: [f32; 4], texture: &[u8]) -> Sprite {
+impl Sprite {
+    pub fn new(x: f32, y: f32,color: [f32; 4],  tex_id: u32) -> Sprite {
 
         Sprite {
-            vertices : [   vertex::Vertex { position: [-0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,1.0]},
-                            vertex::Vertex { position: [0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,1.0]},
-                            vertex::Vertex { position: [0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,0.0]},
-                            vertex::Vertex { position: [-0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,0.0]}],
+            vertices : [vertex::Vertex { position: [-0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,1.0],i_tex_id: tex_id},
+                        vertex::Vertex { position: [0.1 + x, 0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,1.0],i_tex_id: tex_id},
+                        vertex::Vertex { position: [0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [1.0,0.0],i_tex_id: tex_id},
+                        vertex::Vertex { position: [-0.1 + x, -0.1 + y], normal: [0.0,0.0,-1.0], color: color, tex_coords: [0.0,0.0],i_tex_id: tex_id}],
             indices : [0,1,2,0,2,3],
-            texture: texture,
             // transform: transform,
 
             }
@@ -45,18 +38,8 @@ impl <'a>Sprite<'a> {
     }
 }
 
-impl <'a>ImageManager for Sprite<'a> {
-    fn set_image(&self) ->image::ImageResult<image::DynamicImage>{
 
-        // let string = format!("{}", image_path);
-        image::load(Cursor::new(self.texture),
-            image::PNG)
-
-    }
-}
-
-
-impl <'a>GraphicItem for Sprite<'a> {
+impl GraphicItem for Sprite {
 
     fn get_position(&self) -> [f32; 2] {
 
@@ -65,9 +48,7 @@ impl <'a>GraphicItem for Sprite<'a> {
         [x,y]
     }
 
-    fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>{
-        glium::texture::Texture2d::new(display, self.set_image().unwrap())
-    }
+
 
 }
 

@@ -36,30 +36,34 @@ fn generate_sprite(display: &glium::backend::glutin_backend::GlutinFacade, sprit
 }
 
 fn main() {
-    let mut show_fps = true;
+    let screen_height = 600.0;
+    let screen_width = 800.0;
+    let mut show_fps = false;
     let display = glium::glutin::WindowBuilder::new()
                                 //  .with_vsync()
+                                .with_dimensions(screen_width as u32,screen_height as u32)
                                 .build_glium()
                                 .unwrap();
 
 
 
-    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/NatureForests.png")[..]),
-                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],&include_bytes!("../content/11532.png")[..])];
+    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0),
+                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],1)];
 
-    let mut shaders = shader_manager::Shaders::new();
+    // println!("{:?}", vert);
+
+    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],&include_bytes!("../content/11532.png")[..]]);
     shaders.compile_shaders(&display);
 
     let program = shaders.get_compiled_shader("simple_shader");
 
-    let texture = vert[0].get_texture(&display).unwrap();
 
     let sprite_manager = SpriteManager::new(vert);
+    let texture = shaders.get_texture_array(&display);
 
     let mut vertex_buffer = sprite_manager.get_vertex_buffer(&display);
     let indices = sprite_manager.get_index_buffer(&display).unwrap();
     // let img = v.set_image().unwrap();
-
 
 
     let mut t : f32 = 0.0;
@@ -94,6 +98,11 @@ fn main() {
                 sp[2].position[0] = 0.01 * time_between + sp[2].position[0];
                 sp[3].position[0] = 0.01 * time_between + sp[3].position[0];
 
+                sp[0].i_tex_id = 1;
+                sp[1].i_tex_id = 1;
+                sp[2].i_tex_id = 1;
+                sp[3].i_tex_id = 1;
+
 
             }
 
@@ -105,10 +114,10 @@ fn main() {
 
         let uniforms = uniform! {
             matrix: [
-                [1.0, 0.0, 0.0, 0.0],
-                [0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [ 0.0 , 0.0, 0.0, 1.0f32],
+                [screen_height/screen_width, 0.0 , 0.0 , 0.0],
+                [0.0                       , 1.0 , 0.0 , 0.0],
+                [0.0                       , 0.0 , 1.0 , 0.0],
+                [0.0                       , 0.0 , 0.0 , 1.0f32],
             ],
             tex: &texture,
         };

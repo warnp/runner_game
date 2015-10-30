@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::io::Cursor;
+extern crate image;
 
 extern crate glium;
 
@@ -13,11 +15,13 @@ pub struct Shaders<'a> {
     pub shaders_list: HashMap<&'a str, ShaderCouple<'a>>,
     compiled_shaders: HashMap<&'a str, Box<glium::program::Program>>,
 
+    textures: Vec<&'a [u8]>,
+
 }
 
 impl <'a>Shaders<'a> {
 
-    pub fn new() -> Shaders<'a> {
+    pub fn new( textures: Vec<&'a [u8]>) -> Shaders<'a> {
 
         let mut hash = HashMap::new();
 
@@ -29,10 +33,12 @@ impl <'a>Shaders<'a> {
             in vec3 normal;
             in vec4 color;
             in vec2 tex_coords;
+            in uint i_tex_id;
 
             out vec4 colorV;
             out vec3 v_normal;
             out vec2 v_tex_coords;
+            flat out uint v_tex_id;
 
             uniform mat4 matrix;
 
@@ -40,6 +46,7 @@ impl <'a>Shaders<'a> {
                 // colorV = color;
                 v_tex_coords = tex_coords;
                 gl_Position = matrix * vec4(position, 0.0,1.0);
+                v_tex_id = i_tex_id;
             }
             "#,
 
@@ -48,13 +55,15 @@ impl <'a>Shaders<'a> {
 
             in vec4 colorV;
             in vec2 v_tex_coords;
+            flat in uint v_tex_id;
 
             out vec4 color;
 
-            uniform sampler2D tex;
+            // uniform sampler2D tex;
+            uniform sampler2DArray tex;
 
             void main(){
-                color = texture(tex, v_tex_coords);
+                color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
             }
             "#
         });
@@ -63,6 +72,7 @@ impl <'a>Shaders<'a> {
             {
                 shaders_list: hash,
                 compiled_shaders: HashMap::new(),
+                textures: textures,
             }
 
     }
@@ -77,6 +87,29 @@ impl <'a>Shaders<'a> {
     pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> glium::program::Program {
             *self.compiled_shaders.remove(&shader_name).unwrap()
     }
+
+    // pub fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade, image_index: u32) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>{
+    //     glium::texture::Texture2d::new(display, self.set_image(self.textures[image_index]).unwrap())
+    // }
+
+    fn set_image(&self, texture: &'a [u8]) ->image::ImageResult<image::DynamicImage>{
+
+        image::load(Cursor::new(texture),
+            image::PNG)
+
+    }
+
+    pub fn get_texture_array(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::texture::Texture2dArray {
+        let mut tex_vec = Vec::new();
+
+        for tex in &self.textures {
+            tex_vec.push(self.set_image(tex).unwrap());
+        }
+
+        glium::texture::Texture2dArray::new(display, tex_vec).unwrap()
+    }
+
+    //TODO implémenter get_binary() pour sauvegarder le shader
 }
 
 
@@ -91,12 +124,24 @@ mod shader_manager_tests {
     extern crate glium;
 
     #[test]
-    fn should_return_a_hashmap(){
-        let shader = Shaders::new();
+    fn should_return_a_shader(){
+        let mut shader = Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],&include_bytes!("../content/11532.png")[..]]);
         let display = glium::glutin::WindowBuilder::new()
                                     .build_glium()
                                     .unwrap();
-        let lst_shaders = shader.compile_shaders(&display);
-        assert!(lst_shaders.len() == 1);
+        let lst_shaders = shader.get_compiled_shader( "toto");
+        // assert!(lst_shaders.len() == 1);
+        //Shall not pass for the moment, need to find a property to evaluate
+    }
+
+    #[test]
+    fn should_get_texture_array(){
+        let mut shader = Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],&include_bytes!("../content/11532.png")[..]]);
+        let display = glium::glutin::WindowBuilder::new()
+                                    .build_glium()
+                                    .unwrap();
+
+        let lst_shaders = shader.get_texture_array(&display);
+        assert!(lst_shaders.get_array_size() == Some(2));
     }
 }

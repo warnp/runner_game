@@ -1,16 +1,17 @@
-use sprite::Sprite;
+use sprite::{Sprite, GraphicItem};
+
 
 extern crate glium;
 
 use vertex;
 
 #[derive(Debug)]
-pub struct SpriteManager<'a> {
-    sprite_list: Vec<Sprite<'a>>,
+pub struct SpriteManager {
+    sprite_list: Vec<Sprite>,
 }
 
-impl <'a>SpriteManager<'a> {
-    pub fn new(sprites: Vec<Sprite<'a>>) -> SpriteManager {
+impl SpriteManager {
+    pub fn new(sprites: Vec<Sprite>) -> SpriteManager {
         SpriteManager{
             sprite_list: sprites,
         }
