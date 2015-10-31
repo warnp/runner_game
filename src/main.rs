@@ -40,7 +40,7 @@ fn main() {
     let screen_width = 800.0;
     let mut show_fps = false;
     let display = glium::glutin::WindowBuilder::new()
-                                //  .with_vsync()
+                                 .with_vsync()
                                 .with_dimensions(screen_width as u32,screen_height as u32)
                                 .build_glium()
                                 .unwrap();
@@ -88,7 +88,6 @@ fn main() {
         }
         old_time = time;
 
-
         {
             let mut mapping = vertex_buffer.map();
 
@@ -98,10 +97,22 @@ fn main() {
                 sp[2].position[0] = 0.01 * time_between + sp[2].position[0];
                 sp[3].position[0] = 0.01 * time_between + sp[3].position[0];
 
-                sp[0].i_tex_id = 1;
-                sp[1].i_tex_id = 1;
-                sp[2].i_tex_id = 1;
-                sp[3].i_tex_id = 1;
+                //
+                // if t >= 60.0 && t % 10.0 == 0.0 {
+                //     if t % 5.0 != 0.0 {
+                //         sp[0].tex_coords[0] = 0.0977 + sp[0].tex_coords[0];
+                //         sp[1].tex_coords[0] = 0.0977 + sp[1].tex_coords[0];
+                //         sp[2].tex_coords[0] = 0.0977 + sp[2].tex_coords[0];
+                //         sp[3].tex_coords[0] = 0.0977 + sp[3].tex_coords[0];
+                //     } else {
+                //         sp[0].tex_coords[0] = (-0.0977) * 5.0 + sp[0].tex_coords[0];
+                //         sp[1].tex_coords[0] = (-0.0977) * 5.0 + sp[1].tex_coords[0];
+                //         sp[2].tex_coords[0] = (-0.0977) * 5.0 + sp[2].tex_coords[0];
+                //         sp[3].tex_coords[0] = (-0.0977) * 5.0 + sp[3].tex_coords[0];
+                //     }
+                // }
+
+
 
 
             }
@@ -132,7 +143,9 @@ fn main() {
 
 
         for ev in display.poll_events(){
+            println!("{:?}", ev);
             match ev {
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,1,Some(Escape)) => return,
                 glium::glutin::Event::Closed => return,
                 _ => ()
             }

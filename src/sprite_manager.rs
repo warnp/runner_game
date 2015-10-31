@@ -28,21 +28,25 @@ impl SpriteManager {
             sprite[0].position[1] = self.sprite_list[num].vertices[0].position[1];
             sprite[0].tex_coords[0] = self.sprite_list[num].vertices[0].tex_coords[0];
             sprite[0].tex_coords[1] = self.sprite_list[num].vertices[0].tex_coords[1];
+            sprite[0].i_tex_id = self.sprite_list[num].vertices[0].i_tex_id;
 
             sprite[1].position[0] = self.sprite_list[num].vertices[1].position[0];
             sprite[1].position[1] = self.sprite_list[num].vertices[1].position[1];
             sprite[1].tex_coords[0] = self.sprite_list[num].vertices[1].tex_coords[0];
             sprite[1].tex_coords[1] = self.sprite_list[num].vertices[1].tex_coords[1];
+            sprite[1].i_tex_id = self.sprite_list[num].vertices[1].i_tex_id;
 
             sprite[2].position[0] = self.sprite_list[num].vertices[2].position[0];
             sprite[2].position[1] = self.sprite_list[num].vertices[2].position[1];
             sprite[2].tex_coords[0] = self.sprite_list[num].vertices[2].tex_coords[0];
             sprite[2].tex_coords[1] = self.sprite_list[num].vertices[2].tex_coords[1];
+            sprite[2].i_tex_id = self.sprite_list[num].vertices[2].i_tex_id;
 
             sprite[3].position[0] = self.sprite_list[num].vertices[3].position[0];
             sprite[3].position[1] = self.sprite_list[num].vertices[3].position[1];
             sprite[3].tex_coords[0] = self.sprite_list[num].vertices[3].tex_coords[0];
             sprite[3].tex_coords[1] = self.sprite_list[num].vertices[3].tex_coords[1];
+            sprite[3].i_tex_id = self.sprite_list[num].vertices[3].i_tex_id;
         }
 
         vb
