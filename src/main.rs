@@ -69,6 +69,8 @@ fn main() {
     let mut t : f32 = 0.0;
     // let mut time : f32 = time::precise_time_ns() as f32;
     let mut old_time = 0.0;
+
+    let mut horizontal_position = 0.0;
     loop{
         let mut target = display.draw();
 
@@ -92,10 +94,15 @@ fn main() {
             let mut mapping = vertex_buffer.map();
 
             for sp in mapping.chunks_mut(4){
-                sp[0].position[0] = 0.01 * time_between + sp[0].position[0];
-                sp[1].position[0] = 0.01 * time_between + sp[1].position[0];
-                sp[2].position[0] = 0.01 * time_between + sp[2].position[0];
-                sp[3].position[0] = 0.01 * time_between + sp[3].position[0];
+                // sp[0].position[0] = 0.01 * time_between + sp[0].position[0];
+                // sp[1].position[0] = 0.01 * time_between + sp[1].position[0];
+                // sp[2].position[0] = 0.01 * time_between + sp[2].position[0];
+                // sp[3].position[0] = 0.01 * time_between + sp[3].position[0];
+
+                sp[0].position[0] = horizontal_position + sp[0].position[0];
+                sp[1].position[0] = horizontal_position + sp[1].position[0];
+                sp[2].position[0] = horizontal_position + sp[2].position[0];
+                sp[3].position[0] = horizontal_position + sp[3].position[0];
 
                 //
                 // if t >= 60.0 && t % 10.0 == 0.0 {
@@ -112,16 +119,10 @@ fn main() {
                 //     }
                 // }
 
-
-
-
             }
 
 
         }
-
-
-
 
         let uniforms = uniform! {
             matrix: [
@@ -139,12 +140,10 @@ fn main() {
         target.finish().unwrap();
 
 
-
-
-
         for ev in display.poll_events(){
             println!("{:?}", ev);
             match ev {
+                glium::glutin::Event::MouseMoved((_,_)) => horizontal_position = glium::glutin::Event::MouseMoved,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,1,Some(Escape)) => return,
                 glium::glutin::Event::Closed => return,
                 _ => ()
