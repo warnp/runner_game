@@ -143,7 +143,8 @@ fn main() {
         for ev in display.poll_events(){
             println!("{:?}", ev);
             match ev {
-                glium::glutin::Event::MouseMoved((_,_)) => horizontal_position = glium::glutin::Event::MouseMoved,
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, 1, Some(Space)) => horizontal_position = 0.5,
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, 1, Some(Space)) => horizontal_position = 0.0,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,1,Some(Escape)) => return,
                 glium::glutin::Event::Closed => return,
                 _ => ()
