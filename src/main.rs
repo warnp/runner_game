@@ -67,15 +67,47 @@ fn move_to_left(sp: &mut [vertex::Vertex], time_between: f32){
     sp[3].position[0] = sp[3].position[0] - 0.5 * time_between;
 }
 
+struct CollisionMesh {
+    aa: [f32; 2],
+    bb: [f32; 2],
+}
+
+impl CollisionMesh {
+    fn detect_collide(&self,aa: [f32; 2], bb: [f32; 2]) -> bool {
+        if self.aa[0] <= bb[0] &&
+            self.aa[1] >= bb[1] &&
+            self.bb[0] >= aa[0] &&
+            self.bb[1] <= aa[1] {
+                true
+            }
+        false
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_collide(){
+        let collider :CollisionMesh {
+            aa: [-0.5,0.1],
+            bb: [1.0,-1.0],
+        };
+
+        assert!(collider.detect_collide([-1.0, 1.0], [0.0,0.0]));
+    }
+}
+
 
 fn main() {
 
 
-    let screen_height = 600.0;
-    let screen_width = 800.0;
+    let screen_height = 768.0;
+    let screen_width = 1024.0;
     let mut show_fps = false;
     let display = glium::glutin::WindowBuilder::new()
-                                 .with_vsync()
+                                .with_vsync()
                                 .with_dimensions(screen_width as u32,screen_height as u32)
                                 .build_glium()
                                 .unwrap();
