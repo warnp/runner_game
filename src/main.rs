@@ -12,6 +12,9 @@ use shader_manager::{Shaders, ShaderCouple};
 mod sprite_manager;
 use sprite_manager::SpriteManager;
 
+mod collision;
+use collision::CollisionMesh;
+
 use sprite::GraphicItem;
 use glium::{DisplayBuild, Surface};
 
@@ -67,37 +70,6 @@ fn move_to_left(sp: &mut [vertex::Vertex], time_between: f32){
     sp[3].position[0] = sp[3].position[0] - 0.5 * time_between;
 }
 
-struct CollisionMesh {
-    aa: [f32; 2],
-    bb: [f32; 2],
-}
-
-impl CollisionMesh {
-    fn detect_collide(&self,aa: [f32; 2], bb: [f32; 2]) -> bool {
-        if self.aa[0] <= bb[0] &&
-            self.aa[1] >= bb[1] &&
-            self.bb[0] >= aa[0] &&
-            self.bb[1] <= aa[1] {
-                true
-            }
-        false
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn should_collide(){
-        let collider :CollisionMesh {
-            aa: [-0.5,0.1],
-            bb: [1.0,-1.0],
-        };
-
-        assert!(collider.detect_collide([-1.0, 1.0], [0.0,0.0]));
-    }
-}
 
 
 fn main() {
@@ -118,7 +90,7 @@ fn main() {
                     Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],1)];
 
 
-    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],&include_bytes!("../content/11532.png")[..]]);
+    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],&include_bytes!("../content/11532.png")[..]]);
     shaders.compile_shaders(&display);
 
     let program = shaders.get_compiled_shader("simple_shader");
