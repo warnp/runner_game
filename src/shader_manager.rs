@@ -109,6 +109,7 @@ impl <'a>Shaders<'a> {
         glium::texture::Texture2dArray::new(display, tex_vec).unwrap()
     }
 
+
     //TODO implémenter get_binary() pour sauvegarder le shader
 }
 
@@ -124,6 +125,7 @@ mod shader_manager_tests {
     extern crate glium;
 
     #[test]
+    #[ignore]
     fn should_return_a_shader(){
         let mut shader = Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],&include_bytes!("../content/11532.png")[..]]);
         let display = glium::glutin::WindowBuilder::new()

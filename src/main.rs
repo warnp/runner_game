@@ -15,6 +15,9 @@ use sprite_manager::SpriteManager;
 mod collision;
 use collision::CollisionMesh;
 
+mod text_writer;
+use text_writer::TextWriter;
+
 use sprite::GraphicItem;
 use glium::{DisplayBuild, Surface};
 
