@@ -1,6 +1,9 @@
 use vertex;
 
+use collision::CollisionMesh;
+
 extern crate glium;
+
 
 
 
@@ -52,29 +55,70 @@ impl GraphicItem for Sprite {
 
 }
 
+impl CollisionMesh for Sprite {
+
+        fn detect_collide(&self,aa: [f32; 2], bb: [f32; 2]) -> bool {
+            if self.vertices[0].position[0] <= bb[0] &&
+                self.vertices[0].position[1] >= bb[1] &&
+                self.vertices[2].position[0] >= aa[0] &&
+                self.vertices[2].position[1] <= aa[1] {
+                    return true;
+                }
+            return false;
+        }
+
+        fn get_aa_bb(&self) -> ([f32;2], [f32;2]) {
+            let aa = self.vertices[0].position;
+            let bb = self.vertices[2].position;
+
+            (aa,bb)
+        }
+
+}
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use vertex;
     use sprite;
-    // use sprite::Position;
+    use collision::CollisionMesh;
 
-    //Not up to date
-    // #[test]
-    // fn should_calculate_center_of_sprite_position(){
-    //     //Given
-    //     let vert1 = vertex::Vertex { position: [-0.5, 0.5]};
-    //     let vert2 = vertex::Vertex { position: [0.5, 0.5]};
-    //     let vert3 = vertex::Vertex { position: [0.5, -0.5]};
-    //     let vert4 = vertex::Vertex { position: [-0.5, -0.5]};
-    //     let sprite_test = sprite::Sprite {vertices: [vert1, vert2, vert3, vert4] };
-    //     //when
-    //     let position_result = sprite_test.get_position();
-    //
-    //     //then
-    //     assert_eq!(position_result, [0.0,0.0]);
-    // }
+    #[test]
+    fn should_calculate_center_of_sprite_position(){
+        //Given
+        let s = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0));;
+        //when
+        let position_result = s.get_position();
+
+        //then
+        assert_eq!(position_result, [0.0,0.0]);
+    }
+
+    #[test]
+    fn should_collide(){
+        let s = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0));
+
+        assert!(s.detect_collide([-0.10, 1.0], [0.0,0.0]));
+    }
+
+    #[test]
+    #[should_panic]
+    fn should_not_collide(){
+        let s = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0));
+
+        assert!(s.detect_collide([1.0, -1.0], [2.0,-3.0]));
+    }
+
+    #[test]
+    fn should_get_aa_bb_positions(){
+        let s = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0));
+
+        let aabb = s.get_aa_bb();
+
+        assert!(aabb.0 == [-0.1,0.1]);
+        assert!(aabb.1 == [0.1,-0.1]);
+    }
 
 
 }

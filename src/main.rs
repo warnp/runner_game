@@ -161,11 +161,11 @@ fn main() {
                     sp[2].tex_coords[1] = (coord[0].2).1;
                     sp[3].tex_coords[1] = (coord[0].3).1;
 
-                    println!("=========================");
-                    println!("{:?}", sp[0].tex_coords);
-                    println!("{:?}", sp[1].tex_coords);
-                    println!("{:?}", sp[2].tex_coords);
-                    println!("{:?}", sp[3].tex_coords);
+                    // println!("=========================");
+                    // println!("{:?}", sp[0].tex_coords);
+                    // println!("{:?}", sp[1].tex_coords);
+                    // println!("{:?}", sp[2].tex_coords);
+                    // println!("{:?}", sp[3].tex_coords);
                     // if t % 10.0 == 0.0 {
                         // sp[0].tex_coords[0] = 0.0625 + sp[0].tex_coords[0];
                         // sp[1].tex_coords[0] = 0.0625 + sp[1].tex_coords[0];
