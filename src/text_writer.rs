@@ -18,7 +18,7 @@ impl TextWriter {
 
     pub fn get_coordinates(&self,entry: &str) -> Vec<((f32,f32),(f32,f32),(f32,f32),(f32,f32))> {
         let mut return_vec = Vec::new();
-        
+
         for s in entry.chars() {
 
             match s {
@@ -50,8 +50,8 @@ impl TextWriter {
                 'p' => return_vec.push(((0.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(1.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(1.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(0.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
                 'q' => return_vec.push(((1.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(2.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(2.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(1.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
                 'r' => return_vec.push(((2.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(3.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(3.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(2.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
-                's' => return_vec.push(((3.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(4.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(4.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(2.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
-                't' => return_vec.push(((4.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(5.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(5.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(3.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
+                's' => return_vec.push(((3.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(4.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(4.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(3.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
+                't' => return_vec.push(((4.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(5.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(5.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(4.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
                 'u' => return_vec.push(((5.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(6.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(6.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(5.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
                 'v' => return_vec.push(((6.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(7.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(7.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(6.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),
                 'w' => return_vec.push(((7.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(8.0 / self.character_size.0 as f32,9.0 / self.character_size.0 as f32),(8.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32),(7.0 / self.character_size.0 as f32,8.0 / self.character_size.0 as f32))),

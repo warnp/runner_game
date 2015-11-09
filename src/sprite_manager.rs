@@ -63,9 +63,6 @@ impl SpriteManager {
             index_list.push(s.indices[4] + 4 * iterator);
             index_list.push(s.indices[5] + 4 * iterator);
 
-
-
-
             iterator = iterator + 1;
 
         }

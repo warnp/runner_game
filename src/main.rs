@@ -89,11 +89,11 @@ fn main() {
 
 
 
-    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0),
-                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],1)];
+    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.10,0.10)),
+                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0))];
 
 
-    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],&include_bytes!("../content/11532.png")[..]]);
+    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],&include_bytes!("../content/11532.png")[..]]);
     shaders.compile_shaders(&display);
 
     let program = shaders.get_compiled_shader("simple_shader");
@@ -116,6 +116,7 @@ fn main() {
     let mut t : f32 = 0.0;
     let mut old_time = 0.0;
     let mut horizontal_position = 0.0;
+    let text_manager = text_writer::TextWriter::new(0,(256,256),(16,16));
     loop{
         let mut target = display.draw();
 
@@ -147,12 +148,30 @@ fn main() {
                 if index == 0 {
                     jump_function(sp, &mut jump, &mut touch_ground, jump_height, time_between);
 
-                    if t % 10.0 == 0.0 {
-                        sp[0].tex_coords[0] = 0.0625 + sp[0].tex_coords[0];
-                        sp[1].tex_coords[0] = 0.0625 + sp[1].tex_coords[0];
-                        sp[2].tex_coords[0] = 0.0625 + sp[2].tex_coords[0];
-                        sp[3].tex_coords[0] = 0.0625 + sp[3].tex_coords[0];
-                    }
+                    let coord = text_manager.get_coordinates("toto");
+
+                    // println!("{:?}", coord);
+                    sp[0].tex_coords[0] = (coord[0].0).0;
+                    sp[1].tex_coords[0] = (coord[0].1).0;
+                    sp[2].tex_coords[0] = (coord[0].2).0;
+                    sp[3].tex_coords[0] = (coord[0].3).0;
+
+                    sp[0].tex_coords[1] = (coord[0].0).1;
+                    sp[1].tex_coords[1] = (coord[0].1).1;
+                    sp[2].tex_coords[1] = (coord[0].2).1;
+                    sp[3].tex_coords[1] = (coord[0].3).1;
+
+                    println!("=========================");
+                    println!("{:?}", sp[0].tex_coords);
+                    println!("{:?}", sp[1].tex_coords);
+                    println!("{:?}", sp[2].tex_coords);
+                    println!("{:?}", sp[3].tex_coords);
+                    // if t % 10.0 == 0.0 {
+                        // sp[0].tex_coords[0] = 0.0625 + sp[0].tex_coords[0];
+                        // sp[1].tex_coords[0] = 0.0625 + sp[1].tex_coords[0];
+                        // sp[2].tex_coords[0] = 0.0625 + sp[2].tex_coords[0];
+                        // sp[3].tex_coords[0] = 0.0625 + sp[3].tex_coords[0];
+                    // }
                 }
                 else {
                     move_to_left(sp, time_between);
