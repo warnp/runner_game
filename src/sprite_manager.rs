@@ -71,4 +71,44 @@ impl SpriteManager {
     }
 
     //TODO implement add and delete vertex safe sprite functions
+    pub fn add_sprite(&self, sprite: Sprite) -> bool {
+
+    }
+
+    pub fn delete_sprite(&self, sprite: Sprite) -> bool {
+
+    }
+
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[ignored]
+    #[test]
+    fn should_add_sprite {
+
+    }
+
+    #[ignored]
+    #[test]
+    #[should_panic]
+    fn should_not_add_sprite {
+
+    }
+
+    #[ignored]
+    #[test]
+    fn should_delete_sprite {
+
+    }
+
+    #[ignored]
+    #[test]
+    #[should_panic]
+    fn should_not_delete_sprite {
+
+    }
 }
