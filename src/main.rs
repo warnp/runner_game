@@ -18,7 +18,7 @@ use collision::CollisionMesh;
 mod text_writer;
 use text_writer::TextWriter;
 
-use sprite::GraphicItem;
+use graphic_item::GraphicItem;
 use glium::{DisplayBuild, Surface};
 
 #[warn(dead_code)]
@@ -41,7 +41,7 @@ fn generate_sprite(display: &glium::backend::glutin_backend::GlutinFacade, sprit
 
 }
 
-fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f32) {
+fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f32, sprite_list: &Vec<Sprite>, index: u32) {
 
     if *jump && *touch_ground {
 
@@ -52,16 +52,22 @@ fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut 
         sp[3].position[1] = jump_height + sp[3].position[1];
 
     } else {
-        if sp[2].position[1] > -0.5 {
-            *touch_ground = false;
-            *jump = false;
-            sp[0].position[1] = sp[0].position[1] - 0.3 * time_between;
-            sp[1].position[1] = sp[1].position[1] - 0.3 * time_between;
-            sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
-            sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
-        } else {
-            *touch_ground = true;
 
+        for (i,s) in sprite_list.iter().enumerate() {
+            let iterate = i as u32;
+            if iterate != index {
+                let tuple = s.get_aa_bb();
+                if sprite_list.get(index as usize).unwrap().detect_collide(tuple.0, tuple.1) {
+                    *touch_ground = true;
+                } else {
+                    *touch_ground = false;
+                    *jump = false;
+                    sp[0].position[1] = sp[0].position[1] - 0.3 * time_between;
+                    sp[1].position[1] = sp[1].position[1] - 0.3 * time_between;
+                    sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
+                    sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
+                }
+            }
         }
     }
 }
@@ -146,7 +152,7 @@ fn main() {
                 // sp[3].position[0] = 0.01 * time_between + sp[3].position[0];
 
                 if index == 0 {
-                    jump_function(sp, &mut jump, &mut touch_ground, jump_height, time_between);
+                    jump_function(sp, &mut jump, &mut touch_ground, jump_height, time_between, &vert, 0);
 
                     let coord = text_manager.get_coordinates("toto");
 

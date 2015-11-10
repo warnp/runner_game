@@ -1,5 +1,5 @@
-use sprite::{Sprite, GraphicItem};
-
+use sprite::Sprite;
+use graphic_item::GraphicItem;
 
 extern crate glium;
 
@@ -69,4 +69,6 @@ impl SpriteManager {
 
         glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list)
     }
+
+    //TODO implement add and delete vertex safe sprite functions
 }
