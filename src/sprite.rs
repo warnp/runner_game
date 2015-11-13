@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn should_calculate_center_of_sprite_position(){
         //Given
-        let s = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0));;
+        let s = Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0));
         //when
         let position_result = s.get_position();
 
