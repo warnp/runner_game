@@ -56,7 +56,7 @@ impl SpriteManager {
 
     pub fn add_sprite(&self, sprite: Sprite) -> bool {
         self.sprite_list.push(sprite);
-
+        get_vertex_buffer
     }
 
     pub fn delete_sprite(&self, sprite: Sprite) -> (bool) {
