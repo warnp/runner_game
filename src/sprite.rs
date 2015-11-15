@@ -68,8 +68,7 @@ impl CollisionMesh for Sprite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use vertex;
-    use sprite;
+
     use collision::CollisionMesh;
     use graphic_item::GraphicItem;
 

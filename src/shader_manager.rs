@@ -118,9 +118,7 @@ impl <'a>Shaders<'a> {
 mod shader_manager_tests {
     use super::*;
 
-    use std::collections::HashMap;
-    use glium::backend::Facade;
-    use glium::{DisplayBuild, Surface};
+    use glium::DisplayBuild;
 
     extern crate glium;
 

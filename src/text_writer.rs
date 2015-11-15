@@ -99,8 +99,6 @@ impl TextWriter {
 #[cfg(test)]
 mod tests{
     use super::*;
-    use glium::backend::Facade;
-    use glium::{DisplayBuild, Surface};
 
     extern crate glium;
     //This test assume your bmpfont map is 256*256 with char 16*16
