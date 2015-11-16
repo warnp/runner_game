@@ -54,12 +54,15 @@ impl SpriteManager {
         glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list)
     }
 
-    pub fn add_sprite(&self, sprite: Sprite) -> bool {
+    pub fn add_sprite(&self, sprite: Sprite, vertex_buffer: glium::VertexBuffer<vertex::Vertex>) -> bool {
         self.sprite_list.push(sprite);
-        get_vertex_buffer
+        {
+            let mut mapping = vertex_buffer.map();
+            //use slice(1..2).unwrap() instead, see documentation tests/buffer.rs
+        }
     }
 
-    pub fn delete_sprite(&self, sprite: Sprite) -> (bool) {
+    pub fn delete_sprite(&self, sprite: Sprite, vertex_buffer: glium::VertexBuffer<vertex::Vertex>) -> (bool) {
         (true)
 
     }
@@ -76,7 +79,7 @@ mod tests {
 
     extern crate glium;
 
-    #[ignore]//Je sais pas encore comment tester le vertexbuffer!!!
+    #[ignore]
     #[test]
     fn should_set_vertex_buffer(){
         let display = glium::glutin::WindowBuilder::new()
@@ -88,7 +91,7 @@ mod tests {
         let vb = sprite_manager.get_vertex_buffer(&display);
 
         // println!("TOTO ================   {:?}", vb.get_size());
-        // assert_eq!(vb.get_size(),1);
+        assert_eq!(vb.map().len(),1);
     }
 
     #[test]
