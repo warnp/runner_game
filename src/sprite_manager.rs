@@ -13,6 +13,8 @@ pub struct SpriteManager {
 }
 
 impl SpriteManager {
+
+
     pub fn new(sprites: Vec<Sprite>) -> SpriteManager {
         SpriteManager{
             sprite_list: sprites,
@@ -20,8 +22,7 @@ impl SpriteManager {
 
     }
 
-    pub fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex>{
-
+    fn sprite_list_to_vertex_list(&self) -> Vec<Vertex>{
         let mut vertices_array : Vec<Vertex> = Vec::new();
 
         for sprite in &self.sprite_list {
@@ -32,6 +33,13 @@ impl SpriteManager {
             vertices_array.push(sprite.vertices[3]);
 
         }
+
+        vertices_array
+    }
+
+    pub fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex>{
+
+        let vertices_array = self.sprite_list_to_vertex_list();
 
         glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
     }
@@ -54,12 +62,17 @@ impl SpriteManager {
         glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list)
     }
 
-    pub fn add_sprite(&self, sprite: Sprite, vertex_buffer: glium::VertexBuffer<vertex::Vertex>) -> bool {
-        self.sprite_list.push(sprite);
-        {
-            let mut mapping = vertex_buffer.map();
-            //use slice(1..2).unwrap() instead, see documentation tests/buffer.rs
-        }
+    pub fn add_sprite(&self, sprite: Sprite, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex> {
+        let mut tmp = self.sprite_list;
+        tmp.push(sprite);
+        self.sprite_list = tmp;
+        let vertices_array = self.sprite_list_to_vertex_list();
+
+        // {
+        //     let mut mapping = vertex_buffer.map();
+        //     //use slice(1..2).unwrap() instead, see documentation tests/buffer.rs
+        // }
+        glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
     }
 
     pub fn delete_sprite(&self, sprite: Sprite, vertex_buffer: glium::VertexBuffer<vertex::Vertex>) -> (bool) {
@@ -106,7 +119,7 @@ mod tests {
         let vertex_buffer = sprite_manager.get_vertex_buffer(&display);
         let indices = sprite_manager.get_index_buffer(&display).unwrap();
 
-        let buffers = sprite_manager.add_sprite(Sprite::new(0.50,0.50,[1.0,0.0,0.0,1.0],0,(1.0,1.0)));
+        let buffers = sprite_manager.add_sprite(Sprite::new(0.50,0.50,[1.0,0.0,0.0,1.0],0,(1.0,1.0)), &display);
 
         // assert!(buffers.0.len() == vertex_buffer.len()+4);
     }
