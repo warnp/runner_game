@@ -62,17 +62,22 @@ impl SpriteManager {
         glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list)
     }
 
-    pub fn add_sprite(&self, sprite: Sprite, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex> {
-        let mut tmp = self.sprite_list;
+    pub fn add_sprite(&self, sprite_list: Vec<Sprite>,sprite: Sprite, display: &glium::backend::glutin_backend::GlutinFacade) -> (SpriteManager,glium::VertexBuffer<vertex::Vertex>) {
+        let mut tmp = vec![&self.sprite_list.as_mut_ptr()];
         tmp.push(sprite);
-        self.sprite_list = tmp;
+        // self.sprite_list = tmp;
         let vertices_array = self.sprite_list_to_vertex_list();
 
         // {
         //     let mut mapping = vertex_buffer.map();
         //     //use slice(1..2).unwrap() instead, see documentation tests/buffer.rs
         // }
-        glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
+
+        let spManager = SpriteManager {
+            sprite_list : *tmp,
+        };
+
+         (spManager, glium::VertexBuffer::dynamic(display, &vertices_array).unwrap())
     }
 
     pub fn delete_sprite(&self, sprite: Sprite, vertex_buffer: glium::VertexBuffer<vertex::Vertex>) -> (bool) {
