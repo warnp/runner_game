@@ -26,7 +26,7 @@ impl SpriteManager {
     fn sprite_list_to_vertex_list(&self) -> Vec<Vertex>{
         let mut vertices_array : Vec<Vertex> = Vec::new();
         // println!("{:?}", self.sprite_list.into_inner());
-        for sprite in *self.sprite_list.borrow() {
+        for sprite in &*self.sprite_list.borrow() {
 
             vertices_array.push(sprite.vertices[0]);
             vertices_array.push(sprite.vertices[1]);
@@ -38,17 +38,10 @@ impl SpriteManager {
         vertices_array
     }
 
-    pub fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex>{
-
-        let vertices_array = self.sprite_list_to_vertex_list();
-
-        glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
-    }
-
-    pub fn get_index_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> Result<glium::IndexBuffer<u16>, glium::index::BufferCreationError> {
+    fn sprite_list_to_indices_buffer(&self) -> Vec<u16>{
         let mut index_list = Vec::with_capacity(self.sprite_list.borrow().len() * 6);
         let mut iterator : u16 = 0;
-        for s in *self.sprite_list.borrow() {
+        for s in &*self.sprite_list.borrow() {
             index_list.push(s.indices[0] + 4 * iterator);
             index_list.push(s.indices[1] + 4 * iterator);
             index_list.push(s.indices[2] + 4 * iterator);
@@ -60,30 +53,32 @@ impl SpriteManager {
 
         }
 
-        glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list)
+        index_list
     }
 
-    pub fn add_sprite(&self, sprite_list: Vec<Sprite>,sprite: Sprite, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex> {
+    pub fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex>{
+
+        let vertices_array = self.sprite_list_to_vertex_list();
+
+        glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
+    }
+
+    pub fn get_index_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::IndexBuffer<u16> {
+        let index_list = self.sprite_list_to_indices_buffer();
+
+        glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap()
+    }
+
+    pub fn add_sprite(&self,sprite: Sprite, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
         let mut tmp = Vec::new();
-        // tmp.extend(self.sprite_list.iter().cloned());
+        tmp.extend((*self.sprite_list.borrow()).iter().cloned());
         tmp.push(sprite);
 
         *self.sprite_list.borrow_mut() = tmp;
-        // self.sprite_list = tmp;
-        // let vertices_array = self.sprite_list_to_vertex_list();
+        let vertices_array = self.sprite_list_to_vertex_list();
+        let index_list = self.sprite_list_to_indices_buffer();
 
-        // {
-        //     let mut mapping = vertex_buffer.map();
-        //     //use slice(1..2).unwrap() instead, see documentation tests/buffer.rs
-        // }
-
-        // let spManager = SpriteManager {
-        //     sprite_list : vec![],
-        // };
-
-        let vertices_array : Vec<vertex::Vertex> = Vec::new();
-
-         glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
+        (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(), glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap())
     }
 
     pub fn delete_sprite(&self, sprite: Sprite, vertex_buffer: glium::VertexBuffer<vertex::Vertex>) -> (bool) {
@@ -128,19 +123,15 @@ mod tests {
         let sprite_manager = SpriteManager::new(vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0))]);
 
         let vertex_buffer = sprite_manager.get_vertex_buffer(&display);
-        let indices = sprite_manager.get_index_buffer(&display).unwrap();
+        let index_buffer = sprite_manager.get_index_buffer(&display);
 
-        // let buffers = sprite_manager.add_sprite(Sprite::new(0.50,0.50,[1.0,0.0,0.0,1.0],0,(1.0,1.0)), &display);
+        let buffers = sprite_manager.add_sprite(Sprite::new(0.50,0.50,[1.0,0.0,0.0,1.0],0,(1.0,1.0)), &display);
 
-        // assert!(buffers.0.len() == vertex_buffer.len()+4);
+        assert!(buffers.0.len() == vertex_buffer.len()+4);
+        assert!(buffers.1.len() == index_buffer.len()+6);
     }
 
-    #[ignore]
-    #[test]
-    #[should_panic]
-    fn should_not_add_sprite() {
 
-    }
 
     #[ignore]
     #[test]
@@ -148,10 +139,5 @@ mod tests {
 
     }
 
-    #[ignore]
-    #[test]
-    #[should_panic]
-    fn should_not_delete_sprite() {
 
-    }
 }

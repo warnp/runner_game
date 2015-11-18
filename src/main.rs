@@ -108,7 +108,7 @@ fn main() {
     let texture = shaders.get_texture_array(&display);
 
     let mut vertex_buffer = sprite_manager.get_vertex_buffer(&display);
-    let indices = sprite_manager.get_index_buffer(&display).unwrap();
+    let indices = sprite_manager.get_index_buffer(&display);
 
 
 
