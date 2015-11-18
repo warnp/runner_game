@@ -94,8 +94,8 @@ fn main() {
 
 
 
-    let vert = vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.10,0.10)),
-                    Sprite::new(0.5,0.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0))];
+    let vert = vec![Sprite::new("hero",0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.10,0.10)),
+                    Sprite::new("mover0",0.5,0.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0))];
 
 
     let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],&include_bytes!("../content/11532.png")[..]]);

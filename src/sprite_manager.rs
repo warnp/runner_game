@@ -8,12 +8,12 @@ extern crate glium;
 use vertex;
 
 #[derive(Debug)]
-pub struct SpriteManager {
-    sprite_list: RefCell<Vec<Sprite>>,
+pub struct SpriteManager<'a> {
+    sprite_list: RefCell<Vec<Sprite<'a>>>,
     // vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
 }
 
-impl SpriteManager {
+impl<'a> SpriteManager<'a> {
 
 
     pub fn new(sprites: Vec<Sprite>) -> SpriteManager {
@@ -69,7 +69,7 @@ impl SpriteManager {
         glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap()
     }
 
-    pub fn add_sprite(&self,sprite: Sprite, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
+    pub fn add_sprite(&self,sprite: Sprite<'a>, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
         let mut tmp = Vec::new();
         tmp.extend((*self.sprite_list.borrow()).iter().cloned());
         tmp.push(sprite);
@@ -81,8 +81,13 @@ impl SpriteManager {
         (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(), glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap())
     }
 
-    pub fn delete_sprite(&self, sprite: Sprite, vertex_buffer: glium::VertexBuffer<vertex::Vertex>) -> (bool) {
-        (true)
+    pub fn delete_sprite(&self, sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
+        // let mut tmp = Vec::new();
+
+        match (*self.sprite_list.borrow_mut()).as_slice() {
+            sprite_name => println!("HELLO"),
+            _ => println!("FAIL!"),
+        }
 
     }
 
@@ -120,23 +125,34 @@ mod tests {
                                     .build_glium()
                                     .unwrap();
 
-        let sprite_manager = SpriteManager::new(vec![Sprite::new(0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0))]);
+        let sprite_manager = SpriteManager::new(vec![Sprite::new("toto",0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0))]);
 
         let vertex_buffer = sprite_manager.get_vertex_buffer(&display);
         let index_buffer = sprite_manager.get_index_buffer(&display);
 
-        let buffers = sprite_manager.add_sprite(Sprite::new(0.50,0.50,[1.0,0.0,0.0,1.0],0,(1.0,1.0)), &display);
+        let buffers = sprite_manager.add_sprite(Sprite::new("titi",0.50,0.50,[1.0,0.0,0.0,1.0],0,(1.0,1.0)), &display);
 
         assert!(buffers.0.len() == vertex_buffer.len()+4);
         assert!(buffers.1.len() == index_buffer.len()+6);
     }
 
 
-
-    #[ignore]
     #[test]
     fn should_delete_sprite() {
+        let display = glium::glutin::WindowBuilder::new()
+                                    .build_glium()
+                                    .unwrap();
 
+        let sprite_manager = SpriteManager::new(vec![Sprite::new("toto",0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0))]);
+
+        let vertex_buffer = sprite_manager.get_vertex_buffer(&display);
+        let index_buffer = sprite_manager.get_index_buffer(&display);
+
+        let buffers = sprite_manager.delete_sprite("toto", &display);
+
+
+        assert!(buffers.0.len() == vertex_buffer.len()+4);
+        assert!(buffers.1.len() == index_buffer.len()+6);
     }
 
 
