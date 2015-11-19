@@ -75,23 +75,27 @@ impl<'a> SpriteManager<'a> {
         tmp.push(sprite);
 
         *self.sprite_list.borrow_mut() = tmp;
-        let vertices_array = self.sprite_list_to_vertex_list();
-        let index_list = self.sprite_list_to_indices_buffer();
+        self.return_vertex_and_index_lists(display)
 
-        (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(), glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap())
     }
 
-    pub fn delete_sprite(&self, sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade) -> () {
+    pub fn delete_sprite(&self, sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
         // let mut tmp = Vec::new();
+        let mut tmp = Vec::new();
+        tmp.extend((*self.sprite_list.borrow()).iter().cloned());
 
-        for sp in &*self.sprite_list.borrow_mut() {
-            match sp {
-                Sprite {name: sprite_name, ..} => println!("HELLO"),
-            }
-            println!("{:?}", sp);
-        }
+        tmp.retain(|&x| x.name != sprite_name);
+        *self.sprite_list.borrow_mut() = tmp;
+        
 
+        self.return_vertex_and_index_lists(display)
 
+    }
+
+    fn return_vertex_and_index_lists(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>){
+        let vertices_array = self.sprite_list_to_vertex_list();
+        let index_list = self.sprite_list_to_indices_buffer();
+        (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(), glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap())
     }
 
 }
@@ -153,9 +157,8 @@ mod tests {
 
         let buffers = sprite_manager.delete_sprite("toto", &display);
 
-        assert!(false);
-        // assert!(buffers.0.len() == vertex_buffer.len()+4);
-        // assert!(buffers.1.len() == index_buffer.len()+6);
+        assert!(buffers.0.len() == 0);
+        assert!(buffers.1.len() == 0);
     }
 
 
