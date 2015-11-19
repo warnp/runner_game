@@ -81,13 +81,16 @@ impl<'a> SpriteManager<'a> {
         (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(), glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap())
     }
 
-    pub fn delete_sprite(&self, sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
+    pub fn delete_sprite(&self, sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade) -> () {
         // let mut tmp = Vec::new();
 
-        match (*self.sprite_list.borrow_mut()).as_slice() {
-            sprite_name => println!("HELLO"),
-            _ => println!("FAIL!"),
+        for sp in &*self.sprite_list.borrow_mut() {
+            match sp {
+                Sprite {name: sprite_name, ..} => println!("HELLO"),
+            }
+            println!("{:?}", sp);
         }
+
 
     }
 
@@ -150,9 +153,9 @@ mod tests {
 
         let buffers = sprite_manager.delete_sprite("toto", &display);
 
-
-        assert!(buffers.0.len() == vertex_buffer.len()+4);
-        assert!(buffers.1.len() == index_buffer.len()+6);
+        assert!(false);
+        // assert!(buffers.0.len() == vertex_buffer.len()+4);
+        // assert!(buffers.1.len() == index_buffer.len()+6);
     }
 
 

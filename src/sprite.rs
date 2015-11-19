@@ -9,7 +9,7 @@ extern crate glium;
 pub struct Sprite<'a>{
     pub vertices: [vertex::Vertex; 4],
     pub indices: [u16; 6],
-    name: &'a str,
+    pub name: &'a str,
     // pub transform: [[f32; 4]; 4],
     // pub display: &glium::glutin::WindowBuilder,
 }
