@@ -9,7 +9,7 @@ use vertex;
 
 #[derive(Debug)]
 pub struct SpriteManager<'a> {
-    sprite_list: RefCell<Vec<Sprite<'a>>>,
+    pub sprite_list: RefCell<Vec<Sprite<'a>>>,
     // vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
 }
 
@@ -20,6 +20,62 @@ impl<'a> SpriteManager<'a> {
         SpriteManager{
             sprite_list: RefCell::new(sprites),
         }
+
+    }
+
+
+
+    pub fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex>{
+
+        let vertices_array = self.sprite_list_to_vertex_list();
+
+        glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
+    }
+
+    pub fn get_index_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::IndexBuffer<u16> {
+        let index_list = self.sprite_list_to_indices_buffer();
+
+        glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap()
+    }
+
+    pub fn add_sprite(&self,sprite: Sprite<'a>, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
+        let mut tmp = self.get_temp_sprite_list();
+        tmp.push(sprite);
+
+        *self.sprite_list.borrow_mut() = tmp;
+        self.return_vertex_and_index_lists(display)
+
+    }
+
+    pub fn delete_sprite(&self, sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
+        let mut tmp = self.get_temp_sprite_list();
+
+        tmp.retain(|&x| x.name != sprite_name);
+        *self.sprite_list.borrow_mut() = tmp;
+
+
+        self.return_vertex_and_index_lists(display)
+
+    }
+
+
+    pub fn move_sprite(&self, name: &str, new_x: f32, new_y: f32) -> Sprite {
+        let mut tmp = self.get_temp_sprite_list();
+
+        let mut sp = *tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap().1;
+
+        sp.vertices[0].position[0] = sp.vertices[0].position[0] + new_x;
+        sp.vertices[1].position[0] = sp.vertices[1].position[0] + new_x;
+        sp.vertices[2].position[0] = sp.vertices[2].position[0] + new_x;
+        sp.vertices[3].position[0] = sp.vertices[3].position[0] + new_x;
+
+        sp.vertices[0].position[1] = sp.vertices[0].position[1] + new_y;
+        sp.vertices[1].position[1] = sp.vertices[1].position[1] + new_y;
+        sp.vertices[2].position[1] = sp.vertices[2].position[1] + new_y;
+        sp.vertices[3].position[1] = sp.vertices[3].position[1] + new_y;
+
+        sp
+
 
     }
 
@@ -56,46 +112,17 @@ impl<'a> SpriteManager<'a> {
         index_list
     }
 
-    pub fn get_vertex_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::VertexBuffer<vertex::Vertex>{
-
-        let vertices_array = self.sprite_list_to_vertex_list();
-
-        glium::VertexBuffer::dynamic(display, &vertices_array).unwrap()
-    }
-
-    pub fn get_index_buffer(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> glium::IndexBuffer<u16> {
-        let index_list = self.sprite_list_to_indices_buffer();
-
-        glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap()
-    }
-
-    pub fn add_sprite(&self,sprite: Sprite<'a>, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
-        let mut tmp = Vec::new();
-        tmp.extend((*self.sprite_list.borrow()).iter().cloned());
-        tmp.push(sprite);
-
-        *self.sprite_list.borrow_mut() = tmp;
-        self.return_vertex_and_index_lists(display)
-
-    }
-
-    pub fn delete_sprite(&self, sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
-        // let mut tmp = Vec::new();
-        let mut tmp = Vec::new();
-        tmp.extend((*self.sprite_list.borrow()).iter().cloned());
-
-        tmp.retain(|&x| x.name != sprite_name);
-        *self.sprite_list.borrow_mut() = tmp;
-        
-
-        self.return_vertex_and_index_lists(display)
-
-    }
-
     fn return_vertex_and_index_lists(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>){
         let vertices_array = self.sprite_list_to_vertex_list();
         let index_list = self.sprite_list_to_indices_buffer();
         (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(), glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap())
+    }
+
+    fn get_temp_sprite_list(&self) -> Vec<Sprite<'a>> {
+        let mut tmp = Vec::new();
+        tmp.extend((*self.sprite_list.borrow()).iter().cloned());
+
+        tmp
     }
 
 }
@@ -159,6 +186,14 @@ mod tests {
 
         assert!(buffers.0.len() == 0);
         assert!(buffers.1.len() == 0);
+    }
+
+    #[test]
+    fn should_move_sprite(){
+        let sprite_manager = SpriteManager::new(vec![Sprite::new("toto",0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0))]);
+        let sp = sprite_manager.move_sprite("toto",1.0,0.0);
+
+        assert!(sp.vertices[0].position[0] == 0.9);
     }
 
 

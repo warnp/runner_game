@@ -20,34 +20,13 @@ use text_writer::TextWriter;
 
 use glium::{DisplayBuild, Surface};
 
-#[warn(dead_code)]
-fn generate_sprite(display: &glium::backend::glutin_backend::GlutinFacade, sprites: &Vec<Sprite>) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>){
 
-    let mut vb : glium::VertexBuffer<Vertex> = glium::VertexBuffer::empty_dynamic(display, sprites.len() * 4).unwrap();
-    let mut ib_data = Vec::with_capacity(sprites.len() * 6);
-
-    for num in 0..vb.map().chunks_mut(4).enumerate().len() {
-        let num = num as u16;
-        ib_data.push(num * 4);
-        ib_data.push(num * 4 + 1);
-        ib_data.push(num * 4 + 2);
-        ib_data.push(num * 4 + 1);
-        ib_data.push(num * 4 + 3);
-        ib_data.push(num * 4 + 2);
-    }
-
-    (vb, glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &ib_data).unwrap())
-
-}
-
-
-
-
-fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f32, index: u32) {
+fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f32, index: u32, sprite_manager: &SpriteManager) {
 
     if *jump && *touch_ground {
 
         *touch_ground = false;
+
         sp[0].position[1] = jump_height + sp[0].position[1];
         sp[1].position[1] = jump_height + sp[1].position[1];
         sp[2].position[1] = jump_height + sp[2].position[1];
@@ -55,22 +34,35 @@ fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut 
 
     } else {
 
-        // for (i,s) in sprite_list.iter().enumerate() {
-            // let iterate = i as u32;
-            // if iterate != index {
-                // let tuple = s.get_aa_bb();
-                // if sprite_list.get(index as usize).unwrap().detect_collide(tuple.0, tuple.1) {
-                //     *touch_ground = true;
-                // } else {
-                    *touch_ground = false;
-                    *jump = false;
-                    sp[0].position[1] = sp[0].position[1] - 0.3 * time_between;
-                    sp[1].position[1] = sp[1].position[1] - 0.3 * time_between;
-                    sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
-                    sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
-                // }
-            // }
-        // }
+
+        *touch_ground = false;
+        *jump = false;
+
+        // sp[0].position[1] = positions_buffer[0].1 .1;
+        // sp[1].position[1] = positions_buffer[0].2 .1;
+        // sp[2].position[1] = positions_buffer[0].3 .1;
+        // sp[3].position[1] = positions_buffer[0].4 .1;
+        //
+        // positions_buffer[0].1 .1 = sp[0].position[1] - 0.3 * time_between;
+        // positions_buffer[0].2 .1 = sp[1].position[1] - 0.3 * time_between;
+        // positions_buffer[0].3 .1 = sp[2].position[1] - 0.3 * time_between;
+        // positions_buffer[0].4 .1 = sp[3].position[1] - 0.3 * time_between;
+
+        //=======================================
+
+
+        // sp[0].position[1] = sp[0].position[1] - 0.3 * time_between;
+        // sp[1].position[1] = sp[1].position[1] - 0.3 * time_between;
+        // sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
+        // sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
+
+        
+
+        sp[0].position[1] = sp[0].position[1] - 0.3 * time_between;
+        sp[1].position[1] = sp[1].position[1] - 0.3 * time_between;
+        sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
+        sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
+
     }
 }
 
@@ -97,7 +89,7 @@ fn main() {
 
 
 
-    let vert = vec![Sprite::new("hero",0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.10,0.10)),
+    let mut vert = vec![Sprite::new("hero",0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.10,0.10)),
                     Sprite::new("mover0",0.5,0.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0))];
 
 
@@ -129,7 +121,6 @@ fn main() {
     loop{
         let mut target = display.draw();
 
-        println!("{}", buffers.1.len());
 
         target.clear_color(0.0,0.0,1.0,1.0);
 
@@ -151,13 +142,9 @@ fn main() {
             let mut mapping = buffers.0.map();
             let mut index = 0;
             for sp in mapping.chunks_mut(4){
-                // sp[0].position[0] = 0.01 * time_between + sp[0].position[0];
-                // sp[1].position[0] = 0.01 * time_between + sp[1].position[0];
-                // sp[2].position[0] = 0.01 * time_between + sp[2].position[0];
-                // sp[3].position[0] = 0.01 * time_between + sp[3].position[0];
 
                 if index == 0 {
-                    jump_function(sp, &mut jump, &mut touch_ground, jump_height, time_between, 0);
+                    jump_function(sp, &mut jump, &mut touch_ground, jump_height, time_between, 0, &sprite_manager);
 
                     let coord = text_manager.get_coordinates("toto");
 
@@ -172,36 +159,13 @@ fn main() {
                     sp[2].tex_coords[1] = (coord[0].2).1;
                     sp[3].tex_coords[1] = (coord[0].3).1;
 
-                    // println!("=========================");
-                    // println!("{:?}", sp[0].tex_coords);
-                    // println!("{:?}", sp[1].tex_coords);
-                    // println!("{:?}", sp[2].tex_coords);
-                    // println!("{:?}", sp[3].tex_coords);
-                    // if t % 10.0 == 0.0 {
-                        // sp[0].tex_coords[0] = 0.0625 + sp[0].tex_coords[0];
-                        // sp[1].tex_coords[0] = 0.0625 + sp[1].tex_coords[0];
-                        // sp[2].tex_coords[0] = 0.0625 + sp[2].tex_coords[0];
-                        // sp[3].tex_coords[0] = 0.0625 + sp[3].tex_coords[0];
-                    // }
+
                 }
                 else {
                     move_to_left(sp, time_between);
                 }
 
-                //
-                // if t >= 60.0 && t % 10.0 == 0.0 {
-                //     if t % 5.0 != 0.0 {
-                //         sp[0].tex_coords[0] = 0.0977 + sp[0].tex_coords[0];
-                //         sp[1].tex_coords[0] = 0.0977 + sp[1].tex_coords[0];
-                //         sp[2].tex_coords[0] = 0.0977 + sp[2].tex_coords[0];
-                //         sp[3].tex_coords[0] = 0.0977 + sp[3].tex_coords[0];
-                //     } else {
-                //         sp[0].tex_coords[0] = (-0.0977) * 5.0 + sp[0].tex_coords[0];
-                //         sp[1].tex_coords[0] = (-0.0977) * 5.0 + sp[1].tex_coords[0];
-                //         sp[2].tex_coords[0] = (-0.0977) * 5.0 + sp[2].tex_coords[0];
-                //         sp[3].tex_coords[0] = (-0.0977) * 5.0 + sp[3].tex_coords[0];
-                //     }
-                // }
+
                 index = index + 1;
             }
 
@@ -224,12 +188,14 @@ fn main() {
 
 
         for ev in display.poll_events(){
-            println!("{:?}", ev);
+            // println!("{:?}", ev);
             match ev {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => horizontal_position = 0.0,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) => buffers = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0)), &display),
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1", &display),
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(_)) => println!("BONJOUR" ),
                 glium::glutin::Event::Closed => return,
                 _ => ()
             }
