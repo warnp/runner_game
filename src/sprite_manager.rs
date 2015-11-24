@@ -16,9 +16,10 @@ pub struct SpriteManager<'a> {
 impl<'a> SpriteManager<'a> {
 
 
-    pub fn new(sprites: Vec<Sprite>) -> SpriteManager {
-        SpriteManager{
+    pub fn new(sprites: Vec<Sprite>) -> SpriteManager{
+        SpriteManager<'a>{
             sprite_list: RefCell::new(sprites),
+
         }
 
     }
@@ -59,20 +60,22 @@ impl<'a> SpriteManager<'a> {
     }
 
 
-    pub fn move_sprite(&self, name: &str, new_x: f32, new_y: f32) -> Sprite {
-        let mut sp = self.get_sprite(name);
+    pub fn move_sprite(&mut self, name: &str, new_x: f32, new_y: f32) -> Sprite {
+        // let mut sp = self.get_sprite(name);
+        let mut sp = self.spriter;
 
-        sp.vertices[0].position[0] = sp.vertices[0].position[0] + new_x;
-        sp.vertices[1].position[0] = sp.vertices[1].position[0] + new_x;
-        sp.vertices[2].position[0] = sp.vertices[2].position[0] + new_x;
-        sp.vertices[3].position[0] = sp.vertices[3].position[0] + new_x;
+        println!("{:?}", sp[0].vertices[0].position[1]);
+        sp[0].vertices[0].position[0] = sp[0].vertices[0].position[0] + new_x;
+        sp[0].vertices[1].position[0] = sp[0].vertices[1].position[0] + new_x;
+        sp[0].vertices[2].position[0] = sp[0].vertices[2].position[0] + new_x;
+        sp[0].vertices[3].position[0] = sp[0].vertices[3].position[0] + new_x;
 
-        sp.vertices[0].position[1] = sp.vertices[0].position[1] + new_y;
-        sp.vertices[1].position[1] = sp.vertices[1].position[1] + new_y;
-        sp.vertices[2].position[1] = sp.vertices[2].position[1] + new_y;
-        sp.vertices[3].position[1] = sp.vertices[3].position[1] + new_y;
+        sp[0].vertices[0].position[1] = sp[0].vertices[0].position[1] + new_y;
+        sp[0].vertices[1].position[1] = sp[0].vertices[1].position[1] + new_y;
+        sp[0].vertices[2].position[1] = sp[0].vertices[2].position[1] + new_y;
+        sp[0].vertices[3].position[1] = sp[0].vertices[3].position[1] + new_y;
 
-        sp
+        sp[0]
 
 
     }
@@ -87,7 +90,7 @@ impl<'a> SpriteManager<'a> {
 
     }
 
-    fn get_sprite(&self, name: &str) -> Sprite {
+    fn get_sprite(&mut self, name: &str) -> Sprite {
         let mut tmp = self.get_temp_sprite_list();
 
         *tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap().1
@@ -132,9 +135,9 @@ impl<'a> SpriteManager<'a> {
         (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(), glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &index_list).unwrap())
     }
 
-    fn get_temp_sprite_list(&self) -> Vec<Sprite<'a>> {
+    fn get_temp_sprite_list(&mut self) -> Vec<Sprite<'a>> {
         let mut tmp = Vec::new();
-        tmp.extend((*self.sprite_list.borrow()).iter().cloned());
+        tmp.extend((*self.sprite_list.borrow_mut()).iter().cloned());
 
         tmp
     }

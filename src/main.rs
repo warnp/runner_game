@@ -59,7 +59,7 @@ fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut 
         let sprite = sprite_manager.move_sprite("hero", 0.0, -0.3 * time_between);
 
         // let sprite = sprite_manager.get_sprites_coordinate("hero");
-        println!("{:?}", sprite.vertices);
+        // println!("{:?}", sprite.vertices);
         sp[0].position[1] = sprite.vertices[0].position[1];
         sp[1].position[1] = sprite.vertices[1].position[1];
         sp[2].position[1] = sprite.vertices[2].position[1];
@@ -93,6 +93,7 @@ fn main() {
 
     let mut vert = vec![Sprite::new("hero",0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.10,0.10)),
                     Sprite::new("mover0",0.5,0.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0))];
+
 
 
     let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],&include_bytes!("../content/11532.png")[..]]);
