@@ -60,9 +60,7 @@ impl<'a> SpriteManager<'a> {
 
 
     pub fn move_sprite(&self, name: &str, new_x: f32, new_y: f32) -> Sprite {
-        let mut tmp = self.get_temp_sprite_list();
-
-        let mut sp = *tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap().1;
+        let mut sp = self.get_sprite(name);
 
         sp.vertices[0].position[0] = sp.vertices[0].position[0] + new_x;
         sp.vertices[1].position[0] = sp.vertices[1].position[0] + new_x;
@@ -77,6 +75,22 @@ impl<'a> SpriteManager<'a> {
         sp
 
 
+    }
+
+    pub fn get_sprites_coordinate(&self, name: &str) -> ((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
+        let sp = self.get_sprite(name);
+
+        ((sp.vertices[0].position[0],sp.vertices[0].position[1]),
+        (sp.vertices[1].position[0],sp.vertices[1].position[1]),
+        (sp.vertices[2].position[0],sp.vertices[2].position[1]),
+        (sp.vertices[3].position[0],sp.vertices[3].position[1]))
+
+    }
+
+    fn get_sprite(&self, name: &str) -> Sprite {
+        let mut tmp = self.get_temp_sprite_list();
+
+        *tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap().1
     }
 
     fn sprite_list_to_vertex_list(&self) -> Vec<Vertex>{
@@ -194,6 +208,14 @@ mod tests {
         let sp = sprite_manager.move_sprite("toto",1.0,0.0);
 
         assert!(sp.vertices[0].position[0] == 0.9);
+    }
+
+    #[test]
+    fn should_return_sprite_vertices_coordinates(){
+        let sprite_manager = SpriteManager::new(vec![Sprite::new("toto",0.0,0.0,[1.0,0.0,0.0,1.0],0,(1.0,1.0))]);
+        let sp = sprite_manager.get_sprites_coordinate("toto");
+
+        assert!(sp.0 == (-0.1,0.1));
     }
 
 

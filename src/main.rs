@@ -56,12 +56,14 @@ fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut 
         // sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
         // sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
 
-        
+        let sprite = sprite_manager.move_sprite("hero", 0.0, -0.3 * time_between);
 
-        sp[0].position[1] = sp[0].position[1] - 0.3 * time_between;
-        sp[1].position[1] = sp[1].position[1] - 0.3 * time_between;
-        sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
-        sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
+        // let sprite = sprite_manager.get_sprites_coordinate("hero");
+        println!("{:?}", sprite.vertices);
+        sp[0].position[1] = sprite.vertices[0].position[1];
+        sp[1].position[1] = sprite.vertices[1].position[1];
+        sp[2].position[1] = sprite.vertices[2].position[1];
+        sp[3].position[1] = sprite.vertices[3].position[1];
 
     }
 }
