@@ -17,7 +17,7 @@ impl<'a> SpriteManager<'a> {
 
 
     pub fn new(sprites: Vec<Sprite>) -> SpriteManager{
-        SpriteManager<'a>{
+        SpriteManager{
             sprite_list: RefCell::new(sprites),
 
         }
@@ -60,22 +60,24 @@ impl<'a> SpriteManager<'a> {
     }
 
 
-    pub fn move_sprite(&mut self, name: &str, new_x: f32, new_y: f32) -> Sprite {
-        // let mut sp = self.get_sprite(name);
-        let mut sp = self.spriter;
+    pub fn move_sprite(&self, name: &str, new_x: f32, new_y: f32) {
+        let mut sp_full = self.get_sprite(name);
+        // let mut sp = self.spriter;
+        let mut sp = sp_full.1.clone();
+        // println!("{:?}", sp[0].vertices[0].position[1]);
+        sp.vertices[0].position[0] = sp.vertices[0].position[0] + new_x;
+        sp.vertices[1].position[0] = sp.vertices[1].position[0] + new_x;
+        sp.vertices[2].position[0] = sp.vertices[2].position[0] + new_x;
+        sp.vertices[3].position[0] = sp.vertices[3].position[0] + new_x;
 
-        println!("{:?}", sp[0].vertices[0].position[1]);
-        sp[0].vertices[0].position[0] = sp[0].vertices[0].position[0] + new_x;
-        sp[0].vertices[1].position[0] = sp[0].vertices[1].position[0] + new_x;
-        sp[0].vertices[2].position[0] = sp[0].vertices[2].position[0] + new_x;
-        sp[0].vertices[3].position[0] = sp[0].vertices[3].position[0] + new_x;
+        sp.vertices[0].position[1] = sp.vertices[0].position[1] + new_y;
+        sp.vertices[1].position[1] = sp.vertices[1].position[1] + new_y;
+        sp.vertices[2].position[1] = sp.vertices[2].position[1] + new_y;
+        sp.vertices[3].position[1] = sp.vertices[3].position[1] + new_y;
 
-        sp[0].vertices[0].position[1] = sp[0].vertices[0].position[1] + new_y;
-        sp[0].vertices[1].position[1] = sp[0].vertices[1].position[1] + new_y;
-        sp[0].vertices[2].position[1] = sp[0].vertices[2].position[1] + new_y;
-        sp[0].vertices[3].position[1] = sp[0].vertices[3].position[1] + new_y;
+        // self.sprite_list.borrow_mut()[sp_full.0] = sp;
 
-        sp[0]
+        // sp
 
 
     }
@@ -83,17 +85,18 @@ impl<'a> SpriteManager<'a> {
     pub fn get_sprites_coordinate(&self, name: &str) -> ((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
         let sp = self.get_sprite(name);
 
-        ((sp.vertices[0].position[0],sp.vertices[0].position[1]),
-        (sp.vertices[1].position[0],sp.vertices[1].position[1]),
-        (sp.vertices[2].position[0],sp.vertices[2].position[1]),
-        (sp.vertices[3].position[0],sp.vertices[3].position[1]))
+        ((sp.1.vertices[0].position[0],sp.1.vertices[0].position[1]),
+        (sp.1.vertices[1].position[0],sp.1.vertices[1].position[1]),
+        (sp.1.vertices[2].position[0],sp.1.vertices[2].position[1]),
+        (sp.1.vertices[3].position[0],sp.1.vertices[3].position[1]))
 
     }
 
-    fn get_sprite(&mut self, name: &str) -> Sprite {
+    fn get_sprite(&self, name: &str) -> (usize, Sprite) {
         let mut tmp = self.get_temp_sprite_list();
 
-        *tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap().1
+        let res = tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap();
+        (res.0, *res.1)
     }
 
     fn sprite_list_to_vertex_list(&self) -> Vec<Vertex>{
