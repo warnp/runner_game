@@ -105,10 +105,9 @@ fn main() {
     let sprite_manager = SpriteManager::new(vert);
     let texture = shaders.get_texture_array(&display);
 
-    let mut vertex_buffer = sprite_manager.get_vertex_buffer(&display);
-    let mut indices = sprite_manager.get_index_buffer(&display);
+    let mut buffers = sprite_manager.set_buffers(&display);
+    // let mut indices = sprite_manager.get_index_buffer(&display);
 
-    let mut buffers = (vertex_buffer, indices);
 
     let mut go_up = false;
     let jump_height = 0.5;
@@ -196,7 +195,7 @@ fn main() {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => horizontal_position = 0.0,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) => buffers = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0)), &display),
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) => buffers = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0))),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1", &display),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(_)) => println!("BONJOUR" ),
                 glium::glutin::Event::Closed => return,
