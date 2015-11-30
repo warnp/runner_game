@@ -56,7 +56,7 @@ fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut 
         // sp[2].position[1] = sp[2].position[1] - 0.3 * time_between;
         // sp[3].position[1] = sp[3].position[1] - 0.3 * time_between;
 
-        let sprite = sprite_manager.move_sprite("hero", 0.0, -0.3 * time_between);
+        // let sprite = sprite_manager.move_sprite("hero", 0.0, -0.3 * time_between);
 
         // let sprite = sprite_manager.get_sprites_coordinate("hero");
         // println!("{:?}", sprite.vertices);
@@ -105,7 +105,7 @@ fn main() {
     let sprite_manager = SpriteManager::new(vert);
     let texture = shaders.get_texture_array(&display);
 
-    let mut buffers = sprite_manager.set_buffers(&display);
+    // let buffers = sprite_manager.set_buffers(&display);
     // let mut indices = sprite_manager.get_index_buffer(&display);
 
 
@@ -122,7 +122,7 @@ fn main() {
 
     loop{
         let mut target = display.draw();
-
+        let buffers = sprite_manager.set_buffers(&display);
 
         target.clear_color(0.0,0.0,1.0,1.0);
 
@@ -141,35 +141,35 @@ fn main() {
         old_time = time;
 
         {
-            let mut mapping = buffers.0.map();
-            let mut index = 0;
-            for sp in mapping.chunks_mut(4){
-
-                if index == 0 {
-                    jump_function(sp, &mut jump, &mut touch_ground, jump_height, time_between, 0, &sprite_manager);
-
-                    let coord = text_manager.get_coordinates("toto");
-
-                    // println!("{:?}", coord);
-                    sp[0].tex_coords[0] = (coord[0].0).0;
-                    sp[1].tex_coords[0] = (coord[0].1).0;
-                    sp[2].tex_coords[0] = (coord[0].2).0;
-                    sp[3].tex_coords[0] = (coord[0].3).0;
-
-                    sp[0].tex_coords[1] = (coord[0].0).1;
-                    sp[1].tex_coords[1] = (coord[0].1).1;
-                    sp[2].tex_coords[1] = (coord[0].2).1;
-                    sp[3].tex_coords[1] = (coord[0].3).1;
-
-
-                }
-                else {
-                    move_to_left(sp, time_between);
-                }
-
-
-                index = index + 1;
-            }
+            // let mut mapping = buffers.0.map();
+            // let mut index = 0;
+            // for sp in mapping.chunks_mut(4){
+            //
+            //     if index == 0 {
+            //         jump_function(sp, &mut jump, &mut touch_ground, jump_height, time_between, 0, &sprite_manager);
+            //
+            //         let coord = text_manager.get_coordinates("toto");
+            //
+            //         // println!("{:?}", coord);
+            //         sp[0].tex_coords[0] = (coord[0].0).0;
+            //         sp[1].tex_coords[0] = (coord[0].1).0;
+            //         sp[2].tex_coords[0] = (coord[0].2).0;
+            //         sp[3].tex_coords[0] = (coord[0].3).0;
+            //
+            //         sp[0].tex_coords[1] = (coord[0].0).1;
+            //         sp[1].tex_coords[1] = (coord[0].1).1;
+            //         sp[2].tex_coords[1] = (coord[0].2).1;
+            //         sp[3].tex_coords[1] = (coord[0].3).1;
+            //
+            //
+            //     }
+            //     else {
+            //         move_to_left(sp, time_between);
+            //     }
+            //
+            //
+            //     index = index + 1;
+            // }
 
         }
 
@@ -195,8 +195,8 @@ fn main() {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => horizontal_position = 0.0,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) => buffers = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0))),
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1", &display),
+                // glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) => sprite_manager = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0))),
+                // glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => sprite_manager = sprite_manager.delete_sprite("mover1", &display),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(_)) => println!("BONJOUR" ),
                 glium::glutin::Event::Closed => return,
                 _ => ()
