@@ -119,11 +119,10 @@ fn main() {
     let mut old_time = 0.0;
     let mut horizontal_position = 0.0;
     let text_manager = text_writer::TextWriter::new(0,(256,256),(16,16));
+    let mut buffers = sprite_manager.set_buffers(&display);
 
     loop{
         let mut target = display.draw();
-        let buffers = sprite_manager.set_buffers(&display);
-
         target.clear_color(0.0,0.0,1.0,1.0);
 
         t = t + 1.0;
