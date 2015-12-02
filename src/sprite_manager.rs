@@ -3,15 +3,22 @@ use vertex::Vertex;
 use graphic_item::GraphicItem;
 
 extern crate glium;
+extern crate time;
 
 use vertex;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpriteManager<'a> {
-    sprite_list: Vec<Sprite<'a>>, // vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
+    sprite_list: Vec<Sprite<'a>>, /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
+                                   * generation_id: i32, */
 }
 
 impl<'a> SpriteManager<'a> {
+    #[warn(dead_code)]
+    fn get_time() -> i32 {
+        time::now().to_timespec().nsec
+    }
+
     pub fn new(sprites: Vec<Sprite>) -> SpriteManager {
         SpriteManager { sprite_list: sprites }
 
