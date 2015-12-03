@@ -9,7 +9,7 @@ extern crate time;
 
 use vertex;
 
-#[derive(Debug)]
+// #[derive(Debug)]
 pub struct SpriteManager<'a> {
     sprite_list: Rc<RefCell<Vec<Sprite<'a>>>>,
     display: &'a glium::backend::glutin_backend::GlutinFacade, /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
@@ -171,20 +171,21 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let sprite_manager = SpriteManager::new(vec![Sprite::new("sprite",
-                                                                 0.0,
-                                                                 0.0,
-                                                                 [1.0, 0.0, 0.0, 1.0],
-                                                                 0,
-                                                                 (1.0, 1.0))],
-                                                &display);
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("sprite",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0))],
+                                                    &display);
 
-        let vb = sprite_manager.set_buffers();
+        let mut vb = sprite_manager.set_buffers();
 
         // println!("TOTO ================   {:?}", vb.get_size());
-        // assert_eq!(vb.map().len(),1);
+        assert_eq!(vb.0.map().len(), 1);
     }
 
+    #[ignore]
     #[test]
     fn should_add_sprite() {
 
