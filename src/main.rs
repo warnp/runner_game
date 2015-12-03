@@ -102,7 +102,7 @@ fn main() {
     let program = shaders.get_compiled_shader("simple_shader");
 
 
-    let mut sprite_manager = SpriteManager::new(&mut vert, &mut display);
+    let mut sprite_manager = SpriteManager::new(vert, &display);
     let texture = shaders.get_texture_array(&display);
 
     // let buffers = sprite_manager.set_buffers(&display);
@@ -119,12 +119,12 @@ fn main() {
     let mut old_time = 0.0;
     let mut horizontal_position = 0.0;
     let text_manager = text_writer::TextWriter::new(0,(256,256),(16,16));
-    // let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
+    let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
 
     loop{
         let mut target = display.draw();
         target.clear_color(0.0,0.0,1.0,1.0);
-        // let buffers = sprite_manager.set_buffers(&display);
+        buffers = sprite_manager.set_buffers();
         t = t + 1.0;
 
         let time = time::precise_time_ns() as f32;
@@ -139,7 +139,7 @@ fn main() {
         }
         old_time = time;
 
-        {
+        // {
             // let mut mapping = buffers.0.map();
             // let mut index = 0;
             // for sp in mapping.chunks_mut(4){
@@ -170,7 +170,7 @@ fn main() {
             //     index = index + 1;
             // }
 
-        }
+        // }
 
         let uniforms = uniform! {
             matrix: [
@@ -182,8 +182,8 @@ fn main() {
             tex: &texture,
         };
 
-        // target.draw(&buffers.0, &buffers.1, &program, &uniforms,
-                // &Default::default()).unwrap();
+        target.draw(&buffers.0, &buffers.1, &program, &uniforms,
+                &Default::default()).unwrap();
 
         target.finish().unwrap();
 
@@ -194,8 +194,8 @@ fn main() {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => horizontal_position = 0.0,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
-                // glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   sprite_manager = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0))),
-                // glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => sprite_manager = sprite_manager.delete_sprite("mover1", &display),
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   buffers = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0))),
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1", &display),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::P)) => show_fps = true,
                 glium::glutin::Event::Closed => return,
                 _ => ()
