@@ -164,7 +164,7 @@ mod tests {
 
     extern crate glium;
 
-    #[ignore]
+
     #[test]
     fn should_set_vertex_buffer() {
         let display = glium::glutin::WindowBuilder::new()
@@ -182,10 +182,10 @@ mod tests {
         let mut vb = sprite_manager.set_buffers();
 
         // println!("TOTO ================   {:?}", vb.get_size());
-        assert_eq!(vb.0.map().len(), 1);
+        // println!("{:?}", vb.0.len());
+        assert!(vb.0.len() > 0);
     }
 
-    #[ignore]
     #[test]
     fn should_add_sprite() {
 
@@ -211,8 +211,8 @@ mod tests {
                                                             (1.0, 1.0)));
 
         println!("{:?}", buffers.0);
-        assert!(buffers.0.len() == buffers.0.len() + 4);
-        assert!(buffers.1.len() == buffers.1.len() + 6);
+        assert!(buffers.0.len() == vertex_buffer.0.len() + 4);
+        assert!(buffers.1.len() == vertex_buffer.1.len() + 6);
     }
 
 
@@ -237,7 +237,7 @@ mod tests {
         assert!(buffers.1.len() == 0);
     }
 
-    #[ignore]
+    #[ignore]//SpriteManager should return the sprite list at any moment
     #[test]
     fn should_move_sprite() {
         let display = glium::glutin::WindowBuilder::new()

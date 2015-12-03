@@ -139,6 +139,9 @@ fn main() {
         }
         old_time = time;
 
+
+        // buffers = sprite_manager.move_sprite("mover0", 0.1* time_between,0.0);
+
         // {
             // let mut mapping = buffers.0.map();
             // let mut index = 0;
