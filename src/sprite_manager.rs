@@ -78,28 +78,63 @@ impl<'a> SpriteManager<'a> {
                        new_y: f32)
                        -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
-        let mut tmp2 = self.sprite_list.borrow_mut();
+
+        let mut res = tmp.iter_mut()
+                         .enumerate()
+                         .find(|x| (x.1).name == name);
+
+        if res.is_some() {
+            let mut sp = res.unwrap();
+
+            (sp.1).vertices[0].position[0] = (sp.1).vertices[0].position[0] + new_x;
+            (sp.1).vertices[1].position[0] = (sp.1).vertices[1].position[0] + new_x;
+            (sp.1).vertices[2].position[0] = (sp.1).vertices[2].position[0] + new_x;
+            (sp.1).vertices[3].position[0] = (sp.1).vertices[3].position[0] + new_x;
+
+            (sp.1).vertices[0].position[1] = (sp.1).vertices[0].position[1] + new_y;
+            (sp.1).vertices[1].position[1] = (sp.1).vertices[1].position[1] + new_y;
+            (sp.1).vertices[2].position[1] = (sp.1).vertices[2].position[1] + new_y;
+            (sp.1).vertices[3].position[1] = (sp.1).vertices[3].position[1] + new_y;
+
+            self.sprite_list.borrow_mut()[sp.0] = *sp.1;
+        }
+
+        self.set_buffers()
+
+    }
+
+    pub fn get_sprite_list(&self) -> Vec<Sprite> {
+        self.sprite_list.borrow().clone()
+    }
+
+    pub fn set_sprite_position
+                               (&self,
+                                name: &str,
+                                new_x: f32,
+                                new_y: f32)
+                                -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
+
+        let mut tmp = self.sprite_list.borrow_mut().clone();
 
         let mut sp = tmp.iter_mut()
                         .enumerate()
                         .find(|x| (x.1).name != name)
                         .unwrap();
 
-        (sp.1).vertices[0].position[0] = (sp.1).vertices[0].position[0] + new_x;
-        (sp.1).vertices[1].position[0] = (sp.1).vertices[1].position[0] + new_x;
-        (sp.1).vertices[2].position[0] = (sp.1).vertices[2].position[0] + new_x;
-        (sp.1).vertices[3].position[0] = (sp.1).vertices[3].position[0] + new_x;
 
-        (sp.1).vertices[0].position[1] = (sp.1).vertices[0].position[1] + new_y;
-        (sp.1).vertices[1].position[1] = (sp.1).vertices[1].position[1] + new_y;
-        (sp.1).vertices[2].position[1] = (sp.1).vertices[2].position[1] + new_y;
-        (sp.1).vertices[3].position[1] = (sp.1).vertices[3].position[1] + new_y;
+        (sp.1).vertices[0].position[0] = new_x;
+        (sp.1).vertices[1].position[0] = new_x;
+        (sp.1).vertices[2].position[0] = new_x;
+        (sp.1).vertices[3].position[0] = new_x;
 
-        tmp2[sp.0] = *sp.1;
+        (sp.1).vertices[0].position[1] = new_y;
+        (sp.1).vertices[1].position[1] = new_y;
+        (sp.1).vertices[2].position[1] = new_y;
+        (sp.1).vertices[3].position[1] = new_y;
+
+        self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
         self.set_buffers()
-
-
 
     }
 
@@ -210,7 +245,6 @@ mod tests {
                                                             0,
                                                             (1.0, 1.0)));
 
-        println!("{:?}", buffers.0);
         assert!(buffers.0.len() == vertex_buffer.0.len() + 4);
         assert!(buffers.1.len() == vertex_buffer.1.len() + 6);
     }
@@ -237,7 +271,6 @@ mod tests {
         assert!(buffers.1.len() == 0);
     }
 
-    #[ignore]//SpriteManager should return the sprite list at any moment
     #[test]
     fn should_move_sprite() {
         let display = glium::glutin::WindowBuilder::new()
@@ -251,9 +284,34 @@ mod tests {
                                                                      0,
                                                                      (1.0, 1.0))],
                                                     &display);
-        let sp = sprite_manager.move_sprite("toto", 1.0, 0.0);
+        let lst = sprite_manager.get_sprite_list();
+        println!("first {:?}", lst);
 
-        // assert!(sprite_manager.sprite_list.borrow_mut()[0].vertices[0].position[0] == 0.9);
+        let sp = sprite_manager.move_sprite("toto", 1.0, 0.0);
+        let lst = sprite_manager.get_sprite_list();
+        println!("second {:?}", lst);
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == 0.0);
+    }
+
+    #[test]
+    fn should_not_find_sprite_and_dont_move_sprite() {
+        let display = glium::glutin::WindowBuilder::new()
+                          .build_glium()
+                          .unwrap();
+
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0))],
+                                                    &display);
+
+        let sp = sprite_manager.move_sprite("titi", 1.0, 0.0);
+        let lst = sprite_manager.get_sprite_list();
+        println!("second {:?}", lst);
+
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -1.0);
     }
 
     #[ignore]
@@ -273,6 +331,24 @@ mod tests {
         // let sp = sprite_manager.get_sprites_coordinate("toto");
 
         // assert!(sp.0 == (-0.1,0.1));
+    }
+
+    #[test]
+    fn should_get_sprite_list() {
+        let display = glium::glutin::WindowBuilder::new()
+                          .build_glium()
+                          .unwrap();
+
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0))],
+                                                    &display);
+        let lst = sprite_manager.get_sprite_list();
+        assert_eq!(lst.len(), 1);
+
     }
 
 
