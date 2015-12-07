@@ -118,7 +118,7 @@ impl<'a> SpriteManager<'a> {
 
         let mut sp = tmp.iter_mut()
                         .enumerate()
-                        .find(|x| (x.1).name != name)
+                        .find(|x| (x.1).name == name)
                         .unwrap();
 
 
@@ -136,6 +136,15 @@ impl<'a> SpriteManager<'a> {
 
         self.set_buffers()
 
+    }
+
+    pub fn get_sprite(&self, name: &str) -> Sprite {
+        let mut tmp = self.sprite_list.borrow_mut().clone();
+        let sp = tmp.iter()
+                    .enumerate()
+                    .find(|x| (x.1).name == name)
+                    .unwrap();
+        sp.1.clone()
     }
 
     // pub fn get_sprites_coordinate(&self, name: &str) -> ((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
@@ -349,6 +358,24 @@ mod tests {
         let lst = sprite_manager.get_sprite_list();
         assert_eq!(lst.len(), 1);
 
+    }
+
+    #[test]
+    fn should_get_sprite() {
+        let display = glium::glutin::WindowBuilder::new()
+                          .build_glium()
+                          .unwrap();
+
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0))],
+                                                    &display);
+
+        let sp = sprite_manager.get_sprite("toto");
+        assert!(sp.name == "toto");
     }
 
 

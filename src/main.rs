@@ -91,8 +91,8 @@ fn main() {
 
 
 
-    let mut vert = vec![Sprite::new("hero",0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.10,0.10)),
-                    Sprite::new("mover0",0.5,0.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0))];
+    let mut vert = vec![Sprite::new("hero",0.0,0.0,[1.0,0.0,0.0,1.0],0,(0.01,0.01)),
+                    Sprite::new("mover0",0.5,0.0,[1.0,0.0,0.0,1.0],1,(0.2,0.1))];
 
 
 
@@ -140,7 +140,14 @@ fn main() {
         old_time = time;
 
 
-        buffers = sprite_manager.move_sprite("mover0", 0.1* time_between,0.0);
+        buffers = sprite_manager.move_sprite("mover0", -0.1* time_between,0.0);
+        // let sprite_hero = sprite_manager.get_sprite("hero");
+        // for sp in &sprite_manager.get_sprite_list() {
+            // let aa_bb = sp.get_aa_bb();
+            // if sprite_hero.detect_collide(aa_bb.0, aa_bb.1) {
+            //     println!("COLLISION");
+            // }
+        // }
 
         // {
             // let mut mapping = buffers.0.map();
@@ -197,7 +204,7 @@ fn main() {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => horizontal_position = 0.0,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   buffers = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(2.0,1.0))),
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   buffers = sprite_manager.add_sprite(Sprite::new("mover1",0.5,0.5,[1.0,0.0,0.0,1.0],1,(0.2,0.1))),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1", &display),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::P)) => show_fps = true,
                 glium::glutin::Event::Closed => return,
