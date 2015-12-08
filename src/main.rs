@@ -139,16 +139,19 @@ fn main() {
         }
         old_time = time;
 
-
+        // let sp_manager = &sprite_manager;
         buffers = sprite_manager.move_sprite("mover0", -0.1* time_between,0.0);
-        // let sprite_hero = sprite_manager.get_sprite("hero");
-        // for sp in &sprite_manager.get_sprite_list() {
-            // let aa_bb = sp.get_aa_bb();
-            // if sprite_hero.detect_collide(aa_bb.0, aa_bb.1) {
-            //     println!("COLLISION");
-            // }
-        // }
+        buffers = sprite_manager.move_sprite("hero", 0.0,-0.1* time_between);
 
+        {
+            let sprite_hero = sprite_manager.get_sprite("hero");
+            for sp in &sprite_manager.get_sprite_list().into_iter().filter(|&x| x.name != "hero").collect::<Vec<Sprite>>() {
+                let aa_bb = sp.get_aa_bb();
+                if sprite_hero.detect_collide(aa_bb.0, aa_bb.1) {
+                    println!("COLLISION");
+                }
+            }
+        }
         // {
             // let mut mapping = buffers.0.map();
             // let mut index = 0;

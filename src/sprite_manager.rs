@@ -139,7 +139,7 @@ impl<'a> SpriteManager<'a> {
     }
 
     pub fn get_sprite(&self, name: &str) -> Sprite {
-        let mut tmp = self.sprite_list.borrow_mut().clone();
+        let tmp = self.sprite_list.borrow().clone();
         let sp = tmp.iter()
                     .enumerate()
                     .find(|x| (x.1).name == name)
