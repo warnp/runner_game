@@ -113,6 +113,7 @@ fn main() {
     let jump_height = 0.5;
     let mut jump = false;
     let mut touch_ground = false;
+    let mut loose = false;
 
 
     let mut t : f32 = 0.0;
@@ -122,6 +123,9 @@ fn main() {
     let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
 
     loop{
+        if loose {
+            println!("LOOSER!!!");
+        }
         let mut target = display.draw();
         target.clear_color(0.0,0.0,1.0,1.0);
         buffers = sprite_manager.set_buffers();
@@ -141,16 +145,34 @@ fn main() {
 
         // let sp_manager = &sprite_manager;
         buffers = sprite_manager.move_sprite("mover0", -0.1* time_between,0.0);
-        buffers = sprite_manager.move_sprite("hero", 0.0,-0.1* time_between);
+
+        if !touch_ground {
+            buffers = sprite_manager.move_sprite("hero", 0.0,-0.1* time_between);
+        }
 
         {
             let sprite_hero = sprite_manager.get_sprite("hero");
             for sp in &sprite_manager.get_sprite_list().into_iter().filter(|&x| x.name != "hero").collect::<Vec<Sprite>>() {
                 let aa_bb = sp.get_aa_bb();
                 if sprite_hero.detect_collide(aa_bb.0, aa_bb.1) {
-                    println!("COLLISION");
+                    // println!("COLLISION");
+                    if sprite_hero.vertices[2].position[1] <= aa_bb.0[1] {
+                        touch_ground = true;
+                    }else if  sprite_hero.vertices[2].position[0] >= aa_bb.0[0] && sprite_hero.vertices[2].position[1] < aa_bb.0[1]{
+                        loose = true;
+                    } else {
+                        touch_ground = false;
+                    }
+                }else{
+                    touch_ground = false;
                 }
             }
+        }
+
+        if jump {
+            buffers = sprite_manager.move_sprite("hero", 0.0,0.3);
+            jump = false;
+
         }
         // {
             // let mut mapping = buffers.0.map();
