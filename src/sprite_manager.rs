@@ -60,8 +60,7 @@ impl<'a> SpriteManager<'a> {
 
 
     pub fn delete_sprite(&mut self,
-                         sprite_name: &str,
-                         display: &glium::backend::glutin_backend::GlutinFacade)
+                         sprite_name: &str)
                          -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
 
@@ -261,10 +260,6 @@ mod tests {
 
     #[test]
     fn should_delete_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
-                          .build_glium()
-                          .unwrap();
-
         let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
                                                                      0.0,
                                                                      0.0,
@@ -274,7 +269,7 @@ mod tests {
                                                     &display);
 
 
-        let buffers = sprite_manager.delete_sprite("toto", &display);
+        let buffers = sprite_manager.delete_sprite("toto");
 
         assert!(buffers.0.len() == 0);
         assert!(buffers.1.len() == 0);

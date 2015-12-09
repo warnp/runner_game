@@ -1,9 +1,10 @@
 [package]
 name = "runner_game"
 version = "0.1.0"
-authors = ["romain <romain.assie@supinfo.com>"]
+authors = ["romain <assie.romain@gmail.com>"]
 
 [dependencies]
 glium="*"
 image="*"
 time = "0.1"
+rand = "0.3"
