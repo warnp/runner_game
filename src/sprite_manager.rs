@@ -260,6 +260,9 @@ mod tests {
 
     #[test]
     fn should_delete_sprite() {
+        let display = glium::glutin::WindowBuilder::new()
+                          .build_glium()
+                          .unwrap();
         let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
                                                                      0.0,
                                                                      0.0,
