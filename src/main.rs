@@ -121,7 +121,12 @@ fn main() {
 
     let mut t : f32 = 0.0;
     let mut old_time = 0.0;
-    let text_manager = text_writer::TextWriter::new(0,(256,256),(16,16));
+    let text_manager = text_writer::TextWriter::new(0,(256,256),(16,16),1.0, (0.0,0.0), "toto");
+
+    for x in &text_manager.get_string("hello"){
+        sprite_manager.add_sprite(*x);
+    }
+
     let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
     let mut move_object = false;
 
