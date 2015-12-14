@@ -104,6 +104,7 @@ fn main() {
 
     let program = shaders.get_compiled_shader("simple_shader");
 
+    let text_manager = TextWriter::new(0,(256,256),(16,16),0.10, (0.0,0.0), "toto");
 
     let mut sprite_manager = SpriteManager::new(vert, &display);
     let texture = shaders.get_texture_array(&display);
@@ -121,11 +122,11 @@ fn main() {
 
     let mut t : f32 = 0.0;
     let mut old_time = 0.0;
-    let text_manager = text_writer::TextWriter::new(0,(256,256),(16,16),1.0, (0.0,0.0), "toto");
 
-    for x in &text_manager.get_string("hello"){
-        sprite_manager.add_sprite(*x);
+    for x in text_manager.get_string("hello"){
+        sprite_manager.add_sprite(x.clone());
     }
+
 
     let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
     let mut move_object = false;
@@ -169,7 +170,7 @@ fn main() {
         {
             let sprite_mover = sprite_manager.get_sprite("mover0");
             if sprite_mover.vertices[1].position[0] >= -1.0 {
-                println!("{:?}", t);
+                // println!("{:?}", t);
                 buffers = sprite_manager.move_sprite("mover0", -0.1* time_between - t * 0.000001,0.0);
 
             }else {
