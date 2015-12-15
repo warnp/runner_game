@@ -677,7 +677,8 @@ impl<'a> TextWriter<'a> {
                                      self.text_origin.1,
                                      [1.0, 1.0, 1.0, 1.0],
                                      0,
-                                     (self.text_size, self.text_size));
+                                     (self.text_size, self.text_size),
+                                     0);
             sp.vertices[0].tex_coords[0] = (st.0).0;
             sp.vertices[1].tex_coords[0] = (st.1).0;
             sp.vertices[2].tex_coords[0] = (st.2).0;
@@ -717,7 +718,7 @@ mod tests {
     }
 
     #[test]
-    fn should_give_characters_coordinate() {
+    fn should_give_characters_coordinate_with_sprites() {
         let writer = TextWriter::new(0, (256, 256), (16, 16), 1.0, (0.0, 0.0), "toto");
 
         let coordinates = writer.get_string("Blop");
@@ -725,26 +726,11 @@ mod tests {
         assert_eq!(coordinates.len(), 4);
         // TODO A modifier les coordonées !!!
         // println!("{:?}", coordinates[0]);
-        // assert!(coordinates[0] ==
-        //         ((2.0 / 16.0, 12.0 / 16.0),
-        //          (3.0 / 16.0, 12.0 / 16.0),
-        //          (3.0 / 16.0, 11.0 / 16.0),
-        //          (2.0 / 16.0, 11.0 / 16.0)));
-        // assert!(coordinates[1] ==
-        //         ((12.0 / 16.0, 10.0 / 16.0),
-        //          (13.0 / 16.0, 10.0 / 16.0),
-        //          (13.0 / 16.0, 9.0 / 16.0),
-        //          (12.0 / 16.0, 9.0 / 16.0)));
-        // assert!(coordinates[2] ==
-        //         ((15.0 / 16.0, 10.0 / 16.0),
-        //          (16.0 / 16.0, 10.0 / 16.0),
-        //          (16.0 / 16.0, 9.0 / 16.0),
-        //          (15.0 / 16.0, 9.0 / 16.0)));
-        // assert!(coordinates[3] ==
-        //         ((0.0 / 16.0, 9.0 / 16.0),
-        //          (1.0 / 16.0, 9.0 / 16.0),
-        //          (1.0 / 16.0, 8.0 / 16.0),
-        //          (0.0 / 16.0, 8.0 / 16.0)));
+        assert!(coordinates[0].vertices[0].tex_coords == [2.0 / 16.0, 12.0 / 16.0]);
+        assert!(coordinates[1].vertices[0].tex_coords == [12.0 / 16.0, 10.0 / 16.0]);
+        assert!(coordinates[2].vertices[0].tex_coords == [15.0 / 16.0, 10.0 / 16.0]);
+        assert!(coordinates[3].vertices[0].tex_coords == [0.0 / 16.0, 9.0 / 16.0]);
 
     }
+
 }

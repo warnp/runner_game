@@ -11,6 +11,7 @@ pub struct Sprite<'a> {
     pub indices: [u16; 6],
     pub name: &'a str, /* pub transform: [[f32; 4]; 4],
                         * pub display: &glium::glutin::WindowBuilder, */
+    pub order: u16,
 }
 
 impl<'a> Sprite<'a> {
@@ -19,7 +20,8 @@ impl<'a> Sprite<'a> {
                y: f32,
                color: [f32; 4],
                tex_id: u32,
-               size: (f32, f32))
+               size: (f32, f32),
+               order: u16)
                -> Sprite<'a> {
 
         Sprite {
@@ -53,6 +55,7 @@ impl<'a> Sprite<'a> {
                        }],
             indices: [0, 1, 2, 0, 2, 3],
             name: name, // transform: transform,
+            order: order,
         }
 
     }
@@ -101,7 +104,7 @@ mod tests {
     #[test]
     fn should_calculate_center_of_sprite_position() {
         // Given
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0));
+        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
         // when
         let position_result = s.get_position();
 
@@ -111,7 +114,7 @@ mod tests {
 
     #[test]
     fn should_collide() {
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0));
+        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
 
         assert!(s.detect_collide([-0.10, 1.0], [0.0, 0.0]));
     }
@@ -119,14 +122,14 @@ mod tests {
     #[test]
     #[should_panic]
     fn should_not_collide() {
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (0.1, 0.1));
+        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (0.1, 0.1), 0);
 
         assert!(s.detect_collide([1.0, -1.0], [2.0, -3.0]));
     }
 
     #[test]
     fn should_get_aa_bb_positions() {
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0));
+        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
 
         let aabb = s.get_aa_bb();
 

@@ -93,9 +93,9 @@ fn main() {
 
 
 
-    let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],0,(0.05,0.05)),
-                    Sprite::new("mover0",0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1)),
-                    Sprite::new("still",0.0,-1.8,[1.0,0.0,0.0,1.0],1,(2.0,1.0))];
+    let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],0,(0.05,0.05),0),
+                    Sprite::new("mover0",0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),
+                    Sprite::new("still",0.0,-1.8,[1.0,0.0,0.0,1.0],1,(2.0,1.0),2)];
 
 
 
@@ -159,9 +159,11 @@ fn main() {
 
         {
             if move_object {
-                 {buffers = sprite_manager.delete_sprite("mover0");}
                 {
-                    buffers =  sprite_manager.add_sprite(Sprite::new("mover0",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1)));
+                    buffers = sprite_manager.delete_sprite("mover0");
+                }
+                {
+                    buffers =  sprite_manager.add_sprite(Sprite::new("mover0",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1));
                 }
                 move_object = false;
             }
@@ -264,7 +266,7 @@ fn main() {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = false,
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   buffers = sprite_manager.add_sprite(Sprite::new("mover1",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1))),
+                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   buffers = sprite_manager.add_sprite(Sprite::new("mover1",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),2)),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1"),
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::P)) => show_fps = true,
                 glium::glutin::Event::Closed => return,

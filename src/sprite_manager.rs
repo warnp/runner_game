@@ -146,6 +146,10 @@ impl<'a> SpriteManager<'a> {
         sp.1.clone()
     }
 
+    pub fn order_sprites(&self) {
+        self.sprite_list.borrow_mut().sort_by(|a, b| a.cmp(b));
+    }
+
     // pub fn get_sprites_coordinate(&self, name: &str) -> ((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
     //     let sp = self.get_sprite(name);
     //
@@ -219,7 +223,8 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
 
         let mut vb = sprite_manager.set_buffers();
@@ -241,7 +246,8 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
 
         let vertex_buffer = sprite_manager.set_buffers();
@@ -251,7 +257,8 @@ mod tests {
                                                             0.50,
                                                             [1.0, 0.0, 0.0, 1.0],
                                                             0,
-                                                            (1.0, 1.0)));
+                                                            (1.0, 1.0),
+                                                            1));
 
         assert!(buffers.0.len() == vertex_buffer.0.len() + 4);
         assert!(buffers.1.len() == vertex_buffer.1.len() + 6);
@@ -268,7 +275,8 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
 
 
@@ -289,7 +297,8 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
         let lst = sprite_manager.get_sprite_list();
         println!("first {:?}", lst);
@@ -311,7 +320,8 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
 
         let sp = sprite_manager.move_sprite("titi", 1.0, 0.0);
@@ -333,7 +343,8 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
         // let sp = sprite_manager.get_sprites_coordinate("toto");
 
@@ -351,7 +362,8 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
         let lst = sprite_manager.get_sprite_list();
         assert_eq!(lst.len(), 1);
@@ -369,11 +381,48 @@ mod tests {
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
-                                                                     (1.0, 1.0))],
+                                                                     (1.0, 1.0),
+                                                                     0)],
                                                     &display);
 
         let sp = sprite_manager.get_sprite("toto");
         assert!(sp.name == "toto");
+    }
+
+    #[test]
+    fn should_order_sprite() {
+        let display = glium::glutin::WindowBuilder::new()
+                          .build_glium()
+                          .unwrap();
+
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0),
+                                                                     1),
+                                                         Sprite::new("titi",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0),
+                                                                     0)],
+                                                    &display);
+
+        sprite_manager.order_sprites();
+        let mut index = 10;
+
+        for (i, e) in sprite_manager.get_sprite_list().iter().enumerate() {
+            if (e.name == "titi") {
+                index = i;
+            }
+        }
+
+        println!("{}", index);
+        assert!(index == 0);
+
     }
 
 
