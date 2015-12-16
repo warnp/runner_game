@@ -1,6 +1,6 @@
 
 #[derive(Copy, Clone, Debug)]
-pub struct Vertex{
+pub struct Vertex {
     pub position: [f32; 2],
     pub normal: [f32; 3],
     pub color: [f32; 4],

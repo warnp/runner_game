@@ -2,6 +2,7 @@ use vertex;
 
 use collision::CollisionMesh;
 use graphic_item::GraphicItem;
+use std::cmp::{Ord, Ordering};
 extern crate glium;
 
 
@@ -93,6 +94,26 @@ impl<'a> CollisionMesh for Sprite<'a> {
     }
 }
 
+impl<'a> Ord for Sprite<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        (self.order, &self.name).cmp(&(other.order, &other.name))
+    }
+}
+
+impl<'a> PartialOrd for Sprite<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<'a> PartialEq for Sprite<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        (self.order, &self.name) == (other.order, &other.name)
+    }
+}
+
+impl<'a> Eq for Sprite<'a> {}
+
 
 #[cfg(test)]
 mod tests {
@@ -100,6 +121,25 @@ mod tests {
 
     use collision::CollisionMesh;
     use graphic_item::GraphicItem;
+    use std::cmp::Ordering;
+
+    #[test]
+    fn should_get_ordering() {
+        let a = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let b = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 1);
+
+        let ordered = a.cmp(&b);
+        assert!(ordered == Ordering::Less);
+    }
+
+    #[test]
+    fn should_get_equality() {
+        let a = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let b = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+
+        let ordered = a.eq(&b);
+        assert!(ordered == true);
+    }
 
     #[test]
     fn should_calculate_center_of_sprite_position() {
