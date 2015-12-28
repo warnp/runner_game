@@ -150,6 +150,14 @@ fn main() {
         }
         old_time = time;
 
+        //HUD
+        sprite_manager.delete_sprite("toto");
+
+        for x in text_manager.get_string(format!("{} : pts", t)){
+            sprite_manager.add_sprite(x.clone());
+        }
+
+
         //GAME LOGIC
         if loose {
             println!("LOOSER!!!");

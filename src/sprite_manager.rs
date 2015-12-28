@@ -9,19 +9,30 @@ extern crate time;
 
 use vertex;
 
+/// The `SpriteManager` type.
 // #[derive(Debug)]
 pub struct SpriteManager<'a> {
+    /// Sprite list to handle with
     sprite_list: Rc<RefCell<Vec<Sprite<'a>>>>,
     display: &'a glium::backend::glutin_backend::GlutinFacade, /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
                                                                 * generation_id: i32, */
 }
 
 impl<'a> SpriteManager<'a> {
-    #[warn(dead_code)]
-    fn get_time() -> i32 {
-        time::now().to_timespec().nsec
-    }
+    // #[warn(dead_code)]
+    // fn get_time() -> i32 {
+    //     time::now().to_timespec().nsec
+    // }
 
+    /// Construct new `SpriteManager`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use sprite_manager::SpriteManager;
+    ///
+    /// let manager = SpriteManager::new(vec![Sprite("toto", 0.0,0.0,[0.0,0.0,0.0,0.0],1,(1.0,1.0),0)], &display);
+    /// ```
     pub fn new(sprites: Vec<Sprite<'a>>,
                display: &'a glium::backend::glutin_backend::GlutinFacade)
                -> SpriteManager<'a> {
@@ -150,26 +161,8 @@ impl<'a> SpriteManager<'a> {
         self.sprite_list.borrow_mut().sort_by(|a, b| a.cmp(b));
     }
 
-    // pub fn get_sprites_coordinate(&self, name: &str) -> ((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
-    //     let sp = self.get_sprite(name);
-    //
-    //     ((sp.1.vertices[0].position[0],sp.1.vertices[0].position[1]),
-    //     (sp.1.vertices[1].position[0],sp.1.vertices[1].position[1]),
-    //     (sp.1.vertices[2].position[0],sp.1.vertices[2].position[1]),
-    //     (sp.1.vertices[3].position[0],sp.1.vertices[3].position[1]))
-    //
-    // }
-    //
-    // fn get_sprite(&self, name: &str) -> (usize, Sprite) {
-    //     let mut tmp = self.get_temp_sprite_list();
-    //
-    //     let res = tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap();
-    //     (res.0, *res.1)
-    // }
-    //
     fn sprite_list_to_vertex_list(&self) -> Vec<Vertex> {
         let mut vertices_array: Vec<Vertex> = Vec::new();
-        // println!("{:?}", self.sprite_list.into_inner());
         for sprite in &*self.sprite_list.borrow_mut() {
 
             vertices_array.push(sprite.vertices[0]);
@@ -229,8 +222,7 @@ mod tests {
 
         let mut vb = sprite_manager.set_buffers();
 
-        // println!("TOTO ================   {:?}", vb.get_size());
-        // println!("{:?}", vb.0.len());
+
         assert!(vb.0.len() > 0);
     }
 
@@ -329,26 +321,6 @@ mod tests {
         println!("second {:?}", lst);
 
         assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -1.0);
-    }
-
-    #[ignore]
-    #[test]
-    fn should_return_sprite_vertices_coordinates() {
-        let display = glium::glutin::WindowBuilder::new()
-                          .build_glium()
-                          .unwrap();
-
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
-                                                                     0.0,
-                                                                     0.0,
-                                                                     [1.0, 0.0, 0.0, 1.0],
-                                                                     0,
-                                                                     (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
-        // let sp = sprite_manager.get_sprites_coordinate("toto");
-
-        // assert!(sp.0 == (-0.1,0.1));
     }
 
     #[test]
