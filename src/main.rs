@@ -104,7 +104,7 @@ fn main() {
 
     let program = shaders.get_compiled_shader("simple_shader");
 
-    let text_manager = TextWriter::new(0,(256,256),(16,16),0.10, (0.0,0.0), "toto");
+    let text_manager = TextWriter::new(0,(256,256),(16,16),0.050, (0.0,0.0), "toto"); 
 
     let mut sprite_manager = SpriteManager::new(vert, &display);
     let texture = shaders.get_texture_array(&display);
@@ -123,7 +123,7 @@ fn main() {
     let mut t : f32 = 0.0;
     let mut old_time = 0.0;
 
-    for x in text_manager.get_string("hello"){
+    for x in text_manager.get_string("Martin"){
         sprite_manager.add_sprite(x.clone());
     }
 
@@ -153,7 +153,7 @@ fn main() {
         //HUD
         sprite_manager.delete_sprite("toto");
 
-        for x in text_manager.get_string(format!("{} : pts", t)){
+        for x in text_manager.get_string(&format!("{}pts", t)[..]){
             sprite_manager.add_sprite(x.clone());
         }
 
