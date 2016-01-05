@@ -397,5 +397,27 @@ mod tests {
 
     }
 
+    #[test]
+    fn should_move_uv() {
+        let display = glium::glutin::WindowBuilder::new()
+                          .build_glium()
+                          .unwrap();
+
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0),
+                                                                     0)],
+                                                    &display);
+
+
+
+        let sp = sprite_manager.get_sprite("toto");
+        assert!(sp.vertices[0].tex_coords[0] == "toto");
+
+    }
+
 
 }

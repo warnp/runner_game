@@ -671,10 +671,11 @@ impl<'a> TextWriter<'a> {
         }
         let mut sprites_vec = Vec::new();
         let mut i = 0.0;
-        let this_name= self.string_name.clone();
-        
+
         for st in &return_vec {
-            let mut sp = Sprite::new(&format!("{}", this_name)[..],
+
+            // let to_str = &format!("{}", self.string_name)[..];
+            let mut sp = Sprite::new(self.string_name,
                                      self.text_origin.0 + self.text_size * i * 2.0,
                                      self.text_origin.1,
                                      [1.0, 1.0, 1.0, 1.0],
