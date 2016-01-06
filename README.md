@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/warnp/runner_game.svg)](https://travis-ci.org/warnp/runner_game)
+
 # Runner game
 
 A simple runner like game written in rust, it uses [glium](https://github.com/tomaka/glium) library written by @Tomaka. 
