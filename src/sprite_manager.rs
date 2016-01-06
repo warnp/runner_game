@@ -161,6 +161,35 @@ impl<'a> SpriteManager<'a> {
         self.sprite_list.borrow_mut().sort_by(|a, b| a.cmp(b));
     }
 
+    fn set_uv(&self,
+              name: &str,
+              new_coordinates: [f32; 2],
+              uv_size: (f32, f32))
+              -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
+        let mut tmp = self.sprite_list.borrow_mut().clone();
+
+        let mut sp = tmp.iter_mut()
+                        .enumerate()
+                        .find(|x| (x.1).name == name)
+                        .unwrap();
+
+
+        (sp.1).vertices[0].tex_coords[0] = new_coordinates[0];
+        (sp.1).vertices[1].tex_coords[0] = new_coordinates[0] + uv_size.0;
+        (sp.1).vertices[2].tex_coords[0] = new_coordinates[0] + uv_size.0;
+        (sp.1).vertices[3].tex_coords[0] = new_coordinates[0];
+
+        (sp.1).vertices[0].tex_coords[1] = new_coordinates[1];
+        (sp.1).vertices[1].tex_coords[1] = new_coordinates[1];
+        (sp.1).vertices[2].tex_coords[1] = new_coordinates[1] + uv_size.1;
+        (sp.1).vertices[3].tex_coords[1] = new_coordinates[1] + uv_size.1;
+
+        self.sprite_list.borrow_mut()[sp.0] = *sp.1;
+
+        self.set_buffers()
+    }
+
+
     fn sprite_list_to_vertex_list(&self) -> Vec<Vertex> {
         let mut vertices_array: Vec<Vertex> = Vec::new();
         for sprite in &*self.sprite_list.borrow_mut() {
@@ -387,7 +416,7 @@ mod tests {
         let mut index = 10;
 
         for (i, e) in sprite_manager.get_sprite_list().iter().enumerate() {
-            if (e.name == "titi") {
+            if e.name == "titi" {
                 index = i;
             }
         }
@@ -414,8 +443,8 @@ mod tests {
 
 
 
-        let sp = sprite_manager.get_sprite("toto");
-        assert!(sp.vertices[0].tex_coords[0] == "toto");
+        let sp = sprite_manager.set_uv("toto", [0.1, 0.1], (0.1, 0.1));
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].tex_coords[0] == 0.1);
 
     }
 
