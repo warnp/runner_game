@@ -99,18 +99,17 @@ fn main() {
 
 
 
-    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],&include_bytes!("../content/11532.png")[..]]);
+    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],
+                                                        &include_bytes!("../content/11532.png")[..],
+                                                        &include_bytes!("../content/NatureForests.png")[..]]);
     shaders.compile_shaders(&display);
 
     let program = shaders.get_compiled_shader("simple_shader");
 
-    let text_manager = TextWriter::new(0,(256,256),(16,16),0.050, (0.0,0.0), "toto"); 
+    let text_manager = TextWriter::new(0,(256,256),(16,16),0.050, (0.0,0.0), "toto", false);
 
     let mut sprite_manager = SpriteManager::new(vert, &display);
     let texture = shaders.get_texture_array(&display);
-
-    // let buffers = sprite_manager.set_buffers(&display);
-    // let mut indices = sprite_manager.get_index_buffer(&display);
 
 
     let mut go_up = false;
