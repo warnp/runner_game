@@ -236,7 +236,7 @@ mod tests {
 
     #[test]
     fn should_set_vertex_buffer() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -258,7 +258,7 @@ mod tests {
     #[test]
     fn should_add_sprite() {
 
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -288,7 +288,7 @@ mod tests {
 
     #[test]
     fn should_delete_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
         let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
@@ -309,7 +309,7 @@ mod tests {
 
     #[test]
     fn should_move_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -332,7 +332,7 @@ mod tests {
 
     #[test]
     fn should_not_find_sprite_and_dont_move_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -354,7 +354,7 @@ mod tests {
 
     #[test]
     fn should_get_sprite_list() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -373,7 +373,7 @@ mod tests {
 
     #[test]
     fn should_get_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -392,7 +392,7 @@ mod tests {
 
     #[test]
     fn should_order_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -428,7 +428,7 @@ mod tests {
 
     #[test]
     fn should_move_uv() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
