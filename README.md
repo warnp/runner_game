@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/warnp/runner_game.svg)](https://travis-ci.org/warnp/runner_game)[![Coverage Status](https://coveralls.io/repos/warnp/runner_game/badge.svg?branch=master&service=github)](https://coveralls.io/github/warnp/runner_game?branch=master)
+[![Build Status](https://travis-ci.org/warnp/runner_game.svg?branch=master)](https://travis-ci.org/warnp/runner_game) [![Coverage Status](https://coveralls.io/repos/warnp/runner_game/badge.svg?branch=master&service=github)](https://coveralls.io/github/warnp/runner_game?branch=master)
 
 # Runner game
 
