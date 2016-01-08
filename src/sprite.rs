@@ -27,28 +27,28 @@ impl<'a> Sprite<'a> {
 
         Sprite {
             vertices: [vertex::Vertex {
-                           position: [-1.0 * size.0 + x, 1.0 * size.1 + y],
+                           position: [-0.5 * size.0 + x, 0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [0.0, 1.0],
                            i_tex_id: tex_id,
                        },
                        vertex::Vertex {
-                           position: [1.0 * size.0 + x, 1.0 * size.1 + y],
+                           position: [0.5 * size.0 + x, 0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [1.0, 1.0],
                            i_tex_id: tex_id,
                        },
                        vertex::Vertex {
-                           position: [1.0 * size.0 + x, -1.0 * size.1 + y],
+                           position: [0.5 * size.0 + x, -0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [1.0, 0.0],
                            i_tex_id: tex_id,
                        },
                        vertex::Vertex {
-                           position: [-1.0 * size.0 + x, -1.0 * size.1 + y],
+                           position: [-0.5 * size.0 + x, -0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [0.0, 0.0],
@@ -173,8 +173,8 @@ mod tests {
 
         let aabb = s.get_aa_bb();
 
-        assert!(aabb.0 == [-1.0, 1.0]);
-        assert!(aabb.1 == [1.0, -1.0]);
+        assert!(aabb.0 == [-0.5, 0.5]);
+        assert!(aabb.1 == [0.5, -0.5]);
     }
 
 

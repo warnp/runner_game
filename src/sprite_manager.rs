@@ -327,7 +327,7 @@ mod tests {
         let sp = sprite_manager.move_sprite("toto", 1.0, 0.0);
         let lst = sprite_manager.get_sprite_list();
         println!("second {:?}", lst);
-        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == 0.0);
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == 0.5);
     }
 
     #[test]
@@ -347,9 +347,8 @@ mod tests {
 
         let sp = sprite_manager.move_sprite("titi", 1.0, 0.0);
         let lst = sprite_manager.get_sprite_list();
-        println!("second {:?}", lst);
 
-        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -1.0);
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -0.5);
     }
 
     #[test]

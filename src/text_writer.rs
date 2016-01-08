@@ -27,7 +27,7 @@ impl<'a> TextWriter<'a> {
             text_size: text_size,
             text_origin: text_origin,
             string_name: string_name,
-            right_to_left: false,
+            right_to_left: right_to_left,
         }
     }
 
@@ -673,12 +673,21 @@ impl<'a> TextWriter<'a> {
         }
         let mut sprites_vec = Vec::new();
         let mut i = 0.0;
+        let mut offset = 1.0;
+
+        if self.right_to_left {
+            return_vec.reverse();
+            offset = -1.0;
+        } else {
+            offset = 1.0;
+        }
 
         for st in &return_vec {
 
             // let to_str = &format!("{}", self.string_name)[..];
+
             let mut sp = Sprite::new(self.string_name,
-                                     self.text_origin.0 + self.text_size * i * 2.0,
+                                     self.text_origin.0 + self.text_size * i * offset,
                                      self.text_origin.1,
                                      [1.0, 1.0, 1.0, 1.0],
                                      0,
@@ -736,6 +745,9 @@ mod tests {
         assert!(coordinates[2].vertices[0].tex_coords == [15.0 / 16.0, 10.0 / 16.0]);
         assert!(coordinates[3].vertices[0].tex_coords == [0.0 / 16.0, 9.0 / 16.0]);
 
+        assert!(coordinates[1].vertices[0].position == [0.5, 0.5])
+
+
     }
 
     #[test]
@@ -747,10 +759,11 @@ mod tests {
         assert_eq!(coordinates.len(), 4);
         // TODO A modifier les coordonées !!!
         // println!("{:?}", coordinates[0]);
-        assert!(coordinates[0].vertices[0].tex_coords == [2.0 / 16.0, 12.0 / 16.0]);
-        assert!(coordinates[1].vertices[0].tex_coords == [12.0 / 16.0, 10.0 / 16.0]);
-        assert!(coordinates[2].vertices[0].tex_coords == [15.0 / 16.0, 10.0 / 16.0]);
-        assert!(coordinates[3].vertices[0].tex_coords == [0.0 / 16.0, 9.0 / 16.0]);
+        assert!(coordinates[0].vertices[0].tex_coords == [0.0 / 16.0, 9.0 / 16.0]);
+        assert!(coordinates[1].vertices[0].tex_coords == [15.0 / 16.0, 10.0 / 16.0]);
+        assert!(coordinates[2].vertices[0].tex_coords == [12.0 / 16.0, 10.0 / 16.0]);
+        assert!(coordinates[3].vertices[0].tex_coords == [2.0 / 16.0, 12.0 / 16.0]);
+        println!("{:?}", coordinates[1].vertices[0].position);
         assert!(coordinates[1].vertices[0].position == [-1.5, 0.5])
 
     }

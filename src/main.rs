@@ -95,7 +95,7 @@ fn main() {
 
     let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],0,(0.05,0.05),0),
                     Sprite::new("mover0",0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),
-                    Sprite::new("still",0.0,-1.8,[1.0,0.0,0.0,1.0],1,(2.0,1.0),2)];
+                    Sprite::new("still",0.0,-1.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0),2)];
 
 
 
@@ -106,7 +106,7 @@ fn main() {
 
     let program = shaders.get_compiled_shader("simple_shader");
 
-    let text_manager = TextWriter::new(0,(256,256),(16,16),0.050, (0.0,0.0), "toto", false);
+    let text_manager = TextWriter::new(0,(256,256),(16,16),0.050, (0.0,0.0), "toto", true);
 
     let mut sprite_manager = SpriteManager::new(vert, &display);
     let texture = shaders.get_texture_array(&display);
