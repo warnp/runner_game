@@ -107,6 +107,7 @@ fn main() {
     let program = shaders.get_compiled_shader("simple_shader");
 
     let text_manager = TextWriter::new(0,(256,256),(16,16),0.050, (0.0,0.0), "toto", true);
+    let print_fps = TextWriter::new(0,(256,256),(16,16),0.05,(0.0,0.950),"fps", true);
 
     let mut sprite_manager = SpriteManager::new(vert, &display);
     let texture = shaders.get_texture_array(&display);
@@ -122,9 +123,9 @@ fn main() {
     let mut t : f32 = 0.0;
     let mut old_time = 0.0;
 
-    for x in text_manager.get_string("Martin"){
-        sprite_manager.add_sprite(x.clone());
-    }
+    // for x in text_manager.get_string("Martin"){
+    //     sprite_manager.add_sprite(x.clone());
+    // }
 
 
     let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
@@ -144,7 +145,11 @@ fn main() {
         }
 
         let fps = 1.0/(time_between );
+        sprite_manager.delete_sprite("fps");
         if show_fps {
+            for x in print_fps.get_string(&format!("{}fps", fps)[..]){
+                sprite_manager.add_sprite(x.clone());
+            }
             println!("FPS : {}", fps);
         }
         old_time = time;
