@@ -80,6 +80,11 @@ fn move_to_left(sp: &mut [engine::vertex::Vertex], time_between: f32){
     sp[3].position[0] = sp[3].position[0] - 0.5 * time_between;
 }
 
+//TODO insert program and uniform parameters
+fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &glium::VertexBuffer<vertex::Vertex>,index_buffer: &glium::IndexBuffer<u16>) {
+
+}
+
 
 
 fn main() {
@@ -123,35 +128,20 @@ fn main() {
     let mut loose = false;
 
 
-    // let mut t : f32 = 0.0;
-
-    // for x in text_manager.get_string("Martin"){
-    //     sprite_manager.add_sprite(x.clone());
-    // }
-
     let mut engine_helper = EngineHelper::new();
     let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
     let mut move_object = false;
 
     loop{
-        //SCREEN
-        let mut target = display.draw();
-        target.clear_color(0.0,0.0,1.0,1.0);
 
         //SYNC TIMER
-
         sprite_manager.delete_sprite("fps");
-        // if show_fps {
-        //     for x in print_fps.get_string(&format!("{}fps", fps)[..]){
-        //         sprite_manager.add_sprite(x.clone());
-        //     }
-        //     println!("FPS : {}", fps);
-        // }
+
         let fps_counter = engine_helper.get_fps();
 
         for x in print_fps.get_string(&format!("{}fps", fps_counter.0)[..]){
                 sprite_manager.add_sprite(x.clone());
-            }
+        }
 
         //HUD
         sprite_manager.delete_sprite("toto");
@@ -183,7 +173,6 @@ fn main() {
         {
             let sprite_mover = sprite_manager.get_sprite("mover0");
             if sprite_mover.vertices[1].position[0] >= -1.0 {
-                // println!("{:?}", t);
                 buffers = sprite_manager.move_sprite("mover0", -0.1  * fps_counter.1 - engine_helper.get_iterator() * 0.000001,0.0);
 
             }else {
@@ -265,6 +254,9 @@ fn main() {
             ],
             tex: &texture,
         };
+        //SCREEN
+        let mut target = display.draw();
+        target.clear_color(0.0,0.0,1.0,1.0);
 
         target.draw(&buffers.0, &buffers.1, &program, &uniforms,
                 &Default::default()).unwrap();
