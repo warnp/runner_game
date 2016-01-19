@@ -14,4 +14,4 @@ script:
     # We run everything with `-j 1` or travis runs out of memory
     #- cargo build -v --no-default-features --features "$FEATURES"
     #- if [ "$TEST" -eq 1 ]; then cargo test -v -j 1 --no-default-features --features "$FEATURES"; fi
-    - cargo test -v -j 1 --no-default-features --features "travis"
+    - cargo test -v -j 1 --no-default-features --features "integration"
