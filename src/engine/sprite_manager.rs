@@ -1,13 +1,13 @@
-use sprite::Sprite;
-use vertex::Vertex;
+use engine::sprite::Sprite;
+use engine::vertex::Vertex;
 use std::cell::RefCell;
 use std::rc::Rc;
-use graphic_item::GraphicItem;
+use engine::graphic_item::GraphicItem;
+use engine::vertex;
 
 extern crate glium;
 extern crate time;
 
-use vertex;
 
 /// The `SpriteManager` type.
 // #[derive(Debug)]
@@ -227,7 +227,7 @@ impl<'a> SpriteManager<'a> {
 mod tests {
 
     use super::*;
-    use sprite::Sprite;
+    use engine::sprite::Sprite;
     use glium::backend::Facade;
     use glium::{DisplayBuild, Surface};
 

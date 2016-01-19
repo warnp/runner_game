@@ -3,29 +3,30 @@ extern crate glium;
 extern crate time;
 extern crate rand;
 
-mod vertex;
-use vertex::Vertex;
-mod sprite;
-use sprite::Sprite;
-mod graphic_item;
-mod shader_manager;
-use shader_manager::{Shaders, ShaderCouple};
-mod sprite_manager;
-use sprite_manager::SpriteManager;
-mod engine_helper;
-use engine_helper::EngineHelper;
-
-mod collision;
-use collision::CollisionMesh;
-
-mod text_writer;
-use text_writer::TextWriter;
+mod engine;
+// mod vertex;
+use engine::vertex::Vertex;
+// mod sprite;
+use engine::sprite::Sprite;
+// mod graphic_item;
+// mod shader_manager;
+use engine::shader_manager::{Shaders, ShaderCouple};
+// mod sprite_manager;
+use engine::sprite_manager::SpriteManager;
+// mod engine_helper;
+use engine::engine_helper::EngineHelper;
+//
+// mod collision;
+use engine::collision::CollisionMesh;
+//
+// mod text_writer;
+use engine::text_writer::TextWriter;
 
 use glium::{DisplayBuild, Surface};
 use rand::Rand;
 
 
-fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f32, index: u32, sprite_manager: &SpriteManager) {
+fn jump_function(sp: &mut [engine::vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f32, index: u32, sprite_manager: &SpriteManager) {
 
     if *jump && *touch_ground {
 
@@ -72,7 +73,7 @@ fn jump_function(sp: &mut [vertex::Vertex], jump: &mut bool, touch_ground: &mut 
     }
 }
 
-fn move_to_left(sp: &mut [vertex::Vertex], time_between: f32){
+fn move_to_left(sp: &mut [engine::vertex::Vertex], time_between: f32){
     sp[0].position[0] = sp[0].position[0] - 0.5 * time_between;
     sp[1].position[0] = sp[1].position[0] - 0.5 * time_between;
     sp[2].position[0] = sp[2].position[0] - 0.5 * time_between;
@@ -101,7 +102,7 @@ fn main() {
 
 
 
-    let mut shaders = shader_manager::Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],
+    let mut shaders = Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],
                                                         &include_bytes!("../content/11532.png")[..],
                                                         &include_bytes!("../content/NatureForests.png")[..]]);
     shaders.compile_shaders(&display);
