@@ -12,6 +12,8 @@ mod shader_manager;
 use shader_manager::{Shaders, ShaderCouple};
 mod sprite_manager;
 use sprite_manager::SpriteManager;
+mod engine_helper;
+use engine_helper::EngineHelper;
 
 mod collision;
 use collision::CollisionMesh;
@@ -120,14 +122,13 @@ fn main() {
     let mut loose = false;
 
 
-    let mut t : f32 = 0.0;
-    let mut old_time = 0.0;
+    // let mut t : f32 = 0.0;
 
     // for x in text_manager.get_string("Martin"){
     //     sprite_manager.add_sprite(x.clone());
     // }
 
-
+    let mut engine_helper = EngineHelper::new();
     let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
     let mut move_object = false;
 
@@ -135,29 +136,26 @@ fn main() {
         //SCREEN
         let mut target = display.draw();
         target.clear_color(0.0,0.0,1.0,1.0);
-        t = t + 1.0;
 
         //SYNC TIMER
-        let time = time::precise_time_ns() as f32;
-        let mut time_between = 0.0;
-        if t > 60.0{
-            time_between = time/1000000000.0 - old_time/1000000000.0;
-        }
 
-        let fps = 1.0/(time_between );
         sprite_manager.delete_sprite("fps");
-        if show_fps {
-            for x in print_fps.get_string(&format!("{}fps", fps)[..]){
+        // if show_fps {
+        //     for x in print_fps.get_string(&format!("{}fps", fps)[..]){
+        //         sprite_manager.add_sprite(x.clone());
+        //     }
+        //     println!("FPS : {}", fps);
+        // }
+        let fps_counter = engine_helper.get_fps();
+
+        for x in print_fps.get_string(&format!("{}fps", fps_counter.0)[..]){
                 sprite_manager.add_sprite(x.clone());
             }
-            println!("FPS : {}", fps);
-        }
-        old_time = time;
 
         //HUD
         sprite_manager.delete_sprite("toto");
 
-        for x in text_manager.get_string(&format!("{}pts", t)[..]){
+        for x in text_manager.get_string(&format!("{}pts", engine_helper.get_iterator())[..]){
             sprite_manager.add_sprite(x.clone());
         }
 
@@ -185,7 +183,7 @@ fn main() {
             let sprite_mover = sprite_manager.get_sprite("mover0");
             if sprite_mover.vertices[1].position[0] >= -1.0 {
                 // println!("{:?}", t);
-                buffers = sprite_manager.move_sprite("mover0", -0.1* time_between - t * 0.000001,0.0);
+                buffers = sprite_manager.move_sprite("mover0", -0.1  * fps_counter.1 - engine_helper.get_iterator() * 0.000001,0.0);
 
             }else {
                 move_object = true;
@@ -193,7 +191,7 @@ fn main() {
         }
 
         if !touch_ground {
-            buffers = sprite_manager.move_sprite("hero", 0.0,-0.15* time_between);
+            buffers = sprite_manager.move_sprite("hero", 0.0,-0.15 * fps_counter.1);
         }
 
         {
