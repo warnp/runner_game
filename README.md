@@ -8,4 +8,4 @@ For the future, it will certainly grow as a library.
 # Using
 
 To play with this game, you must have [Rust 1.5](https://www.rust-lang.org/) installed.
-Then, to build the game, use the command ```cargo build --release``` in the project folder. Then ```cargo run``` to launch te application.
+Then, to build the game, use the command ```cargo build --release``` in the project folder. Then ```cargo run``` to launch the game.
