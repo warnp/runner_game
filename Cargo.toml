@@ -8,3 +8,6 @@ glium="*"
 image="*"
 time = "0.1"
 rand = "0.3"
+
+[features]
+integration=["travis"]

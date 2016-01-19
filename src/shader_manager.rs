@@ -139,6 +139,7 @@ mod shader_manager_tests {
         // Shall not pass for the moment, need to find a property to evaluate
     }
 
+    #[cfg(not(feature = "travis"))]
     #[test]
     fn should_get_texture_array() {
         let mut shader = Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],
