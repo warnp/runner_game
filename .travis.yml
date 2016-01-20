@@ -25,9 +25,14 @@ script:
     #- if [ "$TEST" -eq 1 ]; then cargo test -v -j 1 --no-default-features --features "$FEATURES"; fi
     - cargo test -v -j 1 --no-default-features --features "integration"
   
-after_success:
-  - wget https://github.com/SimonKagstrom/kcov/archive/master.zip &&
-        unzip master.zip && mv kcov-master kcov && mkdir kcov/build && cd kcov/build && CMAKE_PREFIX_PATH=/opt/elfutils-dir/ \ &&
-        cmake .. && make && make install DESTDIR=../built && cd ../.. &&
-        for file in ./target/debug/*; do ./kcov/built/usr/local/bin/kcov --exclude-pattern=/.cargo ./target/kcov ${file}; done &&
-        ./kcov/built/usr/local/bin/kcov --coveralls-id=${TRAVIS_JOB_ID} --merge ./target/kcov-merge ./target/kcov
+after_success: |
+  wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+        tar xzf master.tar.gz &&
+        mv kcov-master kcov &&
+        mkdir kcov/build &&
+        cd kcov/build &&
+        cmake .. &&
+        make &&
+        make install && 
+        cd ../.. &&
+        kcov --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/runner_game-*
