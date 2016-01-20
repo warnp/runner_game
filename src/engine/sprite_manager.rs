@@ -1,27 +1,38 @@
-use sprite::Sprite;
-use vertex::Vertex;
+use engine::sprite::Sprite;
+use engine::vertex::Vertex;
 use std::cell::RefCell;
 use std::rc::Rc;
-use graphic_item::GraphicItem;
+use engine::graphic_item::GraphicItem;
+use engine::vertex;
 
 extern crate glium;
 extern crate time;
 
-use vertex;
 
+/// The `SpriteManager` type.
 // #[derive(Debug)]
 pub struct SpriteManager<'a> {
+    /// Sprite list to handle with
     sprite_list: Rc<RefCell<Vec<Sprite<'a>>>>,
     display: &'a glium::backend::glutin_backend::GlutinFacade, /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
                                                                 * generation_id: i32, */
 }
 
 impl<'a> SpriteManager<'a> {
-    #[warn(dead_code)]
-    fn get_time() -> i32 {
-        time::now().to_timespec().nsec
-    }
+    // #[warn(dead_code)]
+    // fn get_time() -> i32 {
+    //     time::now().to_timespec().nsec
+    // }
 
+    /// Construct new `SpriteManager`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use sprite_manager::SpriteManager;
+    ///
+    /// let manager = SpriteManager::new(vec![Sprite("toto", 0.0,0.0,[0.0,0.0,0.0,0.0],1,(1.0,1.0),0)], &display);
+    /// ```
     pub fn new(sprites: Vec<Sprite<'a>>,
                display: &'a glium::backend::glutin_backend::GlutinFacade)
                -> SpriteManager<'a> {
@@ -150,26 +161,37 @@ impl<'a> SpriteManager<'a> {
         self.sprite_list.borrow_mut().sort_by(|a, b| a.cmp(b));
     }
 
-    // pub fn get_sprites_coordinate(&self, name: &str) -> ((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
-    //     let sp = self.get_sprite(name);
-    //
-    //     ((sp.1.vertices[0].position[0],sp.1.vertices[0].position[1]),
-    //     (sp.1.vertices[1].position[0],sp.1.vertices[1].position[1]),
-    //     (sp.1.vertices[2].position[0],sp.1.vertices[2].position[1]),
-    //     (sp.1.vertices[3].position[0],sp.1.vertices[3].position[1]))
-    //
-    // }
-    //
-    // fn get_sprite(&self, name: &str) -> (usize, Sprite) {
-    //     let mut tmp = self.get_temp_sprite_list();
-    //
-    //     let res = tmp.iter().enumerate().find(|&x| x.1.name == name).unwrap();
-    //     (res.0, *res.1)
-    // }
-    //
+    fn set_uv(&self,
+              name: &str,
+              new_coordinates: [f32; 2],
+              uv_size: (f32, f32))
+              -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
+        let mut tmp = self.sprite_list.borrow_mut().clone();
+
+        let mut sp = tmp.iter_mut()
+                        .enumerate()
+                        .find(|x| (x.1).name == name)
+                        .unwrap();
+
+
+        (sp.1).vertices[0].tex_coords[0] = new_coordinates[0];
+        (sp.1).vertices[1].tex_coords[0] = new_coordinates[0] + uv_size.0;
+        (sp.1).vertices[2].tex_coords[0] = new_coordinates[0] + uv_size.0;
+        (sp.1).vertices[3].tex_coords[0] = new_coordinates[0];
+
+        (sp.1).vertices[0].tex_coords[1] = new_coordinates[1];
+        (sp.1).vertices[1].tex_coords[1] = new_coordinates[1];
+        (sp.1).vertices[2].tex_coords[1] = new_coordinates[1] + uv_size.1;
+        (sp.1).vertices[3].tex_coords[1] = new_coordinates[1] + uv_size.1;
+
+        self.sprite_list.borrow_mut()[sp.0] = *sp.1;
+
+        self.set_buffers()
+    }
+
+
     fn sprite_list_to_vertex_list(&self) -> Vec<Vertex> {
         let mut vertices_array: Vec<Vertex> = Vec::new();
-        // println!("{:?}", self.sprite_list.into_inner());
         for sprite in &*self.sprite_list.borrow_mut() {
 
             vertices_array.push(sprite.vertices[0]);
@@ -205,16 +227,16 @@ impl<'a> SpriteManager<'a> {
 mod tests {
 
     use super::*;
-    use sprite::Sprite;
+    use engine::sprite::Sprite;
     use glium::backend::Facade;
     use glium::{DisplayBuild, Surface};
 
     extern crate glium;
 
-
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_set_vertex_buffer() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -229,15 +251,15 @@ mod tests {
 
         let mut vb = sprite_manager.set_buffers();
 
-        // println!("TOTO ================   {:?}", vb.get_size());
-        // println!("{:?}", vb.0.len());
+
         assert!(vb.0.len() > 0);
     }
 
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_add_sprite() {
 
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -264,10 +286,10 @@ mod tests {
         assert!(buffers.1.len() == vertex_buffer.1.len() + 6);
     }
 
-
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_delete_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
         let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
@@ -286,9 +308,10 @@ mod tests {
         assert!(buffers.1.len() == 0);
     }
 
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_move_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -306,12 +329,13 @@ mod tests {
         let sp = sprite_manager.move_sprite("toto", 1.0, 0.0);
         let lst = sprite_manager.get_sprite_list();
         println!("second {:?}", lst);
-        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == 0.0);
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == 0.5);
     }
 
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_not_find_sprite_and_dont_move_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -326,34 +350,14 @@ mod tests {
 
         let sp = sprite_manager.move_sprite("titi", 1.0, 0.0);
         let lst = sprite_manager.get_sprite_list();
-        println!("second {:?}", lst);
 
-        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -1.0);
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -0.5);
     }
 
-    #[ignore]
-    #[test]
-    fn should_return_sprite_vertices_coordinates() {
-        let display = glium::glutin::WindowBuilder::new()
-                          .build_glium()
-                          .unwrap();
-
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
-                                                                     0.0,
-                                                                     0.0,
-                                                                     [1.0, 0.0, 0.0, 1.0],
-                                                                     0,
-                                                                     (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
-        // let sp = sprite_manager.get_sprites_coordinate("toto");
-
-        // assert!(sp.0 == (-0.1,0.1));
-    }
-
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_get_sprite_list() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -370,9 +374,10 @@ mod tests {
 
     }
 
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_get_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -389,9 +394,10 @@ mod tests {
         assert!(sp.name == "toto");
     }
 
+#[cfg(not(feature = "integration"))]
     #[test]
     fn should_order_sprite() {
-        let display = glium::glutin::WindowBuilder::new()
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 
@@ -415,13 +421,36 @@ mod tests {
         let mut index = 10;
 
         for (i, e) in sprite_manager.get_sprite_list().iter().enumerate() {
-            if (e.name == "titi") {
+            if e.name == "titi" {
                 index = i;
             }
         }
 
         println!("{}", index);
         assert!(index == 0);
+
+    }
+
+#[cfg(not(feature = "integration"))]
+    #[test]
+    fn should_move_uv() {
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+                          .build_glium()
+                          .unwrap();
+
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+                                                                     0.0,
+                                                                     0.0,
+                                                                     [1.0, 0.0, 0.0, 1.0],
+                                                                     0,
+                                                                     (1.0, 1.0),
+                                                                     0)],
+                                                    &display);
+
+
+
+        let sp = sprite_manager.set_uv("toto", [0.1, 0.1], (0.1, 0.1));
+        assert!(sprite_manager.get_sprite_list()[0].vertices[0].tex_coords[0] == 0.1);
 
     }
 

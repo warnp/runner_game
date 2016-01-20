@@ -1,5 +1,4 @@
-use vertex::Vertex;
-use sprite::Sprite;
+use engine::sprite::Sprite;
 
 pub struct TextWriter<'a> {
     pub string_name: &'a str,
@@ -8,6 +7,7 @@ pub struct TextWriter<'a> {
     pub character_size: (u16, u16),
     pub text_size: f32,
     pub text_origin: (f32, f32),
+    pub right_to_left: bool,
 }
 
 impl<'a> TextWriter<'a> {
@@ -16,7 +16,8 @@ impl<'a> TextWriter<'a> {
                character_size: (u16, u16),
                text_size: f32,
                text_origin: (f32, f32),
-               string_name: &'a str)
+               string_name: &'a str,
+               right_to_left: bool)
                -> TextWriter<'a> {
 
         TextWriter {
@@ -26,6 +27,7 @@ impl<'a> TextWriter<'a> {
             text_size: text_size,
             text_origin: text_origin,
             string_name: string_name,
+            right_to_left: right_to_left,
         }
     }
 
@@ -671,9 +673,21 @@ impl<'a> TextWriter<'a> {
         }
         let mut sprites_vec = Vec::new();
         let mut i = 0.0;
+        let mut offset = 1.0;
+
+        if self.right_to_left {
+            return_vec.reverse();
+            offset = -1.0;
+        } else {
+            offset = 1.0;
+        }
+
         for st in &return_vec {
-            let mut sp = Sprite::new("toto",
-                                     self.text_origin.0 + self.text_size * i * 2.0,
+
+            // let to_str = &format!("{}", self.string_name)[..];
+
+            let mut sp = Sprite::new(self.string_name,
+                                     self.text_origin.0 + self.text_size * i * offset,
                                      self.text_origin.1,
                                      [1.0, 1.0, 1.0, 1.0],
                                      0,
@@ -709,7 +723,7 @@ mod tests {
     // This test assume your bmpfont map is 256*256 with char 16*16
     #[test]
     fn should_set_charmap() {
-        let writer = TextWriter::new(0, (256, 256), (16, 16), 1.0, (0.0, 0.0), "toto");
+        let writer = TextWriter::new(0, (256, 256), (16, 16), 1.0, (0.0, 0.0), "toto", false);
 
         assert!(writer.image_index == 0);
         assert!(writer.image_size == (256, 256));
@@ -719,7 +733,7 @@ mod tests {
 
     #[test]
     fn should_give_characters_coordinate_with_sprites() {
-        let writer = TextWriter::new(0, (256, 256), (16, 16), 1.0, (0.0, 0.0), "toto");
+        let writer = TextWriter::new(0, (256, 256), (16, 16), 1.0, (0.0, 0.0), "toto", false);
 
         let coordinates = writer.get_string("Blop");
 
@@ -730,6 +744,27 @@ mod tests {
         assert!(coordinates[1].vertices[0].tex_coords == [12.0 / 16.0, 10.0 / 16.0]);
         assert!(coordinates[2].vertices[0].tex_coords == [15.0 / 16.0, 10.0 / 16.0]);
         assert!(coordinates[3].vertices[0].tex_coords == [0.0 / 16.0, 9.0 / 16.0]);
+
+        assert!(coordinates[1].vertices[0].position == [0.5, 0.5])
+
+
+    }
+
+    #[test]
+    fn should_give_characters_coordinate_with_sprites_when_right_to_left() {
+        let writer = TextWriter::new(0, (256, 256), (16, 16), 1.0, (0.0, 0.0), "toto", true);
+
+        let coordinates = writer.get_string("Blop");
+
+        assert_eq!(coordinates.len(), 4);
+        // TODO A modifier les coordonées !!!
+        // println!("{:?}", coordinates[0]);
+        assert!(coordinates[0].vertices[0].tex_coords == [0.0 / 16.0, 9.0 / 16.0]);
+        assert!(coordinates[1].vertices[0].tex_coords == [15.0 / 16.0, 10.0 / 16.0]);
+        assert!(coordinates[2].vertices[0].tex_coords == [12.0 / 16.0, 10.0 / 16.0]);
+        assert!(coordinates[3].vertices[0].tex_coords == [2.0 / 16.0, 12.0 / 16.0]);
+        println!("{:?}", coordinates[1].vertices[0].position);
+        assert!(coordinates[1].vertices[0].position == [-1.5, 0.5])
 
     }
 

@@ -129,9 +129,9 @@ mod shader_manager_tests {
     #[test]
     #[ignore]
     fn should_return_a_shader() {
-        let mut shader = Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],
-                                           &include_bytes!("../content/11532.png")[..]]);
-        let display = glium::glutin::WindowBuilder::new()
+        let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
+                                           &include_bytes!("../../content/11532.png")[..]]);
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
         let lst_shaders = shader.get_compiled_shader("toto");
@@ -139,11 +139,12 @@ mod shader_manager_tests {
         // Shall not pass for the moment, need to find a property to evaluate
     }
 
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_get_texture_array() {
-        let mut shader = Shaders::new(vec![&include_bytes!("../content/NatureForests.png")[..],
-                                           &include_bytes!("../content/11532.png")[..]]);
-        let display = glium::glutin::WindowBuilder::new()
+        let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
+                                           &include_bytes!("../../content/11532.png")[..]]);
+        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
                           .build_glium()
                           .unwrap();
 

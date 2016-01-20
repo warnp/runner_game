@@ -1,14 +1,18 @@
-use vertex;
+// use vertex;
 
-use collision::CollisionMesh;
-use graphic_item::GraphicItem;
+// use collision::CollisionMesh;
+// use graphic_item::GraphicItem;
 use std::cmp::{Ord, Ordering};
+use engine::vertex::Vertex;
+use engine::graphic_item::GraphicItem;
+use engine::collision::CollisionMesh;
+
 extern crate glium;
 
 
 #[derive(Copy, Clone, Debug)]
 pub struct Sprite<'a> {
-    pub vertices: [vertex::Vertex; 4],
+    pub vertices: [Vertex; 4],
     pub indices: [u16; 6],
     pub name: &'a str, /* pub transform: [[f32; 4]; 4],
                         * pub display: &glium::glutin::WindowBuilder, */
@@ -26,29 +30,29 @@ impl<'a> Sprite<'a> {
                -> Sprite<'a> {
 
         Sprite {
-            vertices: [vertex::Vertex {
-                           position: [-1.0 * size.0 + x, 1.0 * size.1 + y],
+            vertices: [Vertex {
+                           position: [-0.5 * size.0 + x, 0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [0.0, 1.0],
                            i_tex_id: tex_id,
                        },
-                       vertex::Vertex {
-                           position: [1.0 * size.0 + x, 1.0 * size.1 + y],
+                       Vertex {
+                           position: [0.5 * size.0 + x, 0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [1.0, 1.0],
                            i_tex_id: tex_id,
                        },
-                       vertex::Vertex {
-                           position: [1.0 * size.0 + x, -1.0 * size.1 + y],
+                       Vertex {
+                           position: [0.5 * size.0 + x, -0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [1.0, 0.0],
                            i_tex_id: tex_id,
                        },
-                       vertex::Vertex {
-                           position: [-1.0 * size.0 + x, -1.0 * size.1 + y],
+                       Vertex {
+                           position: [-0.5 * size.0 + x, -0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [0.0, 0.0],
@@ -119,8 +123,8 @@ impl<'a> Eq for Sprite<'a> {}
 mod tests {
     use super::*;
 
-    use collision::CollisionMesh;
-    use graphic_item::GraphicItem;
+    use engine::collision::CollisionMesh;
+    use engine::graphic_item::GraphicItem;
     use std::cmp::Ordering;
 
     #[test]
@@ -173,8 +177,8 @@ mod tests {
 
         let aabb = s.get_aa_bb();
 
-        assert!(aabb.0 == [-1.0, 1.0]);
-        assert!(aabb.1 == [1.0, -1.0]);
+        assert!(aabb.0 == [-0.5, 0.5]);
+        assert!(aabb.1 == [0.5, -0.5]);
     }
 
 
