@@ -8,9 +8,26 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
+    
+addon:
+  apt:
+    packages:
+      - libxxf86vm-dev
+      - libosmesa6-dev
+      - libcurl4-openssl-dev      # for kcov
+      - libelf-dev                # for kcov
+      - libdw-dev                 # for kcov
+      - cmake                     # for kcov
 
 script:
     # We run everything with `-j 1` or travis runs out of memory
     #- cargo build -v --no-default-features --features "$FEATURES"
     #- if [ "$TEST" -eq 1 ]; then cargo test -v -j 1 --no-default-features --features "$FEATURES"; fi
-    - cargo test -v -j 1 --no-default-features --features "integration"
+    #- cargo test -v -j 1 --no-default-features --features "integration"
+  
+after_success:
+  - wget https://github.com/SimonKagstrom/kcov/archive/master.zip &&
+        unzip master.zip && mv kcov-master kcov && mkdir kcov/build && cd kcov/build &&
+        cmake .. && make && make install DESTDIR=../built && cd ../.. &&
+        for file in ./target/debug/*; do ./kcov/built/usr/local/bin/kcov --exclude-pattern=/.cargo ./target/kcov ${file}; done &&
+        ./kcov/built/usr/local/bin/kcov --coveralls-id=${TRAVIS_JOB_ID} --merge ./target/kcov-merge ./target/kcov
