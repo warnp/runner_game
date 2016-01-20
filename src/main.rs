@@ -81,7 +81,7 @@ fn move_to_left(sp: &mut [engine::vertex::Vertex], time_between: f32){
 }
 
 //TODO insert program and uniform parameters
-fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &glium::VertexBuffer<vertex::Vertex>,index_buffer: &glium::IndexBuffer<u16>) {
+fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &glium::VertexBuffer<Vertex>,index_buffer: &glium::IndexBuffer<u16>) {
 
 }
 
