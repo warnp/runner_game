@@ -81,8 +81,27 @@ fn move_to_left(sp: &mut [engine::vertex::Vertex], time_between: f32){
 }
 
 //TODO insert program and uniform parameters
-fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &glium::VertexBuffer<Vertex>,index_buffer: &glium::IndexBuffer<u16>) {
+fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &glium::VertexBuffer<Vertex>,index_buffer: &glium::IndexBuffer<u16>, program: &glium::Program, textures: &glium::texture::Texture2dArray, screen_height: f32, screen_width: f32,) {
 
+    //TRANSFORM TO HAVE NICE SPRITE SIZE
+    let uniforms = uniform! {
+        matrix: [
+            [screen_height/screen_width, 0.0 , 0.0 , 0.0],
+            [0.0                       , 1.0 , 0.0 , 0.0],
+            [0.0                       , 0.0 , 1.0 , 0.0],
+            [0.0                       , 0.0 , 0.0 , 1.0f32],
+        ],
+        tex: textures,
+    };
+
+
+    let mut target = display.draw();
+    target.clear_color(0.0,0.0,1.0,1.0);
+
+    target.draw(vertex_buffer, index_buffer, program, &uniforms,
+            &Default::default()).unwrap();
+
+    target.finish().unwrap();
 }
 
 
@@ -103,7 +122,7 @@ fn main() {
 
     let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],0,(0.05,0.05),0),
                     Sprite::new("mover0",0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),
-                    Sprite::new("still",0.0,-1.0,[1.0,0.0,0.0,1.0],1,(2.0,1.0),2)];
+                    Sprite::new("still",0.0,-1.0,[1.0,0.0,0.0,1.0],2,(2.0,1.0),2)];
 
 
 
@@ -244,25 +263,7 @@ fn main() {
 
         // }
 
-        //TRANSFORM TO HAVE NICE SPRITE SIZE
-        let uniforms = uniform! {
-            matrix: [
-                [screen_height/screen_width, 0.0 , 0.0 , 0.0],
-                [0.0                       , 1.0 , 0.0 , 0.0],
-                [0.0                       , 0.0 , 1.0 , 0.0],
-                [0.0                       , 0.0 , 0.0 , 1.0f32],
-            ],
-            tex: &texture,
-        };
-        //SCREEN
-        let mut target = display.draw();
-        target.clear_color(0.0,0.0,1.0,1.0);
-
-        target.draw(&buffers.0, &buffers.1, &program, &uniforms,
-                &Default::default()).unwrap();
-
-        target.finish().unwrap();
-
+        draw(&display, &buffers.0, &buffers.1, &program, &texture, screen_height, screen_width);
 
         for ev in display.poll_events(){
             match ev {
