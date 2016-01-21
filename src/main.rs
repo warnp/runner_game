@@ -81,7 +81,7 @@ fn move_to_left(sp: &mut [engine::vertex::Vertex], time_between: f32){
 }
 
 //TODO insert program and uniform parameters
-fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &glium::VertexBuffer<Vertex>,index_buffer: &glium::IndexBuffer<u16>, program: &glium::Program, textures: &glium::texture::Texture2dArray, screen_height: f32, screen_width: f32,) {
+fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::VertexBuffer<engine::vertex::Vertex>, glium::IndexBuffer<u16>), program: &glium::Program, textures: &glium::texture::Texture2dArray, screen_height: f32, screen_width: f32,) {
 
     //TRANSFORM TO HAVE NICE SPRITE SIZE
     let uniforms = uniform! {
@@ -94,11 +94,16 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &g
         tex: textures,
     };
 
+    let params = glium::DrawParameters {
+        blend: glium::Blend::alpha_blending(),
+    };
 
+    let vertex_buffer = buffers.0;
+    let index_buffer = buffers.1;
     let mut target = display.draw();
     target.clear_color(0.0,0.0,1.0,1.0);
 
-    target.draw(vertex_buffer, index_buffer, program, &uniforms,
+    target.draw(&vertex_buffer, &index_buffer, program, &uniforms,
             &Default::default()).unwrap();
 
     target.finish().unwrap();
@@ -107,6 +112,7 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,vertex_buffer: &g
 
 
 fn main() {
+
 
 
     let screen_height = 768.0;
@@ -120,7 +126,7 @@ fn main() {
 
 
 
-    let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],0,(0.05,0.05),0),
+    let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],3,(0.05,0.05),0),
                     Sprite::new("mover0",0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),
                     Sprite::new("still",0.0,-1.0,[1.0,0.0,0.0,1.0],2,(2.0,1.0),2)];
 
@@ -128,7 +134,8 @@ fn main() {
 
     let mut shaders = Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],
                                                         &include_bytes!("../content/11532.png")[..],
-                                                        &include_bytes!("../content/NatureForests.png")[..]]);
+                                                        &include_bytes!("../content/NatureForests.png")[..],
+                                                        &include_bytes!("../content/hero.png")[..]]);
     shaders.compile_shaders(&display);
 
     let program = shaders.get_compiled_shader("simple_shader");
@@ -153,17 +160,20 @@ fn main() {
 
     loop{
 
-        //SYNC TIMER
-        sprite_manager.delete_sprite("fps");
+        //HUD
+        sprite_manager.delete_sprite("toto");
 
         let fps_counter = engine_helper.get_fps();
 
-        for x in print_fps.get_string(&format!("{}fps", fps_counter.0)[..]){
-                sprite_manager.add_sprite(x.clone());
+        if engine_helper.get_iterator() % 20.0 == 0.0 {
+            sprite_manager.delete_sprite("fps");
+            for x in print_fps.get_string(&format!("{}fps", fps_counter.0)[..]){
+                    sprite_manager.add_sprite(x.clone());
+            }
         }
 
-        //HUD
-        sprite_manager.delete_sprite("toto");
+
+
 
         for x in text_manager.get_string(&format!("{}pts", engine_helper.get_iterator())[..]){
             sprite_manager.add_sprite(x.clone());
@@ -175,7 +185,6 @@ fn main() {
             println!("LOOSER!!!");
         }
 
-        buffers = sprite_manager.set_buffers();
 
         {
             if move_object {
@@ -263,7 +272,7 @@ fn main() {
 
         // }
 
-        draw(&display, &buffers.0, &buffers.1, &program, &texture, screen_height, screen_width);
+        draw(&display, sprite_manager.set_buffers(), &program, &texture, screen_height, screen_width);
 
         for ev in display.poll_events(){
             match ev {
