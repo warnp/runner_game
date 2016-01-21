@@ -96,6 +96,7 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 
     let params = glium::DrawParameters {
         blend: glium::Blend::alpha_blending(),
+        .. Default::default()
     };
 
     let vertex_buffer = buffers.0;
@@ -104,7 +105,7 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
     target.clear_color(0.0,0.0,1.0,1.0);
 
     target.draw(&vertex_buffer, &index_buffer, program, &uniforms,
-            &Default::default()).unwrap();
+            &params).unwrap();
 
     target.finish().unwrap();
 }
@@ -126,7 +127,7 @@ fn main() {
 
 
 
-    let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],3,(0.05,0.05),0),
+    let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],3,(0.1,0.1),0),
                     Sprite::new("mover0",0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),
                     Sprite::new("still",0.0,-1.0,[1.0,0.0,0.0,1.0],2,(2.0,1.0),2)];
 
@@ -165,13 +166,12 @@ fn main() {
 
         let fps_counter = engine_helper.get_fps();
 
-        if engine_helper.get_iterator() % 20.0 == 0.0 {
+        if engine_helper.get_iterator() % 10.0 == 0.0 {
             sprite_manager.delete_sprite("fps");
             for x in print_fps.get_string(&format!("{}fps", fps_counter.0)[..]){
                     sprite_manager.add_sprite(x.clone());
             }
         }
-
 
 
 

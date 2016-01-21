@@ -22,6 +22,7 @@ impl EngineHelper {
             time_between = time/1000000000.0 - self.old_time/1000000000.0;
         }
 
+
         let fps = 1.0/(time_between );
         self.old_time = time;
 
@@ -57,7 +58,7 @@ mod engine_helper_tests{
         for x in 0..120{
 
                 engine_helper.get_fps();
-            
+
         }
         println!("{:?}", engine_helper.get_iterator());
         assert!(engine_helper.get_iterator() == 120.0);
