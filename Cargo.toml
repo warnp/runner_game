@@ -8,6 +8,7 @@ glium="*"
 image="*"
 time = "0.1"
 rand = "0.3"
+matches = "0.1"
 
 [features]
 integration=[]

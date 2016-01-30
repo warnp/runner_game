@@ -1,26 +1,83 @@
+
+pub trait State {
+    fn go_next(movements: &mut Movements, new_status: Move)-> Move;
+}
+
+pub struct Fall ;
+
+pub struct Walk ;
+
+pub struct Jump ;
+
+impl State for Fall {
+    fn go_next(movements: &mut Movements, new_status: Move) -> Move {
+        match new_status {
+            Move::Walk => {movements.set_status(new_status); movements.get_status()},
+            Move::Jump => {movements.get_status()},
+            Move::Fall => {movements.get_status()},
+        }
+
+    }
+}
+
+impl State for Jump {
+    fn go_next(movements: &mut Movements, new_status: Move) -> Move{
+
+        match new_status {
+            Move::Fall => {movements.set_status(new_status); movements.get_status()},
+            Move::Jump => {movements.get_status()},
+            Move::Walk => {movements.get_status()},
+        }
+    }
+}
+
+impl State for Walk {
+    fn go_next(movements: &mut Movements, new_status: Move) -> Move{
+        match new_status {
+            Move::Jump => {movements.set_status(new_status); movements.get_status()},
+            Move::Fall => {movements.set_status(new_status); movements.get_status()},
+            Move::Walk => {movements.get_status()},
+        }
+
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum Move {
+    Fall,
+    Walk,
+    Jump,
+}
+
+#[derive(Debug)]
 pub struct Movements{
-    touch_ground: bool,
-    start_time: f32,
-    max_height: f32,
+    state: Move,
 }
 
 impl Movements {
-    pub fn new(max_height) -> Movements {
+    pub fn new() -> Movements {
         Movements {
-            touch_ground: true,
-            start_time: 0.0,
-            max_height: max_height,
+            state: Move::Fall,
         }
     }
 
-    pub fn jump(&mut self, actual_time: f32) -> f32 {
-        if self.touch_ground {
-            self.start_time = actual_time;
-            1.0
-        }
-
-        30.0/actual_time - start_time;
+    pub fn get_status(&self) -> Move {
+        self.state.clone()
     }
+
+    fn set_status(&mut self, new_status: Move) {
+        self.state = new_status;
+    }
+
+    pub fn update_status(&mut self, new_status: Move){
+        match self.state {
+            Move::Jump => {Jump::go_next(self, new_status);},
+            Move::Fall => {Fall::go_next(self, new_status);},
+            Move::Walk => {Walk::go_next(self, new_status);},
+        }
+    }
+
+
 }
 
 #[cfg(test)]
@@ -28,50 +85,64 @@ mod tests {
     use super::*;
 
     #[test]
-    fn should_reach_highest_point(){
-        let moves = Movements::new(0.5);
-        let mut height = 0.0;
-        let mut reach_top = false;
-        for i in 0..120 {
-            height = moves.jump(i);
-            if height == 0.5 {
-                reach_top = true;
-            }
-        }
+    fn should_get_actual_status(){
+        let mut moves = Movements::new();
 
-        assert!(reach_top);
+        assert!(moves.get_status() == Move::Fall);
     }
 
     #[test]
-    fn should_not_jump(){
-        let moves = Movements::new(0.5);
-        let mut height = 0.0;
-        let mut reach_top = false;
-        for i in 0..120 {
-            height = moves.jump(i);
-            if height == 0.5 {
-                reach_top = true;
-            }
-        }
+    fn should_go_from_walk_to_jump(){
+        let mut moves = Movements::new();
+        moves.update_status(Move::Walk);
 
+        moves.update_status(Move::Jump);
 
-        assert!(!moves.touch_ground());
+        assert!(moves.get_status() == Move::Jump);
     }
 
     #[test]
-    fn should_jump(){
-        let moves = Movements::new(0.5);
-        let mut height = 0.0;
-        let mut reach_top = false;
-        for i in 0..120 {
-            height = moves.jump(i);
-            if height == 0.5 {
-                reach_top = true;
-            }
-        }
+    fn should_go_from_walk_to_fall(){
+        let mut moves = Movements::new();
+        moves.update_status(Move::Walk);
+
+        moves.update_status(Move::Fall);
+
+        assert!(moves.get_status() == Move::Fall);
+    }
 
 
-        assert!(moves.touch_ground());
+    #[test]
+    fn should_go_from_jump_to_fall(){
+        let mut moves = Movements::new();
+
+        moves.update_status(Move::Jump);
+
+        moves.update_status(Move::Fall);
+
+        assert!(moves.get_status() == Move::Fall);
+    }
+
+
+
+
+
+    #[test]
+    fn should_go_from_fall_to_walk(){
+        let mut moves = Movements::new();
+        // moves.update_status(Move::Fall);
+
+        moves.update_status(Move::Walk);
+        assert!(moves.get_status() == Move::Walk);
+    }
+
+    #[test]
+    fn should_not_go_from_fall_to_jump(){
+        let mut moves = Movements::new();
+        // moves.update_status(Move::Fall);
+        moves.update_status(Move::Jump);
+
+        assert!(moves.get_status() == Move::Fall);
     }
 
 

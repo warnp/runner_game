@@ -1,9 +1,7 @@
 extern crate glium;
 
-struct InputManager{
+struct InputManager;
 
-}
-
-impl InputManager{
-    
-}
+// impl InputManager{
+//
+// }
