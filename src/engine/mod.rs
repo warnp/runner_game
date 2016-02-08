@@ -15,3 +15,5 @@ pub mod collision;
 
 pub mod text_writer;
 // use text_writer::TextWriter;
+pub mod input_manager;
+pub mod modules_manager;

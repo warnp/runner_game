@@ -2,7 +2,6 @@
 extern crate glium;
 extern crate time;
 extern crate rand;
-extern crate matches;
 
 
 mod game_logic;
@@ -289,5 +288,6 @@ fn main() {
                 _ => ()
             }
         }
+
     }
 }
