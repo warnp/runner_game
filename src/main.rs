@@ -114,7 +114,7 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 }
 
 fn main(){
-    ModulesManager::start(vec![], );
+    ModulesManager::start();
 }
 
 
