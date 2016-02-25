@@ -233,10 +233,11 @@ mod tests {
 
     extern crate glium;
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_set_vertex_buffer() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
@@ -255,11 +256,12 @@ mod tests {
         assert!(vb.0.len() > 0);
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_add_sprite() {
 
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
@@ -286,10 +288,11 @@ mod tests {
         assert!(buffers.1.len() == vertex_buffer.1.len() + 6);
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_delete_sprite() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
         let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
@@ -308,10 +311,11 @@ mod tests {
         assert!(buffers.1.len() == 0);
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_move_sprite() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
@@ -332,10 +336,11 @@ mod tests {
         assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == 0.5);
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_not_find_sprite_and_dont_move_sprite() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
@@ -354,10 +359,11 @@ mod tests {
         assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -0.5);
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_get_sprite_list() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
@@ -374,10 +380,11 @@ mod tests {
 
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_get_sprite() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
@@ -394,10 +401,11 @@ mod tests {
         assert!(sp.name == "toto");
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_order_sprite() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
@@ -431,10 +439,11 @@ mod tests {
 
     }
 
-#[cfg(not(feature = "integration"))]
+    #[cfg(not(feature = "integration"))]
     #[test]
     fn should_move_uv() {
-        let display = glium::glutin::HeadlessRendererBuilder::new(1024, 768)
+        let display = glium::glutin::WindowBuilder::new()
+                          .with_visibility(false)
                           .build_glium()
                           .unwrap();
 
