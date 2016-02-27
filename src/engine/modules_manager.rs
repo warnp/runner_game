@@ -8,6 +8,7 @@ use engine::vertex::Vertex;
 use engine::input_manager::InputManager;
 use std::sync::mpsc;
 use std::thread;
+use engine::engine_helper::EngineHelper;
 
 pub struct ModulesManager;
 
@@ -20,6 +21,8 @@ impl ModulesManager {
                           .with_dimensions(1024, 768)
                           .build_glium()
                           .unwrap();
+
+        let mut engine_helper = EngineHelper::new();
 
         // GraphicsHandler::compile_shaders(&display, vec![], "simple_shader");
 
@@ -52,12 +55,27 @@ impl ModulesManager {
 
 
         loop {
+            // thread::sleep_ms(200);
+            let fps = engine_helper.get_fps();
+            println!("{}", fps.0);
+            let time = engine_helper.get_iterator();
+            // println!("{}", time);
             GraphicsHandler::draw(&display, sprite_manager.set_buffers(), &textures, &program);
-            input_buffer.push(InputManager::get_input(&display));
-            println!("{:#?}", input_buffer);
-            if input_buffer.contains(&"escape_press") {
-                return;
-            }
+            let mut result = "";
+
+
+            InputManager::get_input(&display);
+            // if result != "" {
+            //     println!("{:?}", result);
+            //     input_buffer.push(result);
+            //     // input_buffer.push(InputManager::get_input(&display));
+            //
+            // }
+
+            // println!("{:#?}", input_buffer);
+            // if input_buffer.contains(&"escape_press") {
+            //     return;
+            // }
         }
 
     }

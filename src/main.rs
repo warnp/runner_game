@@ -24,12 +24,14 @@ use engine::collision::CollisionMesh;
 // mod text_writer;
 use engine::text_writer::TextWriter;
 use engine::modules_manager::ModulesManager;
+use engine::input_manager::InputManager;
 
 use glium::{DisplayBuild, Surface};
 use rand::Rand;
 
 
-fn jump_function(sp: &mut [engine::vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f32, index: u32, sprite_manager: &SpriteManager) {
+
+fn jump_function(sp: &mut [engine::vertex::Vertex], jump: &mut bool, touch_ground: &mut bool, jump_height: f32, time_between: f64, index: u32, sprite_manager: &SpriteManager) {
 
     if *jump && *touch_ground {
 
@@ -76,11 +78,11 @@ fn jump_function(sp: &mut [engine::vertex::Vertex], jump: &mut bool, touch_groun
     }
 }
 
-fn move_to_left(sp: &mut [engine::vertex::Vertex], time_between: f32){
-    sp[0].position[0] = sp[0].position[0] - 0.5 * time_between;
-    sp[1].position[0] = sp[1].position[0] - 0.5 * time_between;
-    sp[2].position[0] = sp[2].position[0] - 0.5 * time_between;
-    sp[3].position[0] = sp[3].position[0] - 0.5 * time_between;
+fn move_to_left(sp: &mut [engine::vertex::Vertex], time_between: f64){
+    sp[0].position[0] = sp[0].position[0] - (0.5f64 * time_between) as f32;
+    sp[1].position[0] = sp[1].position[0] - (0.5f64 * time_between) as f32;
+    sp[2].position[0] = sp[2].position[0] - (0.5f64 * time_between) as f32;
+    sp[3].position[0] = sp[3].position[0] - (0.5f64 * time_between) as f32;
 }
 
 //TODO insert program and uniform parameters
@@ -113,12 +115,12 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
     target.finish().unwrap();
 }
 
-fn main(){
+fn toto(){
     ModulesManager::start();
 }
 
 
-fn toto() {
+fn main() {
 
 
 
@@ -165,6 +167,8 @@ fn toto() {
     let mut buffers : (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
     let mut move_object = false;
 
+
+
     loop{
 
         //HUD
@@ -172,7 +176,7 @@ fn toto() {
 
         let fps_counter = engine_helper.get_fps();
 
-        if engine_helper.get_iterator() % 10.0 == 0.0 {
+        if engine_helper.get_iterator() % 10 == 0 {
             sprite_manager.delete_sprite("fps");
             for x in print_fps.get_string(&format!("{}fps", fps_counter.0)[..]){
                     sprite_manager.add_sprite(x.clone());
@@ -207,7 +211,7 @@ fn toto() {
         {
             let sprite_mover = sprite_manager.get_sprite("mover0");
             if sprite_mover.vertices[1].position[0] >= -1.0 {
-                buffers = sprite_manager.move_sprite("mover0", -0.1  * fps_counter.1 - engine_helper.get_iterator() * 0.000001,0.0);
+                buffers = sprite_manager.move_sprite("mover0", -0.1  * fps_counter.1 as f32 - engine_helper.get_iterator() as f32 * 0.000001,0.0);
 
             }else {
                 move_object = true;
@@ -215,7 +219,7 @@ fn toto() {
         }
 
         if !touch_ground {
-            buffers = sprite_manager.move_sprite("hero", 0.0,-0.15 * fps_counter.1);
+            buffers = sprite_manager.move_sprite("hero", 0.0,-0.15 * fps_counter.1 as f32);
         }
 
         {
@@ -280,18 +284,20 @@ fn toto() {
 
         draw(&display, sprite_manager.set_buffers(), &program, &texture, screen_height, screen_width);
 
-        for ev in display.poll_events(){
-            match ev {
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = false,
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   buffers = sprite_manager.add_sprite(Sprite::new("mover1",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),2)),
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1"),
-                glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::P)) => show_fps = true,
-                glium::glutin::Event::Closed => return,
-                _ => ()
-            }
-        }
+        let command = InputManager::get_input(&display);
+        println!("{}", command);
+        // for ev in display.poll_events(){
+        //     match ev {
+        //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,
+        //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = false,
+        //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,_,Some(glium::glutin::VirtualKeyCode::Escape)) => return,
+        //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::A)) =>   buffers = sprite_manager.add_sprite(Sprite::new("mover1",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),2)),
+        //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::D)) => buffers = sprite_manager.delete_sprite("mover1"),
+        //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,_,Some(glium::glutin::VirtualKeyCode::P)) => show_fps = true,
+        //         glium::glutin::Event::Closed => return,
+        //         _ => ()
+        //     }
+        // }
 
     }
 }

@@ -1,10 +1,13 @@
 extern crate glium;
 
+#[derive(Debug)]
 pub struct InputManager;
 
 impl InputManager {
     pub fn get_input(display: &glium::backend::glutin_backend::GlutinFacade) -> &str {
         let mut result = "";
+        // println!("{}", &display.poll_events());
+
         for ev in display.poll_events() {
             match ev {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,
@@ -39,6 +42,7 @@ impl InputManager {
                 }
                 _ => result = "",
             }
+            println!("{:#?}", ev);
         }
         result
     }
