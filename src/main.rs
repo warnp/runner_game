@@ -25,6 +25,7 @@ use engine::collision::CollisionMesh;
 use engine::text_writer::TextWriter;
 use engine::modules_manager::ModulesManager;
 use engine::input_manager::InputManager;
+use engine::graphics_handler::GraphicsHandler;
 
 use glium::{DisplayBuild, Surface};
 use rand::Rand;
@@ -115,12 +116,16 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
     target.finish().unwrap();
 }
 
-fn toto(){
-    ModulesManager::start();
+fn main(){
+
+let modules_manager = ModulesManager::new();
+
+        modules_manager.start();
+
 }
 
 
-fn main() {
+fn toto() {
 
 
 

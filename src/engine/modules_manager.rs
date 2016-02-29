@@ -13,7 +13,10 @@ use engine::engine_helper::EngineHelper;
 pub struct ModulesManager;
 
 impl ModulesManager {
-    pub fn start() {
+    pub fn new() -> ModulesManager {
+        ModulesManager
+    }
+    pub fn start(&self) {
 
         // ---------DISPLAY--------------
         let display = glium::glutin::WindowBuilder::new()
@@ -55,27 +58,17 @@ impl ModulesManager {
 
 
         loop {
-            // thread::sleep_ms(200);
+
             let fps = engine_helper.get_fps();
-            println!("{}", fps.0);
+            // println!("{}", fps.0);
             let time = engine_helper.get_iterator();
-            // println!("{}", time);
+
             GraphicsHandler::draw(&display, sprite_manager.set_buffers(), &textures, &program);
             let mut result = "";
 
 
             InputManager::get_input(&display);
-            // if result != "" {
-            //     println!("{:?}", result);
-            //     input_buffer.push(result);
-            //     // input_buffer.push(InputManager::get_input(&display));
-            //
-            // }
 
-            // println!("{:#?}", input_buffer);
-            // if input_buffer.contains(&"escape_press") {
-            //     return;
-            // }
         }
 
     }
