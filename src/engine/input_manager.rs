@@ -4,8 +4,8 @@ extern crate glium;
 pub struct InputManager;
 
 impl InputManager {
-    pub fn get_input(display: &glium::backend::glutin_backend::GlutinFacade) -> &str {
-        let mut result = "";
+    pub fn get_input(display: &glium::backend::glutin_backend::GlutinFacade) -> Vec<&str> {
+        let mut result: Vec<&str> = vec![];
         // println!("{}", &display.poll_events());
 
         for ev in display.poll_events() {
@@ -13,36 +13,36 @@ impl InputManager {
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,
                                                     _,
                                                     Some(glium::glutin::VirtualKeyCode::Space)) => {
-                    result = "space_press"
+                    result.push("space_press")
                 }
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,
                                                     _,
                                                     Some(glium::glutin::VirtualKeyCode::Space)) => {
-                    result = "space_release"
+                    result.push("space_release")
                 }
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,
                                                     _,
                                                     Some(glium::glutin::VirtualKeyCode::A)) => {
-                    result = "a_press"
+                    result.push("a_press")
                 }
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,
                                                     _,
                                                     Some(glium::glutin::VirtualKeyCode::D)) => {
-                    result = "d_press"
+                    result.push("d_press")
                 }
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,
                                                     _,
                                                     Some(glium::glutin::VirtualKeyCode::P)) => {
-                    result = "p_press"
+                    result.push("p_press")
                 }
                 glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed,
                                                     _,
                                                     Some(glium::glutin::VirtualKeyCode::Escape)) => {
-                    result = "escape_press"
+                    result.push("escape_press")
                 }
-                _ => result = "",
+                _ => (),
             }
-            println!("{:#?}", ev);
+            // println!("{:#?}", ev);
         }
         result
     }

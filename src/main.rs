@@ -28,6 +28,7 @@ use engine::input_manager::InputManager;
 use engine::graphics_handler::GraphicsHandler;
 
 use glium::{DisplayBuild, Surface};
+use std::thread;
 use rand::Rand;
 
 
@@ -119,8 +120,14 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 fn main(){
 
 let modules_manager = ModulesManager::new();
+    // thread::spawn(move || {
+    //     loop {
+    //
+    //         println!("TOTO");
+    //     }
+    // });
 
-        modules_manager.start();
+    modules_manager.start();
 
 }
 
@@ -289,8 +296,8 @@ fn toto() {
 
         draw(&display, sprite_manager.set_buffers(), &program, &texture, screen_height, screen_width);
 
-        let command = InputManager::get_input(&display);
-        println!("{}", command);
+        // let command = InputManager::get_input(&display);
+        // println!("{}", command);
         // for ev in display.poll_events(){
         //     match ev {
         //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Pressed, _, Some(glium::glutin::VirtualKeyCode::Space)) => jump = true,

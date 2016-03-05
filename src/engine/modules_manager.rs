@@ -67,7 +67,13 @@ impl ModulesManager {
             let mut result = "";
 
 
-            InputManager::get_input(&display);
+            input_buffer = InputManager::get_input(&display);
+
+            for el in &input_buffer {
+                if el.to_string() == "d_press".to_string() {
+                        println!("{:#?}", input_buffer );
+                }
+            }
 
         }
 
