@@ -9,12 +9,26 @@ use engine::input_manager::InputManager;
 use std::sync::mpsc;
 use std::thread;
 use engine::engine_helper::EngineHelper;
+use engine::generic_object::GenericObject;
+use std::boxed::Box;
 
-pub struct ModulesManager;
+pub struct ModulesManager{
+    pub generics: Vec<Box<GenericObject>>,
+}
 
 impl ModulesManager {
+
     pub fn new() -> ModulesManager {
-        ModulesManager
+        let tmp_gen :Vec<Box<GenericObject>> = Vec::new();
+        ModulesManager{
+            generics: tmp_gen,
+        }
+    }
+
+    pub fn new_with_generics(generics: Vec<Box<GenericObject>>) -> ModulesManager {
+        ModulesManager{
+            generics: generics,
+        }
     }
     pub fn start(&self) {
 

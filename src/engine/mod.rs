@@ -18,3 +18,4 @@ pub mod text_writer;
 pub mod input_manager;
 pub mod modules_manager;
 pub mod graphics_handler;
+pub mod generic_object;

@@ -30,6 +30,8 @@ use engine::graphics_handler::GraphicsHandler;
 use glium::{DisplayBuild, Surface};
 use std::thread;
 use rand::Rand;
+use std::boxed::Box;
+use engine::generic_object::GenericObject;
 
 
 
