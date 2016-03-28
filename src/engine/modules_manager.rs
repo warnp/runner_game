@@ -14,20 +14,24 @@ use std::cell::RefCell;
 // use std::boxed::Box;
 
 pub struct ModulesManager{
-    generics: Vec<Box<GenericObject>>,
+    generics_objects: Vec<Box<GenericObject>>,
+    generics_controls: Vec<Box<GenericControl>>,
+
 }
 
 impl ModulesManager {
 
     pub fn new() -> ModulesManager{
         ModulesManager{
-            generics: vec![],
+            generics_objects: vec![],
+            generics_controls: vec![],
         }
     }
 
-    pub fn new_with_generics(generics: Vec<Box<GenericObject>>) -> ModulesManager {
+    pub fn new_with_generics(generics: Vec<Box<GenericObject>>, generics_controls: Vec<Box<GenericControl>>) -> ModulesManager {
         ModulesManager{
-            generics: generics,
+            generics_objects: generics,
+            generics_controls: generics_controls,
         }
     }
     pub fn start(&self) {

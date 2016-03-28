@@ -121,15 +121,11 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 
 fn main(){
 
-// let modules_manager = ModulesManager::new();
-    // thread::spawn(move || {
-    //     loop {
-    //
-    //         println!("TOTO");
-    //     }
-    // });
+//-----------Faire un handler pour les controls
+//-----------Faire un générateur d'objet "GenericObject comportant tout les attributs pour les placer dans l'univers..."
+let modules_manager = ModulesManager::new();
 
-    // modules_manager.start();
+    modules_manager.start();
 
 }
 
