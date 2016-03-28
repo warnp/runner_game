@@ -121,7 +121,7 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 
 fn main(){
 
-let modules_manager = ModulesManager::new();
+// let modules_manager = ModulesManager::new();
     // thread::spawn(move || {
     //     loop {
     //
@@ -129,7 +129,7 @@ let modules_manager = ModulesManager::new();
     //     }
     // });
 
-    modules_manager.start();
+    // modules_manager.start();
 
 }
 

@@ -10,18 +10,18 @@ use std::sync::mpsc;
 use std::thread;
 use engine::engine_helper::EngineHelper;
 use engine::generic_object::GenericObject;
-use std::boxed::Box;
+use std::cell::RefCell;
+// use std::boxed::Box;
 
 pub struct ModulesManager{
-    pub generics: Vec<Box<GenericObject>>,
+    generics: Vec<Box<GenericObject>>,
 }
 
 impl ModulesManager {
 
-    pub fn new() -> ModulesManager {
-        let tmp_gen :Vec<Box<GenericObject>> = Vec::new();
+    pub fn new() -> ModulesManager{
         ModulesManager{
-            generics: tmp_gen,
+            generics: vec![],
         }
     }
 

@@ -1,3 +1,3 @@
-trait GenericObject {
-    fn key_reader(key: &str);
+pub trait GenericObject {
+    fn key_reader(&self, key: &str);
 }

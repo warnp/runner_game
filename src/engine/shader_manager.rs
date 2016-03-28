@@ -107,7 +107,10 @@ impl<'a> Shaders<'a> {
         let mut tex_vec = Vec::new();
 
         for tex in &self.textures {
-            tex_vec.push(self.set_image(tex).unwrap().to_rgba());
+            let image = self.set_image(tex).unwrap().to_rgba();
+            let image_dimensions = image.dimensions();
+            let image = glium::texture::RawImage2d::from_raw_rgba_reversed(image.into_raw(), image_dimensions );
+            tex_vec.push(image);
         }
 
         glium::texture::Texture2dArray::new(display, tex_vec).unwrap()
