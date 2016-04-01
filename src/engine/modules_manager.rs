@@ -10,6 +10,7 @@ use std::sync::mpsc;
 use std::thread;
 use engine::engine_helper::EngineHelper;
 use engine::generic_object::GenericObject;
+use engine::generic_control::GenericControl;
 use std::cell::RefCell;
 // use std::boxed::Box;
 
