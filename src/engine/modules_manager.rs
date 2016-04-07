@@ -29,6 +29,14 @@ impl ModulesManager {
         }
     }
 
+    //Only for testing
+    pub fn new_with_actors(generics: Vec<Box<GenericObject>>) -> ModulesManager {
+        ModulesManager{
+            generics_objects: generics,
+            generics_controls: vec![],
+        }
+    }
+
     pub fn new_with_generics(generics: Vec<Box<GenericObject>>, generics_controls: Vec<Box<GenericControl>>) -> ModulesManager {
         ModulesManager{
             generics_objects: generics,

@@ -60,6 +60,6 @@ mod engine_helper_tests {
 
         }
         println!("{:?}", engine_helper.get_iterator());
-        assert!(engine_helper.get_iterator() == 120.0);
+        assert!(engine_helper.get_iterator() == 120);
     }
 }

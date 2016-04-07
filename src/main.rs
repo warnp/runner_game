@@ -32,6 +32,7 @@ use std::thread;
 use rand::Rand;
 use std::boxed::Box;
 use engine::generic_object::GenericObject;
+use game_logic::logic_handler::LogicHandler;
 
 
 
@@ -122,10 +123,10 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 fn main(){
 
 //-----------Faire un handler pour les controls
-//-----------Faire un générateur d'objet "GenericObject comportant tout les attributs pour les placer dans l'univers..."
-let modules_manager = ModulesManager::new();
+let logic_manager = LogicHandler;
+let modules_manager = ModulesManager::new_with_actors(logic_manager.init());
 
-    modules_manager.start();
+modules_manager.start();
 
 }
 
