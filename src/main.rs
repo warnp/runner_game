@@ -127,6 +127,9 @@ let logic_manager = LogicHandler;
 let modules_manager = ModulesManager::new_with_actors(logic_manager.init());
 
 modules_manager.start();
+loop {
+    let modules_manager = modules_manager.draw(5.0);
+}
 
 }
 

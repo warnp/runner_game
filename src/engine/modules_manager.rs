@@ -43,6 +43,8 @@ impl ModulesManager {
             generics_controls: generics_controls,
         }
     }
+
+    //Should be a private method and should be used in ctors
     pub fn start(&self) {
 
         // ---------DISPLAY--------------
@@ -52,7 +54,7 @@ impl ModulesManager {
                           .build_glium()
                           .unwrap();
 
-        let mut engine_helper = EngineHelper::new();
+        // let mut engine_helper = EngineHelper::new();
 
         // GraphicsHandler::compile_shaders(&display, vec![], "simple_shader");
 
@@ -84,25 +86,49 @@ impl ModulesManager {
         // });
 
 
-        loop {
+        // loop {
+        //
+        //     // let fps = engine_helper.get_fps();
+        //     // println!("{}", fps.0);
+        //     // let time = engine_helper.get_iterator();
+        //
+        //
+        //     let mut result = "";
+        //
+        //
+        //     input_buffer = InputManager::get_input(&display);
+        //
+        //     for el in &input_buffer {
+        //         if el.to_string() == "d_press".to_string() {
+        //                 println!("{:#?}", input_buffer );
+        //         }
+        //     }
+        //
+        // }
 
-            let fps = engine_helper.get_fps();
-            // println!("{}", fps.0);
-            let time = engine_helper.get_iterator();
+    }
 
-            GraphicsHandler::draw(&display, sprite_manager.set_buffers(), &textures, &program);
-            let mut result = "";
+    pub fn draw(&self,
+         delta_time: f64,
+         display: &glium::backend::glutin_backend::GlutinFacade,
+         buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>),
+         textures: &glium::texture::Texture2dArray,
+         program: &glium::Program) -> &ModulesManager {
 
+        GraphicsHandler::draw(&display, sprite_manager.set_buffers(), &textures, &program);
 
-            input_buffer = InputManager::get_input(&display);
+        self
+    }
+}
 
-            for el in &input_buffer {
-                if el.to_string() == "d_press".to_string() {
-                        println!("{:#?}", input_buffer );
-                }
-            }
+#[cfg(test)]
+mod tests{
+    use super::*;
 
-        }
-
+    #[test]
+    fn should_return_modules_manager(){
+        let modules_manager = ModulesManager::new();
+        // let modules_manager_res = modules_manager.draw(5.0);
+        // assert!(modules_manager.generics_objects.len() == modules_manager_res.generics_objects.len());
     }
 }
