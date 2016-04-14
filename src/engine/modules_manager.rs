@@ -15,60 +15,67 @@ use std::cell::RefCell;
 // use std::boxed::Box;
 
 pub struct ModulesManager{
-    generics_objects: Vec<Box<GenericObject>>,
-    generics_controls: Vec<Box<GenericControl>>,
+    display: glium::backend::glutin_backend::GlutinFacade,
+    shaders: Shaders,
+
 
 }
 
 impl ModulesManager {
 
     pub fn new() -> ModulesManager{
-        ModulesManager{
-            generics_objects: vec![],
-            generics_controls: vec![],
-        }
-    }
-
-    //Only for testing
-    pub fn new_with_actors(generics: Vec<Box<GenericObject>>) -> ModulesManager {
-        ModulesManager{
-            generics_objects: generics,
-            generics_controls: vec![],
-        }
-    }
-
-    pub fn new_with_generics(generics: Vec<Box<GenericObject>>, generics_controls: Vec<Box<GenericControl>>) -> ModulesManager {
-        ModulesManager{
-            generics_objects: generics,
-            generics_controls: generics_controls,
-        }
-    }
-
-    //Should be a private method and should be used in ctors
-    pub fn start(&self) {
-
-        // ---------DISPLAY--------------
         let display = glium::glutin::WindowBuilder::new()
                           .with_vsync()
                           .with_dimensions(1024, 768)
                           .build_glium()
                           .unwrap();
 
+        ModulesManager{
+            display: display,
+            shaders: Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]]),
+        }
+    }
+
+    //Only for testing
+    // pub fn new_with_actors(generics: Vec<Box<GenericObject>>) -> ModulesManager {
+    //     ModulesManager{
+    //         generics_objects: generics,
+    //         generics_controls: vec![],
+    //     }
+    // }
+    //
+    // pub fn new_with_generics(generics: Vec<Box<GenericObject>>, generics_controls: Vec<Box<GenericControl>>) -> ModulesManager {
+    //     ModulesManager{
+    //         generics_objects: generics,
+    //         generics_controls: generics_controls,
+    //     }
+    // }
+
+    //Should be a private method and should be used in ctors
+    pub fn start(&self) {
+
+        // ---------DISPLAY--------------
+        // let display = glium::glutin::WindowBuilder::new()
+        //                   .with_vsync()
+        //                   .with_dimensions(1024, 768)
+        //                   .build_glium()
+        //                   .unwrap();
+
         // let mut engine_helper = EngineHelper::new();
 
         // GraphicsHandler::compile_shaders(&display, vec![], "simple_shader");
 
-        let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]]);
-        shaders.compile_shaders(&display);
-        let program = shaders.get_compiled_shader("simple_shader");
-        let textures = shaders.get_texture_array(&display);
+        // let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]]);
+        // shaders.compile_shaders(&display);
+        // let program = shaders.get_compiled_shader("simple_shader");
+        // let textures = shaders.get_texture_array(&display);
 
         let mut sprite_manager = SpriteManager::new(vec![], &display);
         let mut buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
         buffers = sprite_manager.set_buffers();
 
         // ---------INPUT------------------
-        let mut input_buffer = vec![""];
+        // let mut input_buffer = vec![""];
         // let (tx, rx): (mpsc::Sender<&glium::backend::glutin_backend::GlutinFacade>,
         //                mpsc::Receiver<&glium::backend::glutin_backend::GlutinFacade>) =
         //     mpsc::channel();
@@ -110,12 +117,12 @@ impl ModulesManager {
 
     pub fn draw(&self,
          delta_time: f64,
-         display: &glium::backend::glutin_backend::GlutinFacade,
-         buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>),
-         textures: &glium::texture::Texture2dArray,
-         program: &glium::Program) -> &ModulesManager {
+         generics_objects: Vec<Box<GenericObject>>,
+         generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
 
-        GraphicsHandler::draw(&display, sprite_manager.set_buffers(), &textures, &program);
+
+
+        GraphicsHandler::draw(&self.display, SpriteManager::new(vec![], &self.display).set_buffers(), &textures, &program);
 
         self
     }
