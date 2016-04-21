@@ -16,7 +16,7 @@ use std::cell::RefCell;
 
 pub struct ModulesManager{
     display: glium::backend::glutin_backend::GlutinFacade,
-    shaders: Shaders,
+    shaders: engine::shader_manager::Shaders,
 
 
 }
@@ -30,10 +30,13 @@ impl ModulesManager {
                           .build_glium()
                           .unwrap();
 
-        ModulesManager{
-            display: display,
-            shaders: Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]]),
-        }
+          let shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]]);
+          shaders.compile_shaders(&display);
+            ModulesManager{
+                display: display,
+                shaders: shaders,
+
+            }
     }
 
     //Only for testing
@@ -70,7 +73,7 @@ impl ModulesManager {
         // let program = shaders.get_compiled_shader("simple_shader");
         // let textures = shaders.get_texture_array(&display);
 
-        let mut sprite_manager = SpriteManager::new(vec![], &display);
+        let mut sprite_manager = SpriteManager::new(vec![], &self.display);
         let mut buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
         buffers = sprite_manager.set_buffers();
 
@@ -122,7 +125,7 @@ impl ModulesManager {
 
 
 
-        GraphicsHandler::draw(&self.display, SpriteManager::new(vec![], &self.display).set_buffers(), &textures, &program);
+        GraphicsHandler::draw(&self.display, SpriteManager::new(vec![], &self.display).set_buffers(), &self.shaders.get_texture_array(&display), &self.shaders.get_compiled_shader("simple_shader"));
 
         self
     }
