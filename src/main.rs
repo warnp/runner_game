@@ -124,11 +124,11 @@ fn main(){
 
 //-----------Faire un handler pour les controls
 let logic_manager = LogicHandler;
-let modules_manager = ModulesManager::new_with_actors(logic_manager.init());
+let modules_manager = ModulesManager::new();
 
 modules_manager.start();
 loop {
-    let modules_manager = modules_manager.draw(5.0);
+    let modules_manager = modules_manager.draw(5.0, vec![], vec![]);
 }
 
 }

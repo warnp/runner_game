@@ -14,16 +14,16 @@ use engine::generic_control::GenericControl;
 use std::cell::RefCell;
 // use std::boxed::Box;
 
-pub struct ModulesManager{
+pub struct ModulesManager<'a>{
     display: glium::backend::glutin_backend::GlutinFacade,
-    shaders: engine::shader_manager::Shaders,
+    shaders: Shaders<'a>,
 
 
 }
 
-impl ModulesManager {
+impl<'a> ModulesManager<'a> {
 
-    pub fn new() -> ModulesManager{
+    pub fn new() -> ModulesManager<'a>{
         let display = glium::glutin::WindowBuilder::new()
                           .with_vsync()
                           .with_dimensions(1024, 768)
@@ -34,7 +34,7 @@ impl ModulesManager {
           shaders.compile_shaders(&display);
             ModulesManager{
                 display: display,
-                shaders: shaders,
+                shaders: shaders.clone(),
 
             }
     }
@@ -125,7 +125,7 @@ impl ModulesManager {
 
 
 
-        GraphicsHandler::draw(&self.display, SpriteManager::new(vec![], &self.display).set_buffers(), &self.shaders.get_texture_array(&display), &self.shaders.get_compiled_shader("simple_shader"));
+        GraphicsHandler::draw(&self.display, SpriteManager::new(vec![], &self.display).set_buffers(), &self.shaders.get_texture_array(&self.display), &self.shaders.get_compiled_shader("simple_shader"));
 
         self
     }

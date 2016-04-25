@@ -4,13 +4,13 @@ extern crate image;
 
 extern crate glium;
 
-#[derive(Hash, Eq, PartialEq, Debug)]
+#[derive(Hash, Eq, PartialEq, Debug, Clone)]
 pub struct ShaderCouple<'a> {
     pub vertex_shader: &'a str,
     pub pixel_shader: &'a str,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Shaders<'a> {
     pub shaders_list: HashMap<&'a str, ShaderCouple<'a>>,
     compiled_shaders: HashMap<&'a str, Box<glium::program::Program>>,
