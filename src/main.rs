@@ -122,14 +122,14 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 
 fn main(){
 
-//-----------Faire un handler pour les controls
-let logic_manager = LogicHandler;
-let modules_manager = ModulesManager::new();
+    //-----------Faire un handler pour les controls
+    let logic_manager = LogicHandler;
+    let mut modules_manager = ModulesManager::new();
 
-modules_manager.start();
-loop {
-    let modules_manager = modules_manager.draw(5.0, vec![], vec![]);
-}
+    modules_manager.start();
+    loop {
+        let mut modules_manager = modules_manager.draw(5.0, vec![], vec![]);
+    }
 
 }
 
@@ -158,7 +158,7 @@ fn toto() {
     let mut shaders = Shaders::new(vec![&include_bytes!("../content/VFKM2.png")[..],
                                                         &include_bytes!("../content/11532.png")[..],
                                                         &include_bytes!("../content/NatureForests.png")[..],
-                                                        &include_bytes!("../content/hero.png")[..]]);
+                                                        &include_bytes!("../content/hero.png")[..]], &display);
     shaders.compile_shaders(&display);
 
     let program = shaders.get_compiled_shader("simple_shader");

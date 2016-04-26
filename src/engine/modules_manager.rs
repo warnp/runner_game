@@ -30,11 +30,11 @@ impl<'a> ModulesManager<'a> {
                           .build_glium()
                           .unwrap();
 
-          let shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]]);
-          shaders.compile_shaders(&display);
+          let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]], &display);
+        //   shaders.compile_shaders(&display);
             ModulesManager{
                 display: display,
-                shaders: shaders.clone(),
+                shaders: shaders,
 
             }
     }
@@ -118,14 +118,17 @@ impl<'a> ModulesManager<'a> {
 
     }
 
-    pub fn draw(&self,
+    pub fn draw(&mut self,
          delta_time: f64,
          generics_objects: Vec<Box<GenericObject>>,
          generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
 
 
 
-        GraphicsHandler::draw(&self.display, SpriteManager::new(vec![], &self.display).set_buffers(), &self.shaders.get_texture_array(&self.display), &self.shaders.get_compiled_shader("simple_shader"));
+        GraphicsHandler::draw(&self.display,
+             SpriteManager::new(vec![], &self.display).set_buffers(),
+             &self.shaders.get_texture_array(&self.display),
+             &self.shaders.get_compiled_shader("simple_shader"));
 
         self
     }

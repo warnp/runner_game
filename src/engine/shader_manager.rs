@@ -4,13 +4,13 @@ extern crate image;
 
 extern crate glium;
 
-#[derive(Hash, Eq, PartialEq, Debug, Clone)]
+#[derive(Hash, Eq, PartialEq, Debug)]
 pub struct ShaderCouple<'a> {
     pub vertex_shader: &'a str,
     pub pixel_shader: &'a str,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Shaders<'a> {
     pub shaders_list: HashMap<&'a str, ShaderCouple<'a>>,
     compiled_shaders: HashMap<&'a str, Box<glium::program::Program>>,
@@ -19,7 +19,7 @@ pub struct Shaders<'a> {
 }
 
 impl<'a> Shaders<'a> {
-    pub fn new(textures: Vec<&'a [u8]>) -> Shaders<'a> {
+    pub fn new(textures: Vec<&'a [u8]>, display: &glium::backend::glutin_backend::GlutinFacade) -> Shaders<'a> {
 
         let mut hash = HashMap::new();
 
@@ -66,10 +66,19 @@ impl<'a> Shaders<'a> {
             }
             "#,
                     });
+        let mut hash_compiled = HashMap::new();
+
+        for (name, s) in hash.iter() {
+            hash_compiled.insert("simple_shader", Box::new(glium::Program::from_source(display,
+                                                 s.vertex_shader,
+                                                 s.pixel_shader,
+                                                 None)
+                         .unwrap()));
+        }
 
         Shaders {
             shaders_list: hash,
-            compiled_shaders: HashMap::new(),
+            compiled_shaders: hash_compiled,
             textures: textures,
         }
 
