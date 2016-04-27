@@ -126,9 +126,16 @@ fn main(){
     let logic_manager = LogicHandler;
     let mut modules_manager = ModulesManager::new();
 
-    modules_manager.start();
+    let mut engine_helper = EngineHelper::new();
+
+
+    // modules_manager.start();
     loop {
-        let mut modules_manager = modules_manager.draw(5.0, vec![], vec![]);
+        modules_manager.draw(engine_helper.get_fps().1, vec![], vec![]);
+        if engine_helper.get_iterator() % 10 == 0 {
+            println!("{} fps", engine_helper.get_fps().0);
+
+        }
     }
 
 }
@@ -296,7 +303,7 @@ fn toto() {
 
         // }
 
-        draw(&display, sprite_manager.set_buffers(), &program, &texture, screen_height, screen_width);
+        draw(&display, sprite_manager.get_buffers(), &program, &texture, screen_height, screen_width);
 
         // let command = InputManager::get_input(&display);
         // println!("{}", command);

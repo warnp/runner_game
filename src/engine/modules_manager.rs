@@ -31,7 +31,7 @@ impl<'a> ModulesManager<'a> {
                           .unwrap();
 
           let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]], &display);
-        //   shaders.compile_shaders(&display);
+          shaders.compile_shaders(&display);
             ModulesManager{
                 display: display,
                 shaders: shaders,
@@ -56,6 +56,7 @@ impl<'a> ModulesManager<'a> {
 
     //Should be a private method and should be used in ctors
     pub fn start(&self) {
+        // &self.shaders.compile_shaders(&self.display);
 
         // ---------DISPLAY--------------
         // let display = glium::glutin::WindowBuilder::new()
@@ -75,7 +76,7 @@ impl<'a> ModulesManager<'a> {
 
         let mut sprite_manager = SpriteManager::new(vec![], &self.display);
         let mut buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
-        buffers = sprite_manager.set_buffers();
+        buffers = sprite_manager.get_buffers();
 
         // ---------INPUT------------------
         // let mut input_buffer = vec![""];
@@ -123,12 +124,12 @@ impl<'a> ModulesManager<'a> {
          generics_objects: Vec<Box<GenericObject>>,
          generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
 
-
-
-        GraphicsHandler::draw(&self.display,
-             SpriteManager::new(vec![], &self.display).set_buffers(),
-             &self.shaders.get_texture_array(&self.display),
-             &self.shaders.get_compiled_shader("simple_shader"));
+         let buffers = SpriteManager::new(vec![], &self.display).get_buffers();
+         //TODO May find another solution to optimize perfs
+         GraphicsHandler::draw(&self.display,
+              buffers,
+              &self.shaders.get_texture_array(&self.display),
+              &self.shaders.get_compiled_shader("simple_shader"));
 
         self
     }
@@ -141,7 +142,8 @@ mod tests{
     #[test]
     fn should_return_modules_manager(){
         let modules_manager = ModulesManager::new();
-        // let modules_manager_res = modules_manager.draw(5.0);
-        // assert!(modules_manager.generics_objects.len() == modules_manager_res.generics_objects.len());
+
+        let new_mod = modules_manager.draw(5.0, vec![], vec![]);
+        assert!(modules_manager == new_mod);
     }
 }

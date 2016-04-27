@@ -46,7 +46,7 @@ impl<'a> SpriteManager<'a> {
 
 
 
-    pub fn set_buffers(&self) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
+    pub fn get_buffers(&self) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         let vertices_array = self.sprite_list_to_vertex_list();
         let index_list = self.sprite_list_to_indices_buffer();
@@ -65,7 +65,7 @@ impl<'a> SpriteManager<'a> {
 
         self.sprite_list.borrow_mut().push(sprite);
 
-        self.set_buffers()
+        self.get_buffers()
 
     }
 
@@ -77,7 +77,7 @@ impl<'a> SpriteManager<'a> {
 
         self.sprite_list.borrow_mut().retain(|&x| x.name != sprite_name);
 
-        self.set_buffers()
+        self.get_buffers()
 
     }
 
@@ -109,7 +109,7 @@ impl<'a> SpriteManager<'a> {
             self.sprite_list.borrow_mut()[sp.0] = *sp.1;
         }
 
-        self.set_buffers()
+        self.get_buffers()
 
     }
 
@@ -144,7 +144,7 @@ impl<'a> SpriteManager<'a> {
 
         self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
-        self.set_buffers()
+        self.get_buffers()
 
     }
 
@@ -186,7 +186,7 @@ impl<'a> SpriteManager<'a> {
 
         self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
-        self.set_buffers()
+        self.get_buffers()
     }
 
 
@@ -250,7 +250,7 @@ mod tests {
                                                                      0)],
                                                     &display);
 
-        let mut vb = sprite_manager.set_buffers();
+        let mut vb = sprite_manager.get_buffers();
 
 
         assert!(vb.0.len() > 0);
@@ -274,7 +274,7 @@ mod tests {
                                                                      0)],
                                                     &display);
 
-        let vertex_buffer = sprite_manager.set_buffers();
+        let vertex_buffer = sprite_manager.get_buffers();
 
         let buffers = sprite_manager.add_sprite(Sprite::new("titi",
                                                             0.50,

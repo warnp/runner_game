@@ -96,7 +96,7 @@ impl<'a> Shaders<'a> {
 
     }
 
-    pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> glium::program::Program {
+    pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> &glium::program::Program {
         *self.compiled_shaders.remove(&shader_name).unwrap()
     }
 
