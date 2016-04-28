@@ -132,10 +132,10 @@ fn main(){
     // modules_manager.start();
     loop {
         modules_manager.draw(engine_helper.get_fps().1, vec![], vec![]);
-        if engine_helper.get_iterator() % 10 == 0 {
+        // if engine_helper.get_iterator() % 10 == 0 {
             println!("{} fps", engine_helper.get_fps().0);
 
-        }
+        // }
     }
 
 }

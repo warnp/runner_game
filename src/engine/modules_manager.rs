@@ -1,4 +1,5 @@
 extern crate glium;
+extern crate time;
 use engine::sprite::Sprite;
 use engine::shader_manager::{Shaders, ShaderCouple};
 use engine::sprite_manager::SpriteManager;
@@ -17,7 +18,7 @@ use std::cell::RefCell;
 pub struct ModulesManager<'a>{
     display: glium::backend::glutin_backend::GlutinFacade,
     shaders: Shaders<'a>,
-
+    program: glium::program::Program,
 
 }
 
@@ -34,8 +35,8 @@ impl<'a> ModulesManager<'a> {
           shaders.compile_shaders(&display);
             ModulesManager{
                 display: display,
+                program: shaders.get_compiled_shader("simple_shader"),
                 shaders: shaders,
-
             }
     }
 
@@ -124,12 +125,14 @@ impl<'a> ModulesManager<'a> {
          generics_objects: Vec<Box<GenericObject>>,
          generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
 
+let first = time::get_time();
+
          let buffers = SpriteManager::new(vec![], &self.display).get_buffers();
-         //TODO May find another solution to optimize perfs
+println!("buffers {}", time::get_time() - first);
          GraphicsHandler::draw(&self.display,
               buffers,
               &self.shaders.get_texture_array(&self.display),
-              &self.shaders.get_compiled_shader("simple_shader"));
+              &self.program);
 
         self
     }
