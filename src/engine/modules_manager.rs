@@ -14,6 +14,7 @@ use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
 use std::cell::RefCell;
 // use std::boxed::Box;
+use std::time::Instant;
 
 pub struct ModulesManager<'a>{
     display: glium::backend::glutin_backend::GlutinFacade,
@@ -39,21 +40,6 @@ impl<'a> ModulesManager<'a> {
                 shaders: shaders,
             }
     }
-
-    //Only for testing
-    // pub fn new_with_actors(generics: Vec<Box<GenericObject>>) -> ModulesManager {
-    //     ModulesManager{
-    //         generics_objects: generics,
-    //         generics_controls: vec![],
-    //     }
-    // }
-    //
-    // pub fn new_with_generics(generics: Vec<Box<GenericObject>>, generics_controls: Vec<Box<GenericControl>>) -> ModulesManager {
-    //     ModulesManager{
-    //         generics_objects: generics,
-    //         generics_controls: generics_controls,
-    //     }
-    // }
 
     //Should be a private method and should be used in ctors
     pub fn start(&self) {
@@ -125,14 +111,13 @@ impl<'a> ModulesManager<'a> {
          generics_objects: Vec<Box<GenericObject>>,
          generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
 
-let first = time::get_time();
-
          let buffers = SpriteManager::new(vec![], &self.display).get_buffers();
-println!("buffers {}", time::get_time() - first);
+         let first = Instant::now();
          GraphicsHandler::draw(&self.display,
               buffers,
               &self.shaders.get_texture_array(&self.display),
               &self.program);
+      println!("buffers {:?}", first.elapsed().subsec_nanos());
 
         self
     }
@@ -147,6 +132,11 @@ mod tests{
         let modules_manager = ModulesManager::new();
 
         let new_mod = modules_manager.draw(5.0, vec![], vec![]);
-        assert!(modules_manager == new_mod);
+
+        match new_mod {
+            Some(x) => assert!(true),
+            None => assert!(false)
+        }
+        // assert!(&modules_manager == &new_mod);
     }
 }
