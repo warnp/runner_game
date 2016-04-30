@@ -1,5 +1,4 @@
 extern crate glium;
-extern crate time;
 use engine::sprite::Sprite;
 use engine::shader_manager::{Shaders, ShaderCouple};
 use engine::sprite_manager::SpriteManager;
@@ -14,7 +13,6 @@ use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
 use std::cell::RefCell;
 // use std::boxed::Box;
-use std::time::Instant;
 
 pub struct ModulesManager<'a>{
     display: glium::backend::glutin_backend::GlutinFacade,
@@ -112,20 +110,27 @@ impl<'a> ModulesManager<'a> {
          generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
 
          let buffers = SpriteManager::new(vec![], &self.display).get_buffers();
-         let first = Instant::now();
          GraphicsHandler::draw(&self.display,
               buffers,
               &self.shaders.get_texture_array(&self.display),
               &self.program);
-      println!("buffers {:?}", first.elapsed().subsec_nanos());
 
         self
+    }
+
+    pub fn generic_object_interpretor(&self) -> Vec<GenericObject>{
+
     }
 }
 
 #[cfg(test)]
 mod tests{
     use super::*;
+    use engine::generic_object::GenericObject;
+struct ObjTest;
+impl GenericObject for ObjTest {
+
+}
 
     #[test]
     fn should_return_modules_manager(){
@@ -133,10 +138,20 @@ mod tests{
 
         let new_mod = modules_manager.draw(5.0, vec![], vec![]);
 
-        match new_mod {
-            Some(x) => assert!(true),
-            None => assert!(false)
-        }
+//TODO need to find a way to test that
+        // match new_mod {
+        //     Some(x) => assert!(true),
+        //     None => assert!(false)
+        // }
         // assert!(&modules_manager == &new_mod);
+        assert!(false);
+    }
+
+    #[test]
+    fn should_interpret_generic_object(){
+        let modules_manager = ModulesManager::new();
+
+        let object_list = modules_manager.generic_object_interpretor(vec![ObjTest]);
+        assert!(object_list.len() == 1);
     }
 }

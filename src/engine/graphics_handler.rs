@@ -1,6 +1,9 @@
 extern crate glium;
+extern crate time;
 use engine::vertex::Vertex;
 use glium::{DisplayBuild, Surface};
+use std::time::Instant;
+
 
 
 pub struct GraphicsHandler;
@@ -36,6 +39,7 @@ impl GraphicsHandler {
                 textures: &glium::texture::Texture2dArray,
                 program: &glium::Program) {
 
+
         // TRANSFORM TO HAVE NICE SPRITE SIZE
         let uniforms = uniform! {
                 matrix: [
@@ -62,7 +66,9 @@ impl GraphicsHandler {
         target.draw(&vertex_buffer, &index_buffer, program, &uniforms, &params)
               .unwrap();
 
+      let first = Instant::now();
         target.finish().unwrap();
+        println!("timer {:?}", first.elapsed().subsec_nanos());
 
 
         // for ev in display.poll_events() {
