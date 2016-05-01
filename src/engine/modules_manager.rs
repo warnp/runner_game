@@ -109,6 +109,7 @@ impl<'a> ModulesManager<'a> {
          generics_objects: Vec<Box<GenericObject>>,
          generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
 
+             self.generic_object_interpretor(generics_objects);
          let buffers = SpriteManager::new(vec![], &self.display).get_buffers();
          GraphicsHandler::draw(&self.display,
               buffers,
@@ -118,8 +119,11 @@ impl<'a> ModulesManager<'a> {
         self
     }
 
-    pub fn generic_object_interpretor(&self) -> Vec<GenericObject>{
-
+    pub fn generic_object_interpretor(&self, generic_object: Vec<Box<GenericObject>>) -> Vec<Sprite>{
+        for i in generic_object {
+            println!("{:?}", i.size);
+        }
+        vec![]
     }
 }
 
@@ -127,14 +131,18 @@ impl<'a> ModulesManager<'a> {
 mod tests{
     use super::*;
     use engine::generic_object::GenericObject;
-struct ObjTest;
+
+#[derive(Debug)]
+struct ObjTest {
+    size: i32,
+}
 impl GenericObject for ObjTest {
 
 }
 
     #[test]
     fn should_return_modules_manager(){
-        let modules_manager = ModulesManager::new();
+        let mut modules_manager = ModulesManager::new();
 
         let new_mod = modules_manager.draw(5.0, vec![], vec![]);
 
@@ -151,7 +159,7 @@ impl GenericObject for ObjTest {
     fn should_interpret_generic_object(){
         let modules_manager = ModulesManager::new();
 
-        let object_list = modules_manager.generic_object_interpretor(vec![ObjTest]);
+        let object_list = modules_manager.generic_object_interpretor(vec![Box::new(ObjTest{size: 1})]);
         assert!(object_list.len() == 1);
     }
 }

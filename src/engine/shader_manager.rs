@@ -141,12 +141,14 @@ mod shader_manager_tests {
     #[test]
     #[ignore]
     fn should_return_a_shader() {
-        let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
-                                           &include_bytes!("../../content/11532.png")[..]]);
+
         let display = glium::glutin::WindowBuilder::new()
                           .with_visibility(false)
                           .build_glium()
                           .unwrap();
+
+      let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
+                                             &include_bytes!("../../content/11532.png")[..]], &display);
         let lst_shaders = shader.get_compiled_shader("toto");
         // assert!(lst_shaders.len() == 1);
         // Shall not pass for the moment, need to find a property to evaluate
@@ -155,12 +157,14 @@ mod shader_manager_tests {
     #[cfg(not(feature = "integration"))]
     #[test]
     fn should_get_texture_array() {
-        let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
-                                           &include_bytes!("../../content/11532.png")[..]]);
+
         let display = glium::glutin::WindowBuilder::new()
                           .with_visibility(false)
                           .build_glium()
                           .unwrap();
+
+      let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
+                                         &include_bytes!("../../content/11532.png")[..]], &display);
 
         let lst_shaders = shader.get_texture_array(&display);
         assert!(lst_shaders.get_array_size() == Some(2));
