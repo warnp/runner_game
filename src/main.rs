@@ -173,7 +173,7 @@ fn toto() {
     let text_manager = TextWriter::new(0,(256,256),(16,16),0.050, (0.0,0.0), "toto", true);
     let print_fps = TextWriter::new(0,(256,256),(16,16),0.05,(0.0,0.950),"fps", true);
 
-    let mut sprite_manager = SpriteManager::new(vert, &display);
+    let mut sprite_manager = SpriteManager::new(vert);
     let texture = shaders.get_texture_array(&display);
 
 
@@ -193,21 +193,21 @@ fn toto() {
     loop{
 
         //HUD
-        sprite_manager.delete_sprite("toto");
+        sprite_manager.delete_sprite("toto", &display);
 
         let fps_counter = engine_helper.get_fps();
 
         if engine_helper.get_iterator() % 10 == 0 {
-            sprite_manager.delete_sprite("fps");
+            sprite_manager.delete_sprite("fps", &display);
             for x in print_fps.get_string(&format!("{}fps", fps_counter.0)[..]){
-                    sprite_manager.add_sprite(x.clone());
+                    sprite_manager.add_sprite(x.clone(), &display);
             }
         }
 
 
 
         for x in text_manager.get_string(&format!("{}pts", engine_helper.get_iterator())[..]){
-            sprite_manager.add_sprite(x.clone());
+            sprite_manager.add_sprite(x.clone(), &display);
         }
 
 
@@ -220,10 +220,10 @@ fn toto() {
         {
             if move_object {
                 {
-                    buffers = sprite_manager.delete_sprite("mover0");
+                    buffers = sprite_manager.delete_sprite("mover0",&display);
                 }
                 {
-                    buffers =  sprite_manager.add_sprite(Sprite::new("mover0",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1));
+                    buffers =  sprite_manager.add_sprite(Sprite::new("mover0",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),&display);
                 }
                 move_object = false;
             }
@@ -232,7 +232,7 @@ fn toto() {
         {
             let sprite_mover = sprite_manager.get_sprite("mover0");
             if sprite_mover.vertices[1].position[0] >= -1.0 {
-                buffers = sprite_manager.move_sprite("mover0", -0.1  * fps_counter.1 as f32 - engine_helper.get_iterator() as f32 * 0.000001,0.0);
+                buffers = sprite_manager.move_sprite("mover0", -0.1  * fps_counter.1 as f32 - engine_helper.get_iterator() as f32 * 0.000001,0.0, &display);
 
             }else {
                 move_object = true;
@@ -240,7 +240,7 @@ fn toto() {
         }
 
         if !touch_ground {
-            buffers = sprite_manager.move_sprite("hero", 0.0,-0.15 * fps_counter.1 as f32);
+            buffers = sprite_manager.move_sprite("hero", 0.0,-0.15 * fps_counter.1 as f32, &display);
         }
 
         {
@@ -266,7 +266,7 @@ fn toto() {
         }
 
         if jump && touch_ground {
-            buffers = sprite_manager.move_sprite("hero", 0.0,0.3);
+            buffers = sprite_manager.move_sprite("hero", 0.0,0.3, &display);
             jump = false;
 
         }
@@ -303,7 +303,7 @@ fn toto() {
 
         // }
 
-        draw(&display, sprite_manager.get_buffers(), &program, &texture, screen_height, screen_width);
+        draw(&display, sprite_manager.get_buffers(&display), &program, &texture, screen_height, screen_width);
 
         // let command = InputManager::get_input(&display);
         // println!("{}", command);

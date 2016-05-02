@@ -14,7 +14,7 @@ extern crate time;
 pub struct SpriteManager<'a> {
     /// Sprite list to handle with
     sprite_list: Rc<RefCell<Vec<Sprite<'a>>>>,
-    display: &'a glium::backend::glutin_backend::GlutinFacade, /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
+ /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
                                                                 * generation_id: i32, */
 }
 
@@ -33,51 +33,49 @@ impl<'a> SpriteManager<'a> {
     ///
     /// let manager = SpriteManager::new(vec![Sprite("toto", 0.0,0.0,[0.0,0.0,0.0,0.0],1,(1.0,1.0),0)], &display);
     /// ```
-    pub fn new(sprites: Vec<Sprite<'a>>,
-               display: &'a glium::backend::glutin_backend::GlutinFacade)
+    pub fn new(sprites: Vec<Sprite<'a>>)
                -> SpriteManager<'a> {
 
         SpriteManager {
             sprite_list: Rc::new(RefCell::new(sprites)),
-            display: display,
         }
 
     }
 
 
 
-    pub fn get_buffers(&self) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
+    pub fn get_buffers(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         let vertices_array = self.sprite_list_to_vertex_list();
         let index_list = self.sprite_list_to_indices_buffer();
 
 
-        (glium::VertexBuffer::dynamic(self.display, &vertices_array).unwrap(),
-         glium::index::IndexBuffer::new(self.display,
+        (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(),
+         glium::index::IndexBuffer::new(display,
                                         glium::index::PrimitiveType::TrianglesList,
                                         &index_list)
              .unwrap())
     }
 
     pub fn add_sprite(&mut self,
-                      sprite: Sprite<'a>)
+                      sprite: Sprite<'a>,display: &glium::backend::glutin_backend::GlutinFacade)
                       -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         self.sprite_list.borrow_mut().push(sprite);
 
-        self.get_buffers()
+        self.get_buffers(display)
 
     }
 
 
     pub fn delete_sprite(&mut self,
-                         sprite_name: &str)
+                         sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade)
                          -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
 
         self.sprite_list.borrow_mut().retain(|&x| x.name != sprite_name);
 
-        self.get_buffers()
+        self.get_buffers(display)
 
     }
 
@@ -85,7 +83,7 @@ impl<'a> SpriteManager<'a> {
     pub fn move_sprite(&self,
                        name: &str,
                        new_x: f32,
-                       new_y: f32)
+                       new_y: f32, display: &glium::backend::glutin_backend::GlutinFacade)
                        -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
 
@@ -109,7 +107,7 @@ impl<'a> SpriteManager<'a> {
             self.sprite_list.borrow_mut()[sp.0] = *sp.1;
         }
 
-        self.get_buffers()
+        self.get_buffers(display)
 
     }
 
@@ -121,7 +119,7 @@ impl<'a> SpriteManager<'a> {
                                (&self,
                                 name: &str,
                                 new_x: f32,
-                                new_y: f32)
+                                new_y: f32, display: &glium::backend::glutin_backend::GlutinFacade)
                                 -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         let mut tmp = self.sprite_list.borrow_mut().clone();
@@ -144,7 +142,7 @@ impl<'a> SpriteManager<'a> {
 
         self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
-        self.get_buffers()
+        self.get_buffers(&display)
 
     }
 
@@ -164,7 +162,7 @@ impl<'a> SpriteManager<'a> {
     fn set_uv(&self,
               name: &str,
               new_coordinates: [f32; 2],
-              uv_size: (f32, f32))
+              uv_size: (f32, f32), display: &glium::backend::glutin_backend::GlutinFacade)
               -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
 
@@ -186,7 +184,7 @@ impl<'a> SpriteManager<'a> {
 
         self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
-        self.get_buffers()
+        self.get_buffers(display)
     }
 
 
@@ -247,10 +245,9 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
 
-        let mut vb = sprite_manager.get_buffers();
+        let mut vb = sprite_manager.get_buffers(&display);
 
 
         assert!(vb.0.len() > 0);
@@ -271,10 +268,9 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
 
-        let vertex_buffer = sprite_manager.get_buffers();
+        let vertex_buffer = sprite_manager.get_buffers(&display);
 
         let buffers = sprite_manager.add_sprite(Sprite::new("titi",
                                                             0.50,
@@ -282,7 +278,7 @@ mod tests {
                                                             [1.0, 0.0, 0.0, 1.0],
                                                             0,
                                                             (1.0, 1.0),
-                                                            1));
+                                                            1), &display);
 
         assert!(buffers.0.len() == vertex_buffer.0.len() + 4);
         assert!(buffers.1.len() == vertex_buffer.1.len() + 6);
@@ -301,11 +297,10 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
 
 
-        let buffers = sprite_manager.delete_sprite("toto");
+        let buffers = sprite_manager.delete_sprite("toto", &display);
 
         assert!(buffers.0.len() == 0);
         assert!(buffers.1.len() == 0);
@@ -325,12 +320,11 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
         let lst = sprite_manager.get_sprite_list();
         println!("first {:?}", lst);
 
-        let sp = sprite_manager.move_sprite("toto", 1.0, 0.0);
+        let sp = sprite_manager.move_sprite("toto", 1.0, 0.0, &display);
         let lst = sprite_manager.get_sprite_list();
         println!("second {:?}", lst);
         assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == 0.5);
@@ -350,10 +344,9 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
 
-        let sp = sprite_manager.move_sprite("titi", 1.0, 0.0);
+        let sp = sprite_manager.move_sprite("titi", 1.0, 0.0, &display);
         let lst = sprite_manager.get_sprite_list();
 
         assert!(sprite_manager.get_sprite_list()[0].vertices[0].position[0] == -0.5);
@@ -373,8 +366,7 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
         let lst = sprite_manager.get_sprite_list();
         assert_eq!(lst.len(), 1);
 
@@ -394,8 +386,7 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
 
         let sp = sprite_manager.get_sprite("toto");
         assert!(sp.name == "toto");
@@ -422,8 +413,7 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
 
         sprite_manager.order_sprites();
         let mut index = 10;
@@ -453,12 +443,11 @@ mod tests {
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
-                                                                     0)],
-                                                    &display);
+                                                                     0)]);
 
 
 
-        let sp = sprite_manager.set_uv("toto", [0.1, 0.1], (0.1, 0.1));
+        let sp = sprite_manager.set_uv("toto", [0.1, 0.1], (0.1, 0.1), &display);
         assert!(sprite_manager.get_sprite_list()[0].vertices[0].tex_coords[0] == 0.1);
 
     }

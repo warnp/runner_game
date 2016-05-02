@@ -18,6 +18,7 @@ pub struct ModulesManager<'a>{
     display: glium::backend::glutin_backend::GlutinFacade,
     shaders: Shaders<'a>,
     program: glium::program::Program,
+    sprite_manager: SpriteManager<'a>,
 
 }
 
@@ -32,10 +33,13 @@ impl<'a> ModulesManager<'a> {
 
           let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]], &display);
           shaders.compile_shaders(&display);
+          let mut buffers = SpriteManager::new(vec![]);
+
             ModulesManager{
                 display: display,
                 program: shaders.get_compiled_shader("simple_shader"),
                 shaders: shaders,
+                sprite_manager: buffers,
             }
     }
 
@@ -59,9 +63,9 @@ impl<'a> ModulesManager<'a> {
         // let program = shaders.get_compiled_shader("simple_shader");
         // let textures = shaders.get_texture_array(&display);
 
-        let mut sprite_manager = SpriteManager::new(vec![], &self.display);
+        let mut sprite_manager = SpriteManager::new(vec![]);
         let mut buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
-        buffers = sprite_manager.get_buffers();
+        buffers = sprite_manager.get_buffers(&self.display);
 
         // ---------INPUT------------------
         // let mut input_buffer = vec![""];
@@ -107,23 +111,29 @@ impl<'a> ModulesManager<'a> {
     pub fn draw(&mut self,
          delta_time: f64,
          generics_objects: Vec<Box<GenericObject>>,
-         generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
+         generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager<'a> {
 
-             self.generic_object_interpretor(generics_objects);
-         let buffers = SpriteManager::new(vec![], &self.display).get_buffers();
+         self.generic_object_interpretor(generics_objects);
          GraphicsHandler::draw(&self.display,
-              buffers,
+              self.sprite_manager.get_buffers(&self.display),
               &self.shaders.get_texture_array(&self.display),
               &self.program);
 
         self
     }
 
+    //TODO Object identification by string is not cool
     pub fn generic_object_interpretor(&self, generic_object: Vec<Box<GenericObject>>) -> Vec<Sprite>{
+        let sprite = "Sprite".to_string();
+        let mut result_vec = Vec::new();
         for i in generic_object {
-            println!("{:?}", i.size);
+
+            match i.get_type()  {
+                sprite => println!("toto"),
+                // _ => println!("nothing"),
+            }
         }
-        vec![]
+        result_vec
     }
 }
 
@@ -137,7 +147,16 @@ struct ObjTest {
     size: i32,
 }
 impl GenericObject for ObjTest {
+    fn get_type(&self) -> String {
+        "Sprite".to_string()
+    }
 
+    fn get_position(&self) -> (f64,f64,f64){
+        (0.0,0.0,0.0)
+    }
+    fn get_name(&self) -> String {
+        "Test".to_string()
+    }
 }
 
     #[test]
