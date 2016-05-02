@@ -19,13 +19,13 @@ impl<'a> Actor<'a>{
     }
 }
 impl<'a> GenericObject for Actor<'a> {
-    fn get_type(&self) -> String {
-        "Sprite".to_string()
+    fn get_type(&self) -> & str {
+        "Sprite"
     }
-    fn get_position(&self) -> (f64,f64,f64){
+    fn get_position(&self) -> (f32,f32,f32){
         (0.0,0.0,0.0)
     }
-    fn get_name(&self) -> String {
-        "Actor".to_string()
+    fn get_name(&self) -> & str {
+        "Actor"
     }
 }

@@ -123,17 +123,29 @@ impl<'a> ModulesManager<'a> {
     }
 
     //TODO Object identification by string is not cool
-    pub fn generic_object_interpretor(&self, generic_object: Vec<Box<GenericObject>>) -> Vec<Sprite>{
-        let sprite = "Sprite".to_string();
+    pub fn generic_object_interpretor(&mut self, generic_object: Vec<Box<GenericObject>>) -> Vec<Sprite>{
+        let sprite = "Sprite";
         let mut result_vec = Vec::new();
         for i in generic_object {
-
+            let name = i;{
             match i.get_type()  {
-                sprite => println!("toto"),
+                sprite => {self.process_sprite(name.get_name(), i.get_position())},
                 // _ => println!("nothing"),
-            }
+            }}
         }
         result_vec
+    }
+
+    fn process_sprite(&mut self, sprite_name: &'a str, position: (f32,f32,f32))  {
+        if self.sprite_manager.get_sprite_list()
+                                    .into_iter()
+                                    .filter(|&x| x.name == sprite_name)
+                                    .collect::<Vec<Sprite>>().len() == 0 {
+                                        self.sprite_manager.add_sprite(Sprite::new(sprite_name,position.0,position.1,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),&self.display);
+                                    } else {
+                                        self.sprite_manager.move_sprite(sprite_name, position.0, position.1, &self.display);
+                                    }
+
     }
 }
 
@@ -147,15 +159,15 @@ struct ObjTest {
     size: i32,
 }
 impl GenericObject for ObjTest {
-    fn get_type(&self) -> String {
-        "Sprite".to_string()
+    fn get_type(&self) -> &str {
+        "Sprite"
     }
 
-    fn get_position(&self) -> (f64,f64,f64){
+    fn get_position(&self) -> (f32,f32,f32){
         (0.0,0.0,0.0)
     }
-    fn get_name(&self) -> String {
-        "Test".to_string()
+    fn get_name(&self) -> &str {
+        "Test"
     }
 }
 
