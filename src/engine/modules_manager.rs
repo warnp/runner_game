@@ -12,6 +12,7 @@ use engine::engine_helper::EngineHelper;
 use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
 use std::cell::RefCell;
+use std::borrow::Cow;
 // use std::boxed::Box;
 
 pub struct ModulesManager<'a>{
@@ -123,25 +124,37 @@ impl<'a> ModulesManager<'a> {
     }
 
     //TODO Object identification by string is not cool
-    pub fn generic_object_interpretor(&mut self, generic_object: Vec<Box<GenericObject>>) -> Vec<Sprite>{
+    pub fn generic_object_interpretor(& mut self, generic_object:  Vec<Box<GenericObject>>) -> Vec<Sprite>{
         let sprite = "Sprite";
         let mut result_vec = Vec::new();
         for i in generic_object {
-            let name = i;{
-            match i.get_type()  {
-                sprite => {self.process_sprite(name.get_name(), i.get_position())},
-                // _ => println!("nothing"),
-            }}
+// let toto = i.copy();
+        let toto = &i;
+            // match &i.get_type()  {
+            //     sprite => {self.process_sprite(i.get_name(), position)},
+            //     // _ => println!("nothing"),
+            // }
+            // self.process_sprite(toto.get_name().as_ref(), toto.get_position());
+
+            if self.sprite_manager.get_sprite_list()
+                                        .into_iter()
+                                        .filter(|&x| x.name == toto.get_name())
+                                        .collect::<Vec<Sprite>>().len() == 0 {
+                                            self.sprite_manager.add_sprite(Sprite::new(&toto.get_name(),toto.get_position().0,toto.get_position().1,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),&self.display);
+                                        } else {
+                                            self.sprite_manager.move_sprite(&toto.get_name(), toto.get_position().0, toto.get_position().1, &self.display);
+                                        }
         }
         result_vec
     }
 
     fn process_sprite(&mut self, sprite_name: &'a str, position: (f32,f32,f32))  {
+        // let name = String::with_capacity(sprite_name.len());
         if self.sprite_manager.get_sprite_list()
                                     .into_iter()
                                     .filter(|&x| x.name == sprite_name)
                                     .collect::<Vec<Sprite>>().len() == 0 {
-                                        self.sprite_manager.add_sprite(Sprite::new(sprite_name,position.0,position.1,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),&self.display);
+                                        self.sprite_manager.add_sprite(Sprite::new(sprite_name.into(),position.0,position.1,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),&self.display);
                                     } else {
                                         self.sprite_manager.move_sprite(sprite_name, position.0, position.1, &self.display);
                                     }
