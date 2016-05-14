@@ -686,7 +686,7 @@ impl<'a> TextWriter<'a> {
 
             // let to_str = &format!("{}", self.string_name)[..];
 
-            let mut sp = Sprite::new(self.string_name,
+            let mut sp = Sprite::new(self.string_name.to_string(),
                                      self.text_origin.0 + self.text_size * i * offset,
                                      self.text_origin.1,
                                      [1.0, 1.0, 1.0, 1.0],

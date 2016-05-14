@@ -33,6 +33,7 @@ use rand::Rand;
 use std::boxed::Box;
 use engine::generic_object::GenericObject;
 use game_logic::logic_handler::LogicHandler;
+use game_logic::actor::Actor;
 
 
 
@@ -131,7 +132,7 @@ fn main(){
 
     // modules_manager.start();
     loop {
-        modules_manager.draw(engine_helper.get_fps().1, vec![], vec![]);
+        modules_manager.draw(engine_helper.get_fps().1, vec![Box::new(Actor::new("toto", [0.0,0.0], "une_image", [0.1,0.1]))], vec![]);
         // if engine_helper.get_iterator() % 10 == 0 {
             // println!("{} fps", engine_helper.get_fps().0);
 
@@ -156,9 +157,9 @@ fn toto() {
 
 
 
-    let mut vert = vec![Sprite::new("hero",-0.8,0.0,[1.0,0.0,0.0,1.0],3,(0.1,0.1),0),
-                    Sprite::new("mover0",0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),
-                    Sprite::new("still",0.0,-1.0,[1.0,0.0,0.0,1.0],2,(2.0,1.0),2)];
+    let mut vert = vec![Sprite::new("hero".to_string(),-0.8,0.0,[1.0,0.0,0.0,1.0],3,(0.1,0.1),0),
+                    Sprite::new("mover0".to_string(),0.8,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),
+                    Sprite::new("still".to_string(),0.0,-1.0,[1.0,0.0,0.0,1.0],2,(2.0,1.0),2)];
 
 
 
@@ -223,7 +224,7 @@ fn toto() {
                     buffers = sprite_manager.delete_sprite("mover0",&display);
                 }
                 {
-                    buffers =  sprite_manager.add_sprite(Sprite::new("mover0",1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),&display);
+                    buffers =  sprite_manager.add_sprite(Sprite::new("mover0".to_string(),1.5,-0.8,[1.0,0.0,0.0,1.0],1,(0.2,0.1),1),&display);
                 }
                 move_object = false;
             }
@@ -247,16 +248,16 @@ fn toto() {
             let sprite_hero = sprite_manager.get_sprite("hero");
             for sp in &sprite_manager.get_sprite_list()
                                         .into_iter()
-                                        .filter(|&x| x.name != "hero")
+                                        .filter(|x| x.name != "hero")
                                         .collect::<Vec<Sprite>>() {
                 let aa_bb = sp.get_aa_bb();
                 if sprite_hero.detect_collide(aa_bb.0, aa_bb.1) {
 
-                    match sp.name {
-                        "mover0" => {loose = true; break;},
-                        "still" => {touch_ground = true; break;},
-                        _ => {}
-                    }
+                    // match sp.name {
+                    //     "mover0" => {loose = true; break;},
+                    //     "still" => {touch_ground = true; break;},
+                    //     _ => {}
+                    // }
 
                 }else{
 

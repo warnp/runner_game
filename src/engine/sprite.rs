@@ -10,24 +10,24 @@ use engine::collision::CollisionMesh;
 extern crate glium;
 
 
-#[derive(Copy, Clone, Debug)]
-pub struct Sprite<'a> {
+#[derive( Clone, Debug)]
+pub struct Sprite {
     pub vertices: [Vertex; 4],
     pub indices: [u16; 6],
-    pub name: &'a str, /* pub transform: [[f32; 4]; 4],
+    pub name: String, /* pub transform: [[f32; 4]; 4],
                         * pub display: &glium::glutin::WindowBuilder, */
     pub order: u16,
 }
 
-impl<'a> Sprite<'a> {
-    pub fn new(name: &'a str,
+impl Sprite {
+    pub fn new(name: String,
                x: f32,
                y: f32,
                color: [f32; 4],
                tex_id: u32,
                size: (f32, f32),
                order: u16)
-               -> Sprite<'a> {
+               -> Sprite {
 
         Sprite {
             vertices: [Vertex {
@@ -67,7 +67,7 @@ impl<'a> Sprite<'a> {
 }
 
 
-impl<'a> GraphicItem for Sprite<'a> {
+impl GraphicItem for Sprite {
     fn get_position(&self) -> [f32; 2] {
 
         let x = (self.vertices[0].position[0] + self.vertices[1].position[0] +
@@ -80,7 +80,7 @@ impl<'a> GraphicItem for Sprite<'a> {
     }
 }
 
-impl<'a> CollisionMesh for Sprite<'a> {
+impl CollisionMesh for Sprite {
     fn detect_collide(&self, aa: [f32; 2], bb: [f32; 2]) -> bool {
         if self.vertices[0].position[0] <= bb[0] && self.vertices[0].position[1] >= bb[1] &&
            self.vertices[2].position[0] >= aa[0] &&
@@ -98,25 +98,25 @@ impl<'a> CollisionMesh for Sprite<'a> {
     }
 }
 
-impl<'a> Ord for Sprite<'a> {
+impl Ord for Sprite {
     fn cmp(&self, other: &Self) -> Ordering {
         (self.order, &self.name).cmp(&(other.order, &other.name))
     }
 }
 
-impl<'a> PartialOrd for Sprite<'a> {
+impl PartialOrd for Sprite {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl<'a> PartialEq for Sprite<'a> {
+impl PartialEq for Sprite {
     fn eq(&self, other: &Self) -> bool {
         (self.order, &self.name) == (other.order, &other.name)
     }
 }
 
-impl<'a> Eq for Sprite<'a> {}
+impl Eq for Sprite {}
 
 
 #[cfg(test)]
@@ -129,8 +129,8 @@ mod tests {
 
     #[test]
     fn should_get_ordering() {
-        let a = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
-        let b = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 1);
+        let a = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let b = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 1);
 
         let ordered = a.cmp(&b);
         assert!(ordered == Ordering::Less);
@@ -138,8 +138,8 @@ mod tests {
 
     #[test]
     fn should_get_equality() {
-        let a = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
-        let b = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let a = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let b = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
 
         let ordered = a.eq(&b);
         assert!(ordered == true);
@@ -148,7 +148,7 @@ mod tests {
     #[test]
     fn should_calculate_center_of_sprite_position() {
         // Given
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
         // when
         let position_result = s.get_position();
 
@@ -158,7 +158,7 @@ mod tests {
 
     #[test]
     fn should_collide() {
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
 
         assert!(s.detect_collide([-0.10, 1.0], [0.0, 0.0]));
     }
@@ -166,14 +166,14 @@ mod tests {
     #[test]
     #[should_panic]
     fn should_not_collide() {
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (0.1, 0.1), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (0.1, 0.1), 0);
 
         assert!(s.detect_collide([1.0, -1.0], [2.0, -3.0]));
     }
 
     #[test]
     fn should_get_aa_bb_positions() {
-        let s = Sprite::new("toto", 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
 
         let aabb = s.get_aa_bb();
 

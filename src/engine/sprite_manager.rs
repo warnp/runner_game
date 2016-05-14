@@ -11,14 +11,14 @@ extern crate time;
 
 /// The `SpriteManager` type.
 // #[derive(Debug)]
-pub struct SpriteManager<'a> {
+pub struct SpriteManager {
     /// Sprite list to handle with
-    sprite_list: Rc<RefCell<Vec<Sprite<'a>>>>,
+    sprite_list: Rc<RefCell<Vec<Sprite>>>,
  /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
                                                                 * generation_id: i32, */
 }
 
-impl<'a> SpriteManager<'a> {
+impl SpriteManager {
     // #[warn(dead_code)]
     // fn get_time() -> i32 {
     //     time::now().to_timespec().nsec
@@ -33,8 +33,8 @@ impl<'a> SpriteManager<'a> {
     ///
     /// let manager = SpriteManager::new(vec![Sprite("toto", 0.0,0.0,[0.0,0.0,0.0,0.0],1,(1.0,1.0),0)], &display);
     /// ```
-    pub fn new(sprites: Vec<Sprite<'a>>)
-               -> SpriteManager<'a> {
+    pub fn new(sprites: Vec<Sprite>)
+               -> SpriteManager {
 
         SpriteManager {
             sprite_list: Rc::new(RefCell::new(sprites)),
@@ -58,7 +58,7 @@ impl<'a> SpriteManager<'a> {
     }
 
     pub fn add_sprite(&mut self,
-                      sprite: Sprite<'a>,display: &glium::backend::glutin_backend::GlutinFacade)
+                      sprite: Sprite,display: &glium::backend::glutin_backend::GlutinFacade)
                       -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         self.sprite_list.borrow_mut().push(sprite);
@@ -73,7 +73,7 @@ impl<'a> SpriteManager<'a> {
                          -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
 
-        self.sprite_list.borrow_mut().retain(|&x| x.name != sprite_name);
+        self.sprite_list.borrow_mut().retain(|x| x.name != sprite_name);
 
         self.get_buffers(display)
 
@@ -104,7 +104,7 @@ impl<'a> SpriteManager<'a> {
             (sp.1).vertices[2].position[1] = (sp.1).vertices[2].position[1] + new_y;
             (sp.1).vertices[3].position[1] = (sp.1).vertices[3].position[1] + new_y;
 
-            self.sprite_list.borrow_mut()[sp.0] = *sp.1;
+            // self.sprite_list.borrow_mut()[sp.0] = *sp.1;
         }
 
         self.get_buffers(display)
@@ -140,7 +140,7 @@ impl<'a> SpriteManager<'a> {
         (sp.1).vertices[2].position[1] = new_y;
         (sp.1).vertices[3].position[1] = new_y;
 
-        self.sprite_list.borrow_mut()[sp.0] = *sp.1;
+        // self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
         self.get_buffers(&display)
 
@@ -182,7 +182,7 @@ impl<'a> SpriteManager<'a> {
         (sp.1).vertices[2].tex_coords[1] = new_coordinates[1] + uv_size.1;
         (sp.1).vertices[3].tex_coords[1] = new_coordinates[1] + uv_size.1;
 
-        self.sprite_list.borrow_mut()[sp.0] = *sp.1;
+        // self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
         self.get_buffers(display)
     }
@@ -239,7 +239,7 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("sprite",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("sprite".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -262,7 +262,7 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -272,7 +272,7 @@ mod tests {
 
         let vertex_buffer = sprite_manager.get_buffers(&display);
 
-        let buffers = sprite_manager.add_sprite(Sprite::new("titi",
+        let buffers = sprite_manager.add_sprite(Sprite::new("titi".to_string(),
                                                             0.50,
                                                             0.50,
                                                             [1.0, 0.0, 0.0, 1.0],
@@ -291,7 +291,7 @@ mod tests {
                           .with_visibility(false)
                           .build_glium()
                           .unwrap();
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -314,7 +314,7 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -338,7 +338,7 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -360,7 +360,7 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -380,7 +380,7 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -400,14 +400,14 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
                                                                      0,
                                                                      (1.0, 1.0),
                                                                      1),
-                                                         Sprite::new("titi",
+                                                         Sprite::new("titi".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
@@ -437,7 +437,7 @@ mod tests {
                           .build_glium()
                           .unwrap();
 
-        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto",
+        let mut sprite_manager = SpriteManager::new(vec![Sprite::new("toto".to_string(),
                                                                      0.0,
                                                                      0.0,
                                                                      [1.0, 0.0, 0.0, 1.0],
