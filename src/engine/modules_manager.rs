@@ -13,6 +13,7 @@ use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
 use std::cell::RefCell;
 use std::borrow::Cow;
+use engine::text_writer::TextWriter;
 // use std::boxed::Box;
 
 pub struct ModulesManager<'a>{
@@ -63,13 +64,20 @@ impl<'a> ModulesManager<'a> {
     //TODO Object identification by string is not cool
     pub fn generic_object_interpretor(&self, generic_object:  Vec<Box<GenericObject>>) -> SpriteManager{
         let mut result_vec = Vec::new();
+        let mut name : String;
+        let mut position: (f32,f32,f32);
         for i in &generic_object {
-            if i.get_type() == "Sprite" {
+            name = i.get_name();
+            position = i.get_position();
+            match i.get_type().as_ref() {
+                "Sprite" => {result_vec.push(Sprite::new(name, position.0,position.1,[1.0,0.0,0.0,1.0],1,(0.1,0.1),0));},
 
-                result_vec.push(Sprite::new(i.get_name(), 0.0,0.0,[1.0,0.0,0.0,1.0],1,(0.1,0.1),0));
-
+                "Text" => {
+                        let text_writer = TextWriter::new(0,(256,256),(16,16),0.05,(position.0,position.1),&name, true);
+                        result_vec.extend_from_slice(&text_writer.get_string("toto"));
+                    },
+                _ => ()
             }
-
 
         }
         SpriteManager::new(result_vec)
@@ -95,6 +103,9 @@ impl GenericObject for ObjTest {
     }
     fn get_name(&self) -> String {
         "Test".to_string()
+    }
+    fn get_description(&self) -> String {
+        "This is a test description".to_string()
     }
 }
 

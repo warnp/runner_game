@@ -28,4 +28,7 @@ impl<'a> GenericObject for Actor<'a> {
     fn get_name(&self) -> String {
         "Actor".to_string()
     }
+    fn get_description(&self) -> String {
+        "This is an actor".to_string()
+    }
 }
