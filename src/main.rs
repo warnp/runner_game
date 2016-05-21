@@ -129,10 +129,13 @@ fn main(){
 
     let mut engine_helper = EngineHelper::new();
 
+    let mut positionX = 0.0;
 
     // modules_manager.start();
     loop {
-        modules_manager.draw(engine_helper.get_fps().1, vec![Box::new(Actor::new("toto", [0.0,0.0], "une_image", [0.1,0.1]))], vec![]);
+        println!("toto");
+        positionX = positionX + 0.01;
+        modules_manager.draw(engine_helper.get_fps().1, vec![Box::new(Actor::new("toto", [positionX,0.0], "une_image", [0.1,0.1]))], vec![]);
         // if engine_helper.get_iterator() % 10 == 0 {
             // println!("{} fps", engine_helper.get_fps().0);
 
@@ -142,7 +145,7 @@ fn main(){
 }
 
 
-fn toto() {
+fn titi() {
 
 
 
@@ -197,6 +200,7 @@ fn toto() {
         sprite_manager.delete_sprite("toto", &display);
 
         let fps_counter = engine_helper.get_fps();
+        println!("toto {}", fps_counter.1);
 
         if engine_helper.get_iterator() % 10 == 0 {
             sprite_manager.delete_sprite("fps", &display);

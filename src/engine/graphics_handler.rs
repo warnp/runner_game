@@ -43,7 +43,7 @@ impl GraphicsHandler {
         // TRANSFORM TO HAVE NICE SPRITE SIZE
         let uniforms = uniform! {
                 matrix: [
-                    [768.0/1024.0, 0.0 , 0.0 , 0.0],
+                    [600.0/800.0, 0.0 , 0.0 , 0.0],
                     [0.0                       , 1.0 , 0.0 , 0.0],
                     [0.0                       , 0.0 , 1.0 , 0.0],
                     [0.0                       , 0.0 , 0.0 , 1.0f32],
@@ -59,6 +59,8 @@ impl GraphicsHandler {
         let vertex_buffer = buffers.0;
         let index_buffer = buffers.1;
 
+
+
         let mut target = display.draw();
 
         target.clear_color(0.0, 0.0, 1.0, 1.0);
@@ -66,10 +68,9 @@ impl GraphicsHandler {
         target.draw(&vertex_buffer, &index_buffer, program, &uniforms, &params)
               .unwrap();
 
-      let first = Instant::now();
-        target.finish().unwrap();
-        println!("timer {:?}", first.elapsed().subsec_nanos());
-
+    //   let first = Instant::now();
+        let errors = target.finish().unwrap();
+        // println!("timer {:?}", first.elapsed().subsec_nanos());
 
         // for ev in display.poll_events() {
         //     match ev {

@@ -23,7 +23,7 @@ impl<'a> GenericObject for Actor<'a> {
         "Sprite".to_string()
     }
     fn get_position(&self) -> (f32,f32,f32){
-        (0.0,0.0,0.0)
+        (self.position[0],self.position[1],0.0)
     }
     fn get_name(&self) -> String {
         "Actor".to_string()

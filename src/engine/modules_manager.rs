@@ -20,6 +20,7 @@ pub struct ModulesManager<'a>{
     display: glium::backend::glutin_backend::GlutinFacade,
     shaders: Shaders<'a>,
     program: glium::program::Program,
+    textures: glium::texture::Texture2dArray,
     // sprite_manager: SpriteManager<'a>,
 
 }
@@ -28,18 +29,18 @@ impl<'a> ModulesManager<'a> {
 
     pub fn new() -> ModulesManager<'a>{
         let display = glium::glutin::WindowBuilder::new()
-                          .with_vsync()
-                          .with_dimensions(1024, 768)
+                        //   .with_vsync()
+                          .with_dimensions(800, 600)
                           .build_glium()
                           .unwrap();
 
           let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..]], &display);
           shaders.compile_shaders(&display);
-          let mut buffers = SpriteManager::new(vec![]);
-
+          let textures = shaders.get_texture_array(&display);
             ModulesManager{
                 display: display,
                 program: shaders.get_compiled_shader("simple_shader"),
+                textures: textures,
                 shaders: shaders,
                 // sprite_manager: buffers,
             }
@@ -52,12 +53,13 @@ impl<'a> ModulesManager<'a> {
          generics_objects: Vec<Box<GenericObject>>,
          generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager<'a> {
 
+        let bunch_of_generic_objects = self.generic_object_interpretor(generics_objects).get_buffers(&self.display);
+
 
          GraphicsHandler::draw(&self.display,
-              self.generic_object_interpretor(generics_objects).get_buffers(&self.display),
-              &self.shaders.get_texture_array(&self.display),
+              bunch_of_generic_objects,
+              &self.textures,
               &self.program);
-
         self
     }
 
