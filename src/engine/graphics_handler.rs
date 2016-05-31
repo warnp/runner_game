@@ -59,8 +59,6 @@ impl GraphicsHandler {
         let vertex_buffer = buffers.0;
         let index_buffer = buffers.1;
 
-
-
         let mut target = display.draw();
 
         target.clear_color(0.0, 0.0, 1.0, 1.0);

@@ -124,20 +124,20 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade,buffers: (glium::
 fn main(){
 
     //-----------Faire un handler pour les controls
-    let logic_manager = LogicHandler;
+    let mut logic_manager = LogicHandler::new();
     let mut modules_manager = ModulesManager::new();
+    
 
     let mut engine_helper = EngineHelper::new();
 
-    let mut positionX = 0.0;
-
     // modules_manager.start();
+    // let mut generic_objects_vec = &logic_manager.get_buffer();
     loop {
-        println!("toto");
-        positionX = positionX + 0.01;
-        modules_manager.draw(engine_helper.get_fps().1, vec![Box::new(Actor::new("toto", [positionX,0.0], "une_image", [0.1,0.1]))], vec![]);
+        logic_manager.update(engine_helper.get_fps().1);
+        // let generic_objects_vec = &logic_manager.get_buffer();
+        modules_manager.draw(engine_helper.get_fps().1, &(&logic_manager).get_buffer(), vec![]);
         // if engine_helper.get_iterator() % 10 == 0 {
-            // println!("{} fps", engine_helper.get_fps().0);
+        println!("{} fps", engine_helper.get_fps().0);
 
         // }
     }
