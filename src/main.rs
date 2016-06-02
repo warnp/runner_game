@@ -126,16 +126,16 @@ fn main(){
     //-----------Faire un handler pour les controls
     let mut logic_manager = LogicHandler::new();
     let mut modules_manager = ModulesManager::new();
-    
+
 
     let mut engine_helper = EngineHelper::new();
 
     // modules_manager.start();
     // let mut generic_objects_vec = &logic_manager.get_buffer();
     loop {
-        logic_manager.update(engine_helper.get_fps().1);
+        logic_manager.update(engine_helper.get_fps());
         // let generic_objects_vec = &logic_manager.get_buffer();
-        modules_manager.draw(engine_helper.get_fps().1, &(&logic_manager).get_buffer(), vec![]);
+        modules_manager.draw(engine_helper.get_fps().1, &(&logic_manager).get_buffer(engine_helper.get_fps()), vec![]);
         // if engine_helper.get_iterator() % 10 == 0 {
         println!("{} fps", engine_helper.get_fps().0);
 

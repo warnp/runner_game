@@ -41,8 +41,10 @@ impl GenericObject for Actor {
 mod tests{
     use super::*;
 
+    #[test]
+    #[ignore]
     fn should_update_position(){
-        let actor = Actor::new("an_actor", [0.0,0.0],0, [1.0,1.0]);
+        let actor = Actor::new("an_actor".to_string(), [0.0,0.0],0, [1.0,1.0]);
 
         actor.update_position([1.0,0.0]);
 
