@@ -5,6 +5,7 @@ pub trait GenericObject {
     fn get_position(&self) -> (f32,f32,f32);
     fn get_name(&self) -> String;
     fn get_description(&self) -> String;
+    fn get_texture_id(&self)->i32;
 }
 
 impl <F: ?Sized> GenericObject for Box<F>
@@ -24,5 +25,8 @@ impl <F: ?Sized> GenericObject for Box<F>
 
     fn get_description(&self) -> String {
         (**self).get_description()
+    }
+    fn get_texture_id(&self)->i32 {
+        (**self).get_texture_id()
     }
 }

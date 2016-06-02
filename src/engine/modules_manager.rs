@@ -75,12 +75,14 @@ impl ModulesManager {
             position = i.get_position();
             description = i.get_description();
             match i.get_type().as_ref() {
-                "Sprite" => {result_vec.push(Sprite::new(name, position.0,position.1,[1.0,0.0,0.0,1.0],1,(0.1,0.1),0));},
+                "Sprite" => {
+                    result_vec.push(Sprite::new(name, position.0,position.1,[1.0,0.0,0.0,1.0],i.get_texture_id() as u32,(0.1,0.1),0));
+                },
 
                 "Text" => {
                         let text_writer = TextWriter::new(0,(256,256),(16,16),0.05,(position.0,position.1),&name, true);
                         result_vec.extend_from_slice(&text_writer.get_string(description.as_str()));
-                    },
+                },
                 _ => ()
             }
 
@@ -111,6 +113,9 @@ impl GenericObject for ObjTest {
     }
     fn get_description(&self) -> String {
         "This is a test description".to_string()
+    }
+    fn get_texture_id(&self) -> i32 {
+        0
     }
 }
 
