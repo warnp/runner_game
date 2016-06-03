@@ -1,19 +1,13 @@
 extern crate glium;
 use engine::sprite::Sprite;
-use engine::shader_manager::{Shaders, ShaderCouple};
+use engine::shader_manager::Shaders;
 use engine::sprite_manager::SpriteManager;
 use engine::graphics_handler::GraphicsHandler;
-use glium::{VertexBuffer, IndexBuffer, DisplayBuild};
-use engine::vertex::Vertex;
-use engine::input_manager::InputManager;
-use std::sync::mpsc;
-use std::thread;
-use engine::engine_helper::EngineHelper;
+use glium::DisplayBuild;
 use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
-use std::cell::RefCell;
-use std::borrow::Cow;
 use engine::text_writer::TextWriter;
+use engine::generic_object_type::GenericObjectType;
 // use std::boxed::Box;
 
 pub struct ModulesManager{
@@ -74,16 +68,16 @@ impl ModulesManager {
             name = i.get_name();
             position = i.get_position();
             description = i.get_description();
-            match i.get_type().as_ref() {
-                "Sprite" => {
+            match i.get_type() {
+                GenericObjectType::Sprite => {
                     result_vec.push(Sprite::new(name, position.0,position.1,[1.0,0.0,0.0,1.0],i.get_texture_id() as u32,(0.1,0.1),0));
                 },
 
-                "Text" => {
+                GenericObjectType::Text => {
                         let text_writer = TextWriter::new(0,(256,256),(16,16),0.05,(position.0,position.1),&name, true);
                         result_vec.extend_from_slice(&text_writer.get_string(description.as_str()));
                 },
-                _ => ()
+
             }
 
         }

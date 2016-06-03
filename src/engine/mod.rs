@@ -20,3 +20,4 @@ pub mod modules_manager;
 pub mod graphics_handler;
 pub mod generic_object;
 pub mod generic_control;
+pub mod generic_object_type;

@@ -1,4 +1,5 @@
 use engine::generic_object::GenericObject;
+use engine::generic_object_type::GenericObjectType;
 
 #[derive(Clone,Debug)]
 pub struct Actor{
@@ -20,8 +21,8 @@ impl Actor{
 }
 
 impl GenericObject for Actor {
-    fn get_type(&self) -> String {
-        "Sprite".to_string()
+    fn get_type(&self) -> GenericObjectType {
+        GenericObjectType::Sprite
     }
     fn get_position(&self) -> (f32,f32,f32) {
         (self.position[0],self.position[1],0.0)

@@ -1,4 +1,5 @@
 use engine::generic_object::GenericObject;
+use engine::generic_object_type::GenericObjectType;
 
 pub struct Text{
     name: String,
@@ -17,8 +18,8 @@ impl Text {
 }
 
 impl GenericObject for Text{
-    fn get_type(&self) -> String {
-        "Text".to_string()
+    fn get_type(&self) -> GenericObjectType {
+        GenericObjectType::Text
     }
     fn get_position(&self) -> (f32,f32,f32) {
         (self.position[0],self.position[1], 0.0)
