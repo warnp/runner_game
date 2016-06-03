@@ -133,13 +133,16 @@ fn main(){
     // modules_manager.start();
     // let mut generic_objects_vec = &logic_manager.get_buffer();
     loop {
-        logic_manager.update(engine_helper.get_fps());
-        // let generic_objects_vec = &logic_manager.get_buffer();
-        modules_manager.draw(engine_helper.get_fps().1, &(&logic_manager).get_buffer(engine_helper.get_fps()), vec![]);
-        // if engine_helper.get_iterator() % 10 == 0 {
+        let res = modules_manager.draw(engine_helper.get_fps().1, &(&logic_manager).get_buffer(engine_helper.get_fps()), vec![]);
+        logic_manager.update(engine_helper.get_fps(),  &res.1);
+
         println!("{} fps", engine_helper.get_fps().0);
 
-        // }
+        if res.1.len() > 0{
+            if res.1[0] == "escape_press" {
+                return
+            }
+        }
     }
 
 }

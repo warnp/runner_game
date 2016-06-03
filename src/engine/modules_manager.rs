@@ -8,6 +8,7 @@ use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
 use engine::text_writer::TextWriter;
 use engine::generic_object_type::GenericObjectType;
+use engine::input_manager::InputManager;
 // use std::boxed::Box;
 
 pub struct ModulesManager{
@@ -46,7 +47,7 @@ impl ModulesManager {
     pub fn draw(&mut self,
          delta_time: f64,
          generics_objects: &Vec<Box<GenericObject>>,
-         generics_controls: Vec<Box<GenericControl>>) -> &ModulesManager {
+         generics_controls: Vec<Box<GenericControl>>) -> (&ModulesManager, Vec<&str>) {
 
         let bunch_of_generic_objects = self.generic_object_interpretor(generics_objects).get_buffers(&self.display);
 
@@ -55,10 +56,9 @@ impl ModulesManager {
               bunch_of_generic_objects,
               &self.textures,
               &self.program);
-        self
+        (self,InputManager::get_input(&self.display))
     }
 
-    //TODO Object identification by string is not cool
     pub fn generic_object_interpretor(&self, generic_object:  &Vec<Box<GenericObject>>) -> SpriteManager{
         let mut result_vec = Vec::new();
         let mut name : String;
@@ -83,20 +83,22 @@ impl ModulesManager {
         }
         SpriteManager::new(result_vec)
     }
+
 }
 
 #[cfg(test)]
 mod tests{
     use super::*;
     use engine::generic_object::GenericObject;
+    use engine::generic_object_type::GenericObjectType;
 
 #[derive(Debug)]
 struct ObjTest {
     size: i32,
 }
 impl GenericObject for ObjTest {
-    fn get_type(&self) -> String {
-        "Sprite".to_string()
+    fn get_type(&self) -> GenericObjectType {
+        GenericObjectType::Sprite
     }
 
     fn get_position(&self) -> (f32,f32,f32){
@@ -134,5 +136,12 @@ impl GenericObject for ObjTest {
 
         let object_list = modules_manager.generic_object_interpretor(&vec![Box::new(ObjTest{size: 1})]);
         assert!(object_list.get_sprite_list().len() == 1);
+    }
+
+    #[test]
+    fn should_send_input_messages(){
+        let modules_manager= ModulesManager::new();
+        let command_list = modules_manager.get_inputs();
+        assert_eq!(command_list.len(), 0);
     }
 }
