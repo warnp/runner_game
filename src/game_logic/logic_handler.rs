@@ -45,9 +45,6 @@ impl LogicHandler {
 
     pub fn get_buffer(&self, time: (f64,f64)) -> &Vec<Box<GenericObject>> {
 
-        // let result = self.go_threw_buffer(time, &vec![]);
-        //
-        // result
         &self.buffer
     }
 
