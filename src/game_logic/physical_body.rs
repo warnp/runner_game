@@ -57,7 +57,6 @@ mod tests{
         let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto", [0.0,0.0], "toto.jpg", [0.1,0.1])));
         let actors = body.generate_actor();
 
-        
 
     }
 
