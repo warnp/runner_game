@@ -132,10 +132,12 @@ fn main(){
 
     // modules_manager.start();
     // let mut generic_objects_vec = &logic_manager.get_buffer();
+    let mut key_buf = vec![];
     loop {
         let fps_timer = engine_helper.get_fps();
-        let res = modules_manager.draw(fps_timer.1, &(&logic_manager).get_buffer(fps_timer), vec![]);
-        logic_manager.update(fps_timer,  &res.1);
+        // let res = modules_manager.draw(fps_timer.1, &(&logic_manager).get_buffer(fps_timer), vec![]);
+        let res = modules_manager.draw(fps_timer.1, &logic_manager.update(fps_timer,&key_buf), vec![]);
+
 
         println!("{} fps", fps_timer.0);
 
