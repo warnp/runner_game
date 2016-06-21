@@ -35,23 +35,43 @@ impl PhysicalBody {
     pub fn get_name(&self) -> &str {
         &&self.name
     }
+
+    pub fn detect_collision(&self, body : PhysicalBody) -> bool {
+
+        let aa_bb_guest = body.get_aa_bb();
+
+        if self.left_up_corner[0] <= aa_bb_guest.1[0] &&
+            self.left_up_corner[1] >= aa_bb_guest.1[1] &&
+           self.right_down_corner[0] >= aa_bb_guest.0[0] &&
+           self.right_down_corner[1] <= aa_bb_guest.0[1] {
+            return true;
+        }
+
+        return false;
+    }
+
+    pub fn get_aa_bb(&self) ->  ([f32; 2], [f32; 2]) {
+        (self.left_up_corner, self.right_down_corner)
+    }
 }
 
 #[cfg(test)]
 mod tests{
     use super::*;
+    use  engine::generic_object::GenericObject;
+    use game_logic::actor::Actor;
 
     #[test]
     fn should_generate_actors(){
-        let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto", [0.0,0.0], "toto.jpg", [0.1,0.1])));
+        let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto".to_string(), [0.0,0.0], 0, [0.1,0.1])));
         let actors = body.generate_actor();
 
-        assert_eq!(actors.get_position(), (0.5,-0.5,0.0));
+        assert_eq!((*actors.as_ref()).get_position(), (0.0,0.0,0.0));
     }
 
     #[test]
     fn should_get_name(){
-        let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto", [0.0,0.0], "toto.jpg", [0.1,0.1])));
+        let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto".to_string(), [0.0,0.0], 0, [0.1,0.1])));
         let name = body.get_name();
 
         assert_eq!(name, "toto");
@@ -59,7 +79,7 @@ mod tests{
 
     #[test]
     fn should_move_physical_body() {
-        let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto", [0.0,0.0], "toto.jpg", [0.1,0.1])));
+        let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto".to_string(), [0.0,0.0], 0, [0.1,0.1])));
         let actors = body.generate_actor();
 
         assert!(false);
@@ -67,6 +87,17 @@ mod tests{
 
     #[test]
     fn should_detect_collision() {
+        let body1 = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto".to_string(), [0.0,0.0], 0, [0.1,0.1])));
+        let body2 = PhysicalBody::new("titi".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("titi".to_string(), [0.0,0.0], 0, [0.1,0.1])));
 
+        let result = body1.detect_collision(body2);
+        assert_eq!(result, true);
+    }
+
+    fn should_get_aa_bb(){
+        let body = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto".to_string(), [0.0,0.0], 0, [0.1,0.1])));
+        let aa_bb = body.get_aa_bb();
+
+        assert_eq!(aa_bb, ([0.0,0.0],[1.0,-1.0]));
     }
 }
