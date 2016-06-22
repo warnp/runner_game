@@ -10,7 +10,7 @@ matrix:
   allow_failures:
     - rust: nightly
     
-#addon:
+# addon:
 #  apt:
 #    packages:
 #      - libxxf86vm-dev
@@ -20,13 +20,13 @@ matrix:
 #      - libdw-dev                 # for kcov
 #      - cmake                     # for kcov
 
-#script:
+# script:
     # We run everything with `-j 1` or travis runs out of memory
     #- cargo build -v --no-default-features --features "$FEATURES"
     #- if [ "$TEST" -eq 1 ]; then cargo test -v -j 1 --no-default-features --features "$FEATURES"; fi
 #    - cargo test -v -j 1 --no-default-features --features "integration"
   
-#after_success: |
+# after_success: |
 #  wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
 #        tar xzf master.tar.gz &&
 #        mv kcov-master kcov &&
