@@ -6,6 +6,7 @@ use std::cmp::{Ord, Ordering};
 use engine::vertex::Vertex;
 use engine::graphic_item::GraphicItem;
 use engine::collision::CollisionMesh;
+use engine::layer_type::LayerType;
 
 extern crate glium;
 
@@ -79,8 +80,8 @@ impl GraphicItem for Sprite {
         [x, y]
     }
 
-    fn draw(&self) {
-        
+    fn get_layer(&self) -> LayerType{
+        LayerType::UI
     }
 }
 

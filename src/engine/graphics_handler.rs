@@ -9,30 +9,6 @@ use std::time::Instant;
 pub struct GraphicsHandler;
 
 impl GraphicsHandler {
-    // pub fn init(screen_height: f32,
-    //             screen_width: f32)
-    //             -> &glium::backend::glutin_backend::GlutinFacade {
-    //
-    //     glium::glutin::WindowBuilder::new()
-    //         .with_vsync()
-    //         .with_dimensions(screen_width as u32, screen_height as u32)
-    //         .build_glium()
-    //         .unwrap()
-    //
-    // }
-
-    // pub fn compile_shaders(display: &glium::backend::glutin_backend::GlutinFacade, textures_list: Vec<&str>, shader_name: &str) -> glium::program::Program {
-    // let mut shaders_bytes : Vec<&[u8]>;
-    //
-    // for texture_name in textures_list {
-    // shaders_bytes.push(&include_bytes!(shader_name));
-    // }
-    //
-    // let mut shaders = Shaders::new(shaders_bytes);
-    // shaders.compile_shaders(&display);
-    //
-    // shaders.get_compiled_shader(shader_name);
-    // }
 
     pub fn draw(display: &glium::backend::glutin_backend::GlutinFacade,
                 buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>),
@@ -40,6 +16,7 @@ impl GraphicsHandler {
                 program: &glium::Program) {
 
 
+        //--------------------------UI-DRAW-START---------------------------//
         // TRANSFORM TO HAVE NICE SPRITE SIZE
         let uniforms = uniform! {
                 matrix: [
@@ -66,21 +43,11 @@ impl GraphicsHandler {
         target.draw(&vertex_buffer, &index_buffer, program, &uniforms, &params)
               .unwrap();
 
-    //   let first = Instant::now();
         let errors = target.finish().unwrap();
-        // println!("timer {:?}", first.elapsed().subsec_nanos());
 
-        // for ev in display.poll_events() {
-        //     match ev {
-        //         glium::glutin::Event::KeyboardInput(glium::glutin::ElementState::Released,
-        //                                             _,
-        //                                             Some(glium::glutin::VirtualKeyCode::Escape)) => {
-        //             return
-        //         }
-        //         glium::glutin::Event::Closed => return,
-        //         _ => (),
-        //     }
-        // }
+        //--------------------------UI-DRAW-END-----------------------------//
+        //-------------------DEFFERED-RENDERING-DRAW-START------------------//
+        //-------------------DEFFERED-RENDERING-DRAW-END--------------------//
 
     }
 }
