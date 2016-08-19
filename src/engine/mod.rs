@@ -21,3 +21,4 @@ pub mod graphics_handler;
 pub mod generic_object;
 pub mod generic_control;
 pub mod generic_object_type;
+pub mod frame_buffer_manager;

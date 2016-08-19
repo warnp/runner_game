@@ -1,5 +1,6 @@
 pub trait GraphicItem {
     fn get_position(&self) -> [f32; 2];
+    fn draw(&self);
     // fn get_vertex_shader(&self) -> &str;
     // fn get_fragment_shader(&self) -> &str;
 

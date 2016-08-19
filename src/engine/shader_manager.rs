@@ -66,10 +66,33 @@ impl<'a> Shaders<'a> {
             }
             "#,
                     });
+        hash.insert("screen_shader",
+                        ShaderCouple {
+                            vertex_shader:r#"
+                                  #version 140
+
+                                  in vec2 position;
+
+                                  void main() {
+                                      gl_Position = vec4(position, 0.0, 1.0);
+                                  }
+                              "#,
+
+                              // fragment shader
+                              pixel_shader: r#"
+                                  #version 140
+
+                                  out vec4 outColor;
+
+                                  void main(){
+                                      outColor = vec4(1.0,1.0,1.0,1.0);
+                                  }
+                              "#,
+                        });
         let mut hash_compiled = HashMap::new();
 
         for (name, s) in hash.iter() {
-            hash_compiled.insert("simple_shader", Box::new(glium::Program::from_source(display,
+            hash_compiled.insert(*name, Box::new(glium::Program::from_source(display,
                                                  s.vertex_shader,
                                                  s.pixel_shader,
                                                  None)
@@ -99,10 +122,6 @@ impl<'a> Shaders<'a> {
     pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> glium::program::Program {
         *self.compiled_shaders.remove(&shader_name).unwrap()
     }
-
-    // pub fn get_texture(&self, display: &glium::backend::glutin_backend::GlutinFacade, image_index: u32) -> Result<glium::texture::texture2d::Texture2d, glium::texture::TextureCreationError>{
-    //     glium::texture::Texture2d::new(display, self.set_image(self.textures[image_index]).unwrap())
-    // }
 
     fn set_image(&self, texture: &'a [u8]) -> image::ImageResult<image::DynamicImage> {
 

@@ -78,6 +78,10 @@ impl GraphicItem for Sprite {
                  self.vertices[3].position[1]) as f32;
         [x, y]
     }
+
+    fn draw(&self) {
+        
+    }
 }
 
 impl CollisionMesh for Sprite {
