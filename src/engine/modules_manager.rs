@@ -38,7 +38,7 @@ impl<'a> ModulesManager<'a> {
           let textures = shaders.get_texture_array(&display);
           ModulesManager{
                 display: display,
-                program: shaders.get_compiled_shader("simple_shader"),
+                program: shaders.get_compiled_shader("screen_shader"),
                 textures: textures,
                 frame_texture: frame_texture,
                 // frame_buffer: frame_buffer,
@@ -52,6 +52,7 @@ impl<'a> ModulesManager<'a> {
          delta_time: f64,
          generics_objects: &Vec<Box<GenericObject>>,
          generics_controls: Vec<Box<GenericControl>>,
+         ui_texture: &glium::texture::Texture2d,
          frame_buffer: &mut glium::framebuffer::SimpleFrameBuffer) -> (&ModulesManager, Vec<&str>) {
 
         // match self.frame_buffer {
@@ -59,55 +60,100 @@ impl<'a> ModulesManager<'a> {
         //     None => self.frame_buffer =  Some(Box::new(FrameBufferManager::new(&self.display))),
         // }
 
-        let bunch_of_generic_objects = self.generic_object_interpretor(generics_objects).get_buffers(self.display);
+        let bunch_of_generic_sprite_objects = self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
         //--------------------TEST--------------------//
 
-        let lighting_program = glium::Program::from_source(self.display,
-       // vertex shader
-       "
-           #version 140
 
-           in vec2 position;
+        let sprite_program = glium::Program::from_source(self.display,
+            //Vertex shader
+             r#"
+     #version 140
 
-           void main() {
-               gl_Position = vec4(position, 0.0, 1.0);
-           }
-       ",
+     in vec2 position;
+     in vec3 normal;
+     in vec4 color;
+     in vec2 tex_coords;
+     in uint i_tex_id;
 
-       // fragment shader
-       "
-           #version 140
+     out vec4 colorV;
+     out vec3 v_normal;
+     out vec2 v_tex_coords;
+     flat out uint v_tex_id;
 
-           out vec4 outColor;
+     uniform mat4 matrix;
 
-           void main(){
-               outColor = vec4(1.0,1.0,1.0,1.0);
-           }
-       ",
+     void main(){
+        // colorV = color;
+        v_tex_coords = tex_coords;
+        gl_Position = matrix * vec4(position, 0.0,1.0);
+        v_tex_id = i_tex_id;
+     }
+     "#,
+     //Pixel shader
+      r#"
+     #version 140
+
+     in vec4 colorV;
+     in vec2 v_tex_coords;
+     flat in uint v_tex_id;
+
+     out vec4 color;
+
+     // uniform sampler2D tex;
+     uniform sampler2DArray tex;
+
+     void main(){
+        color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
+     }
+     "#,
 
        // geometry shader
        None)
        .unwrap();
 
-   let uniforms = uniform! {
-           position: [0.0,0.0],
-       };
+       let uniforms = uniform! {
+               matrix: [
+                   [600.0/800.0, 0.0 , 0.0 , 0.0],
+                   [0.0                       , 1.0 , 0.0 , 0.0],
+                   [0.0                       , 0.0 , 1.0 , 0.0],
+                   [0.0                       , 0.0 , 0.0 , 1.0f32],
+               ],
+               tex: &self.textures,
+           };
+
+
+           let params = glium::DrawParameters {
+                  //depth_function: glium::DepthFunction::IfLessOrEqual,
+                  blend: glium::Blend {
+                      color: glium::BlendingFunction::Addition {
+                          source: glium::LinearBlendingFactor::One,
+                          destination: glium::LinearBlendingFactor::One
+                      },
+                      alpha: glium::BlendingFunction::Addition {
+                          source: glium::LinearBlendingFactor::One,
+                          destination: glium::LinearBlendingFactor::One
+                      },
+                      constant_value: (1.0, 1.0, 1.0, 1.0)
+                  },
+                  .. Default::default()
+            };
 
         frame_buffer.clear_color(0.0f32, 0.0f32, 0.0f32, 0.0f32);
-        frame_buffer.draw(&bunch_of_generic_objects.0,&bunch_of_generic_objects.1,&lighting_program, &uniforms,  &Default::default()).unwrap();
-
+        frame_buffer.draw(&bunch_of_generic_sprite_objects.0,&bunch_of_generic_sprite_objects.1,&sprite_program, &uniforms, &params).unwrap();
 
         //--------------------FIN-TEST----------------//
 
+
          GraphicsHandler::draw(&self.display,
-              bunch_of_generic_objects,
+              bunch_of_generic_sprite_objects,
               &self.textures,
+              ui_texture,
               &self.program);
         (self,InputManager::get_input(self.display))
     }
 
-    pub fn generic_object_interpretor(&self, generic_object:  &Vec<Box<GenericObject>>) -> SpriteManager{
+    pub fn generic_sprite_object_interpretor(&self, generic_object:  &Vec<Box<GenericObject>>) -> SpriteManager{
         let mut result_vec = Vec::new();
         let mut name : String;
         let mut position: (f32,f32,f32);
@@ -182,7 +228,7 @@ impl GenericObject for ObjTest {
     fn should_interpret_generic_object(){
         let modules_manager = ModulesManager::new();
 
-        let object_list = modules_manager.generic_object_interpretor(&vec![Box::new(ObjTest{size: 1})]);
+        let object_list = modules_manager.generic_sprite_object_interpretor(&vec![Box::new(ObjTest{size: 1})]);
         assert!(object_list.get_sprite_list().len() == 1);
     }
 #[ignore]

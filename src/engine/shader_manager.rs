@@ -72,9 +72,15 @@ impl<'a> Shaders<'a> {
                                   #version 140
 
                                   in vec2 position;
+                                  in vec2 tex_coords;
 
-                                  void main() {
-                                      gl_Position = vec4(position, 0.0, 1.0);
+                                  uniform mat4 matrix;
+
+                                  smooth out vec2 frag_texcoord;
+
+                                  void main(){
+                                      frag_texcoord = tex_coords;
+                                      gl_Position = matrix * vec4(position, 0.0,1.0);
                                   }
                               "#,
 
@@ -82,10 +88,13 @@ impl<'a> Shaders<'a> {
                               pixel_shader: r#"
                                   #version 140
 
-                                  out vec4 outColor;
+                                  uniform sampler2D ui_texture;
+                                  smooth in vec2 frag_texcoord;
+
+                                  out vec4 color;
 
                                   void main(){
-                                      outColor = vec4(1.0,1.0,1.0,1.0);
+                                      color = vec4(texture(ui_texture, frag_texcoord).rgb, 1.0);
                                   }
                               "#,
                         });

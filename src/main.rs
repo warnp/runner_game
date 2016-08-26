@@ -145,7 +145,7 @@ fn main(){
     loop {
         let fps_timer = engine_helper.get_fps();
         // let res = modules_manager.draw(fps_timer.1, &(&logic_manager).get_buffer(fps_timer), vec![]);
-        let res = modules_manager.draw(fps_timer.1, &logic_manager.update(fps_timer,&key_buf), vec![], &mut frame_buffer);
+        let res = modules_manager.draw(fps_timer.1, &logic_manager.update(fps_timer,&key_buf), vec![], &frame_texture,&mut frame_buffer);
 
 
         println!("{} fps", fps_timer.0);

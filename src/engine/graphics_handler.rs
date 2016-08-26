@@ -13,20 +13,31 @@ impl GraphicsHandler {
     pub fn draw(display: &glium::backend::glutin_backend::GlutinFacade,
                 buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>),
                 textures: &glium::texture::Texture2dArray,
+                ui_texture: &glium::texture::Texture2d,
                 program: &glium::Program) {
 
 
         //--------------------------UI-DRAW-START---------------------------//
         // TRANSFORM TO HAVE NICE SPRITE SIZE
+        // let uniforms = uniform! {
+        //         matrix: [
+        //             [600.0/800.0, 0.0 , 0.0 , 0.0],
+        //             [0.0                       , 1.0 , 0.0 , 0.0],
+        //             [0.0                       , 0.0 , 1.0 , 0.0],
+        //             [0.0                       , 0.0 , 0.0 , 1.0f32],
+        //         ],
+        //         tex: textures,
+        //     };
+
         let uniforms = uniform! {
-                matrix: [
-                    [600.0/800.0, 0.0 , 0.0 , 0.0],
-                    [0.0                       , 1.0 , 0.0 , 0.0],
-                    [0.0                       , 0.0 , 1.0 , 0.0],
-                    [0.0                       , 0.0 , 0.0 , 1.0f32],
-                ],
-                tex: textures,
-            };
+            matrix: [
+                         [600.0/800.0, 0.0 , 0.0 , 0.0],
+                         [0.0                       , 1.0 , 0.0 , 0.0],
+                         [0.0                       , 0.0 , 1.0 , 0.0],
+                         [0.0                       , 0.0 , 0.0 , 1.0f32],
+                     ],
+             ui_texture: ui_texture,
+        };
 
         let params = glium::DrawParameters {
             blend: glium::Blend::alpha_blending(),
@@ -40,7 +51,7 @@ impl GraphicsHandler {
 
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
-        target.draw(&vertex_buffer, &index_buffer, program, &uniforms, &params)
+        target.draw(&vertex_buffer, &index_buffer, program, &uniforms, &Default::default())
               .unwrap();
 
         let errors = target.finish().unwrap();
