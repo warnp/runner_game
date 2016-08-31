@@ -94,7 +94,8 @@ impl<'a> Shaders<'a> {
                                   out vec4 color;
 
                                   void main(){
-                                      color = vec4(texture(ui_texture, frag_texcoord).rgb, 1.0);
+
+                                      color = vec4(1.0-texture(ui_texture, frag_texcoord).rgb, 1.0);
                                   }
                               "#,
                         });

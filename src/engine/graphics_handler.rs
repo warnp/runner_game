@@ -3,6 +3,7 @@ extern crate time;
 use engine::vertex::Vertex;
 use glium::{DisplayBuild, Surface};
 use std::time::Instant;
+use engine::sprite::Sprite;
 
 
 
@@ -31,11 +32,17 @@ impl GraphicsHandler {
 
         let uniforms = uniform! {
             matrix: [
-                         [600.0/800.0, 0.0 , 0.0 , 0.0],
-                         [0.0                       , 1.0 , 0.0 , 0.0],
-                         [0.0                       , 0.0 , 1.0 , 0.0],
-                         [0.0                       , 0.0 , 0.0 , 1.0f32],
-                     ],
+                        [1.0, 0.0 , 0.0 , 0.0],
+                        [0.0, 1.0 , 0.0 , 0.0],
+                        [0.0, 0.0 , 1.0 , 0.0],
+                        [0.0, 0.0 , 0.0 , 1.0f32],
+            ],
+            // matrix: [
+            //              [600.0/800.0, 0.0 , 0.0 , 0.0],
+            //              [0.0                       , 1.0 , 0.0 , 0.0],
+            //              [0.0                       , 0.0 , 1.0 , 0.0],
+            //              [0.0                       , 0.0 , 0.0 , 1.0f32],
+            //          ],
              ui_texture: ui_texture,
         };
 
@@ -44,8 +51,15 @@ impl GraphicsHandler {
             ..Default::default()
         };
 
-        let vertex_buffer = buffers.0;
-        let index_buffer = buffers.1;
+        // let vertex_buffer = buffers.0;
+        // let index_buffer = buffers.1;
+
+        let screen = Sprite::new("screen".to_string(), 0.0,0.0,[1.0,0.0,0.0,1.0],1u32,(2.0,2.0),0);
+
+        let vertex_buffer = glium::VertexBuffer::dynamic(display, &screen.vertices).unwrap();
+        let index_buffer =glium::index::IndexBuffer::new(display,glium::index::PrimitiveType::TrianglesList,
+                                        &screen.indices)
+             .unwrap();
 
         let mut target = display.draw();
 

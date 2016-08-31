@@ -125,21 +125,23 @@ impl<'a> ModulesManager<'a> {
 
            let params = glium::DrawParameters {
                   //depth_function: glium::DepthFunction::IfLessOrEqual,
-                  blend: glium::Blend {
-                      color: glium::BlendingFunction::Addition {
-                          source: glium::LinearBlendingFactor::One,
-                          destination: glium::LinearBlendingFactor::One
-                      },
-                      alpha: glium::BlendingFunction::Addition {
-                          source: glium::LinearBlendingFactor::One,
-                          destination: glium::LinearBlendingFactor::One
-                      },
-                      constant_value: (1.0, 1.0, 1.0, 1.0)
-                  },
+                //   blend: glium::Blend {
+                //       color: glium::BlendingFunction::Addition {
+                //           source: glium::LinearBlendingFactor::One,
+                //           destination: glium::LinearBlendingFactor::One
+                //       },
+                //       alpha: glium::BlendingFunction::Addition {
+                //           source: glium::LinearBlendingFactor::One,
+                //           destination: glium::LinearBlendingFactor::One
+                //       },
+                //       constant_value: (1.0, 1.0, 1.0, 1.0)
+                //   },
+                blend: glium::Blend::alpha_blending(),
+
                   .. Default::default()
             };
 
-        frame_buffer.clear_color(0.0f32, 0.0f32, 0.0f32, 0.0f32);
+        frame_buffer.clear_color(1.0f32, 1.0f32, 1.0f32, 0.0f32);
         frame_buffer.draw(&bunch_of_generic_sprite_objects.0,&bunch_of_generic_sprite_objects.1,&sprite_program, &uniforms, &params).unwrap();
 
         //--------------------FIN-TEST----------------//
