@@ -16,8 +16,9 @@ use glium::backend::Facade;
 
 pub struct ModulesManager<'a>{
     display: &'a glium::backend::glutin_backend::GlutinFacade,
-    program: glium::program::Program,
+    program: Vec<glium::program::Program>,
     textures: glium::texture::Texture2dArray,
+    // compiled_shaders: HashMap<&'a str, Box<glium::program::Program>>,
     // frame_buffer: glium::framebuffer::SimpleFrameBuffer<'a>,
     frame_texture: glium::texture::Texture2d,
     // sprite_manager: SpriteManager<'a>,
@@ -32,13 +33,15 @@ impl<'a> ModulesManager<'a> {
                                                               &include_bytes!("../../content/11532.png")[..],
                                                               &include_bytes!("../../content/NatureForests.png")[..],
                                                               &include_bytes!("../../content/hero.png")[..]], &display);
+
+
           shaders.compile_shaders(&display);
 
           let frame_texture = glium::texture::Texture2d::empty_with_format(display, glium::texture::UncompressedFloatFormat::F32F32F32F32, glium::texture::MipmapsOption::NoMipmap, 800,600).unwrap();
           let textures = shaders.get_texture_array(&display);
           ModulesManager{
                 display: display,
-                program: shaders.get_compiled_shader("screen_shader"),
+                program: vec![shaders.get_compiled_shader("screen_shader"), shaders.get_compiled_shader("sprite_shader")],
                 textures: textures,
                 frame_texture: frame_texture,
                 // frame_buffer: frame_buffer,
@@ -63,87 +66,6 @@ impl<'a> ModulesManager<'a> {
         let bunch_of_generic_sprite_objects = self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
         //--------------------TEST--------------------//
-
-
-        let sprite_program = glium::Program::from_source(self.display,
-            //Vertex shader
-             r#"
-     #version 140
-
-     in vec2 position;
-     in vec3 normal;
-     in vec4 color;
-     in vec2 tex_coords;
-     in uint i_tex_id;
-
-     out vec4 colorV;
-     out vec3 v_normal;
-     out vec2 v_tex_coords;
-     flat out uint v_tex_id;
-
-     uniform mat4 matrix;
-
-     void main(){
-        // colorV = color;
-        v_tex_coords = tex_coords;
-        gl_Position = matrix * vec4(position, 0.0,1.0);
-        v_tex_id = i_tex_id;
-     }
-     "#,
-     //Pixel shader
-      r#"
-     #version 140
-
-     in vec4 colorV;
-     in vec2 v_tex_coords;
-     flat in uint v_tex_id;
-
-     out vec4 color;
-
-     // uniform sampler2D tex;
-     uniform sampler2DArray tex;
-
-     void main(){
-        color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
-     }
-     "#,
-
-       // geometry shader
-       None)
-       .unwrap();
-
-       let uniforms = uniform! {
-               matrix: [
-                   [600.0/800.0, 0.0 , 0.0 , 0.0],
-                   [0.0                       , 1.0 , 0.0 , 0.0],
-                   [0.0                       , 0.0 , 1.0 , 0.0],
-                   [0.0                       , 0.0 , 0.0 , 1.0f32],
-               ],
-               tex: &self.textures,
-           };
-
-
-           let params = glium::DrawParameters {
-                  //depth_function: glium::DepthFunction::IfLessOrEqual,
-                //   blend: glium::Blend {
-                //       color: glium::BlendingFunction::Addition {
-                //           source: glium::LinearBlendingFactor::One,
-                //           destination: glium::LinearBlendingFactor::One
-                //       },
-                //       alpha: glium::BlendingFunction::Addition {
-                //           source: glium::LinearBlendingFactor::One,
-                //           destination: glium::LinearBlendingFactor::One
-                //       },
-                //       constant_value: (1.0, 1.0, 1.0, 1.0)
-                //   },
-                blend: glium::Blend::alpha_blending(),
-
-                  .. Default::default()
-            };
-
-        frame_buffer.clear_color(1.0f32, 1.0f32, 1.0f32, 0.0f32);
-        frame_buffer.draw(&bunch_of_generic_sprite_objects.0,&bunch_of_generic_sprite_objects.1,&sprite_program, &uniforms, &params).unwrap();
-
         //--------------------FIN-TEST----------------//
 
 
@@ -151,7 +73,8 @@ impl<'a> ModulesManager<'a> {
               bunch_of_generic_sprite_objects,
               &self.textures,
               ui_texture,
-              &self.program);
+              &self.program,
+                frame_buffer);
         (self,InputManager::get_input(self.display))
     }
 

@@ -93,12 +93,83 @@ impl<'a> Shaders<'a> {
 
                                   out vec4 color;
 
-                                  void main(){
+                                //   float kernel[9] = float[](
+                                //       1,1,1,
+                                //       1,-8,1,
+                                //       1,1,1
+                                //   );
+                                  //
+                                //   const float offset = 1.0/300.0;
 
-                                      color = vec4(1.0-texture(ui_texture, frag_texcoord).rgb, 1.0);
+                                  void main(){
+                                    //   vec2 offsets[9] = vec2[](
+                                    //         vec2(-offset, offset),  // top-left
+                                    //         vec2(0.0f,    offset),  // top-center
+                                    //         vec2(offset,  offset),  // top-right
+                                    //         vec2(-offset, 0.0f),    // center-left
+                                    //         vec2(0.0f,    0.0f),    // center-center
+                                    //         vec2(offset,  0.0f),    // center-right
+                                    //         vec2(-offset, -offset), // bottom-left
+                                    //         vec2(0.0f,    -offset), // bottom-center
+                                    //         vec2(offset,  -offset)  // bottom-right
+                                    //     );
+
+                                      vec3 tex = texture(ui_texture, frag_texcoord).rgb;
+                                    //   vec3 sample[9];
+                                    //   for(int i = 0; i < 9; i++){
+                                    //       sample[i] = vec3(texture(ui_texture, frag_texcoord + offsets[i]));
+                                    //   }
+                                    //   vec3 col = vec3(0.0);
+                                    //   for(int i = 0; i < 9; i++){
+                                    //       col += sample[i] * kernel[i];
+                                    //   }
+                                      color = vec4(tex, 1.0);
                                   }
                               "#,
                         });
+
+            hash.insert("sprite_shader",
+                            ShaderCouple{
+                                vertex_shader:
+                                 r#"
+                                    #version 140
+
+                                    in vec2 position;
+                                    in vec3 normal;
+                                    in vec4 color;
+                                    in vec2 tex_coords;
+                                    in uint i_tex_id;
+
+                                    out vec4 colorV;
+                                    out vec3 v_normal;
+                                    out vec2 v_tex_coords;
+                                    flat out uint v_tex_id;
+
+                                    uniform mat4 matrix;
+
+                                    void main(){
+                                    v_tex_coords = tex_coords;
+                                    gl_Position = matrix * vec4(position, 0.0,1.0);
+                                    v_tex_id = i_tex_id;
+                                    }
+                                "#,
+                            pixel_shader:
+                                r#"
+                                    #version 140
+
+                                    in vec4 colorV;
+                                    in vec2 v_tex_coords;
+                                    flat in uint v_tex_id;
+
+                                    out vec4 color;
+
+                                    uniform sampler2DArray tex;
+
+                                    void main(){
+                                        color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
+                                    }
+                                    "#,
+                            });
         let mut hash_compiled = HashMap::new();
 
         for (name, s) in hash.iter() {
