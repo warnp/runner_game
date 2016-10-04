@@ -33,6 +33,9 @@ impl GenericObject for Text{
     fn get_texture_id(&self)->i32 {
         0 //For the moment it's truly 0, I think...
     }
+    fn get_size(&self)->(f32,f32,f32){
+        (0.0,0.0,0.0)
+    }
 }
 
 #[cfg(test)]

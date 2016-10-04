@@ -29,14 +29,14 @@ impl PhysicalBody {
         Box::new(Actor::new((&&self.name).to_string(),
          [self.actor.get_position().0,self.actor.get_position().1],
          self.actor.get_texture_id(),
-         [0.1,0.1]))
+         [self.actor.get_size().0,self.actor.get_size().1]))
     }
 
     pub fn get_name(&self) -> &str {
         &&self.name
     }
 
-    pub fn detect_collision(&self, body : PhysicalBody) -> bool {
+    pub fn detect_collision(&self, body : &PhysicalBody) -> bool {
 
         let aa_bb_guest = body.get_aa_bb();
 
@@ -90,7 +90,7 @@ mod tests{
         let body1 = PhysicalBody::new("toto".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("toto".to_string(), [0.0,0.0], 0, [0.1,0.1])));
         let body2 = PhysicalBody::new("titi".to_string(), [0.0,0.0],[1.0,-1.0], Box::new(Actor::new("titi".to_string(), [0.0,0.0], 0, [0.1,0.1])));
 
-        let result = body1.detect_collision(body2);
+        let result = body1.detect_collision(&body2);
         assert_eq!(result, true);
     }
 

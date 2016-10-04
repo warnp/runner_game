@@ -49,8 +49,6 @@ impl<'a> ModulesManager<'a> {
         }
     }
 
-
-
     pub fn draw(&mut self,
          delta_time: f64,
          generics_objects: &Vec<Box<GenericObject>>,
@@ -58,16 +56,7 @@ impl<'a> ModulesManager<'a> {
          ui_texture: &glium::texture::Texture2d,
          frame_buffer: &mut glium::framebuffer::SimpleFrameBuffer) -> (&ModulesManager, Vec<&str>) {
 
-        // match self.frame_buffer {
-        //     Some(x) => (*x).init_frame_buffer(&self.display),
-        //     None => self.frame_buffer =  Some(Box::new(FrameBufferManager::new(&self.display))),
-        // }
-
         let bunch_of_generic_sprite_objects = self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
-
-        //--------------------TEST--------------------//
-        //--------------------FIN-TEST----------------//
-
 
          GraphicsHandler::draw(&self.display,
               bunch_of_generic_sprite_objects,
@@ -89,7 +78,13 @@ impl<'a> ModulesManager<'a> {
             description = i.get_description();
             match i.get_type() {
                 GenericObjectType::Sprite => {
-                    result_vec.push(Sprite::new(name, position.0,position.1,[1.0,0.0,0.0,1.0],i.get_texture_id() as u32,(0.1,0.1),0));
+                    result_vec.push(Sprite::new(name,
+                         position.0,
+                         position.1,
+                         [1.0,0.0,0.0,1.0],
+                         i.get_texture_id() as u32,
+                         (i.get_size().0,i.get_size().1)
+                         ,0));
                 },
 
                 GenericObjectType::Text => {

@@ -36,6 +36,9 @@ impl GenericObject for Actor {
     fn get_texture_id(&self) -> i32 {
         self.image
     }
+    fn get_size(&self) -> (f32,f32,f32){
+        (self.size[0], self.size[1], 0.0)
+    }
 }
 
 #[cfg(test)]
@@ -52,5 +55,5 @@ mod tests{
         // assert_eq!(actor.get_position(),[1.0,0.0]);
     }
 
-    
+
 }

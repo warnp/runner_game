@@ -1,4 +1,6 @@
-// use movements::State;
+extern crate rand;
+
+use rand::Rng;
 use engine::generic_object::GenericObject;
 use game_logic::actor::Actor;
 use game_logic::text::Text;
@@ -16,55 +18,52 @@ impl LogicHandler {
     // fn go_next()
     pub fn new() -> LogicHandler {
         let mut mov = Movements::new();
+        let mut x = rand::thread_rng();
+
+
+        let mut buffer = vec![PhysicalBody::new("player".to_string(),
+         [-0.1,0.1],
+         [0.1,-0.1],
+         Box::new(Actor::new("player".to_string(),
+                      [0.0,0.0],
+                      3,
+                      [0.1,0.1])))
+         ];
+
+         for i in 0..10 {
+             let height = x.gen::<u8>();
+             let size_x = x.gen::<u8>();
+             let size_y = x.gen::<u8>();
+
+             let size_x = (size_x as f32) / 511.0;
+             let size_y = (size_y as f32) / 383.0;
+             let height = (height as f32 - 128.0) / 127.0;
+             buffer.push(PhysicalBody::new("obstacle".to_string(), [1.0-size_x/2.0,height + size_y /2.0], [1.0+size_x/2.0,height-size_y/2.0],Box::new(Actor::new("obstacle".to_string(), [1.0,height], 2, [size_x,size_y]))));
+         }
+
         LogicHandler{
-            buffer: vec![PhysicalBody::new("player".to_string(), [-0.1,0.1], [0.1,-0.1],Box::new(Actor::new("player".to_string(), [0.0,0.0], 3, [0.1,0.1])))],
-            // buffer: vec![Box::new(Actor::new("player".to_string(), [0.0,0.0], 3, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.9,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.8,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.7,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.6,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.5,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.4,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.3,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.2,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.1,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [-0.0,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.9,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.8,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.7,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.6,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.5,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.4,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.3,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.2,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.1,0.0], 2, [0.1,0.1])),
-            //             Box::new(Actor::new("obstacle".to_string(), [0.0,0.0], 2, [0.1,0.1])),
-            //             Box::new(Text::new("fps".to_string(), [-0.5,0.8],"une valeur".to_string()))],
+            buffer: buffer,
             state_buffer: mov,
         }
 
     }
-
-    // pub fn get_buffer(&self, time: (f64,f64)) -> &Vec<Box<GenericObject>> {
-    //     let mut result : Vec<Box<GenericObject>> = vec![];
-    //     for el in &self.buffer {
-    //         result.push(el.generate_actor());
-    //     }
-    //
-    //     &result
-    // }
 
     pub fn update(&mut self, time: (f64,f64), keys: &Vec<&str>) -> Vec<Box<GenericObject>>  {
 
         let mut result : Vec<Box<GenericObject>> = vec![];
 
         let lists : (Vec<Box<GenericObject>>, Vec<PhysicalBody>) = self.go_threw_buffer(time,keys);
+        LogicHandler::detect_collision_with_player(&lists.1);
 
         for el in  &lists.0 {
-
             match el.get_type() {
-                GenericObjectType::Sprite => result.push(Box::new(Actor::new(el.get_name(), [el.get_position().0, el.get_position().1], el.get_texture_id(),[0.1,0.1]))),
-                GenericObjectType::Text => result.push(Box::new(Text::new(el.get_name(), [el.get_position().0, el.get_position().1], el.get_description())))
+                GenericObjectType::Sprite => result.push(Box::new(Actor::new(el.get_name(),
+                 [el.get_position().0, el.get_position().1],
+                   el.get_texture_id(),
+                   [el.get_size().0,el.get_size().1]))),
+                GenericObjectType::Text => result.push(Box::new(Text::new(el.get_name(),
+                 [el.get_position().0, el.get_position().1],
+                  el.get_description())))
             }
         }
 
@@ -75,7 +74,6 @@ impl LogicHandler {
         }
 
         result
-
     }
 
     fn go_threw_buffer(&mut self, time: (f64,f64), keys: &Vec<&str>) -> (Vec<Box<GenericObject>>, Vec<PhysicalBody>) {
@@ -94,28 +92,28 @@ impl LogicHandler {
                     pos = 1.5;
                 }
                 let new_position = [pos,  el.get_position().1];
-                lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [-0.1,0.1],[0.1,-0.1] ,
-                    Box::new(Actor::new(name.to_string(), new_position, 2,[0.1,0.1]))));
+                lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [new_position[0]-el.get_size().0/2.0,new_position[1] + el.get_size().1 /2.0], [new_position[0]+el.get_size().0/2.0,new_position[1]-el.get_size().1/2.0] ,
+                    Box::new(Actor::new(name.to_string(), new_position, 2,[el.get_size().0,el.get_size().1]))));
 
             } else if name == "player"{
+
                 if self.state_buffer.get_status() == Move::Fall {
                     if el.get_position().1 <= -0.8 {
                         self.state_buffer.update_status(Move::Walk);
                     }
                     lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [-0.1,0.1],[0.1,-0.1] ,
-                    Box::new(Actor::new(name.to_string(), [-0.8,el.get_position().1 - 0.15 * time.1 as f32], 3,[0.2,0.2]))));
+                    Box::new(Actor::new(name.to_string(), [-0.8,el.get_position().1 - 0.15 * time.1 as f32], 3,[el.get_size().0,el.get_size().1]))));
 
                 } else if self.state_buffer.get_status() == Move::Walk {
                     lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [-0.1,0.1],[0.1,-0.1] ,
-                    Box::new(Actor::new(name.to_string(), [-0.8,-0.8], 3,[0.2,0.2]))));
+                    Box::new(Actor::new(name.to_string(), [-0.8,-0.8], 3,[el.get_size().0,el.get_size().1]))));
 
                 }else {
                     lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [-0.1,0.1],[0.1,-0.1] ,
-                    Box::new(Actor::new(name.to_string(), [-0.8,0.0], 3,[0.2,0.2]))));
+                    Box::new(Actor::new(name.to_string(), [-0.8,0.0], 3,[el.get_size().0,el.get_size().1]))));
                 }
 
             }
-
 
             for el in &lst_physical_bodies {
                 result.push(el.generate_actor());
@@ -127,7 +125,26 @@ impl LogicHandler {
         (result, lst_physical_bodies)
     }
 
+    fn detect_collision_with_player(physical_buffer: &Vec<PhysicalBody>) -> bool {
+        let player = physical_buffer.iter().find(|x| x.get_name() == "player");
 
+        match (player){
+            Some(p) => {
+                for o in physical_buffer{
+                    if o.get_name() != "player" && p.detect_collision(o) {
+                        println!("Collision!!!");
+                        println!("{:#?}", o);
+                    }
+                }
+
+            },
+            None => (),
+        }
+        // println!("{:?}", Some(player).get_name());
+
+
+        true
+    }
 }
 
 #[cfg(test)]
