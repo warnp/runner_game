@@ -12,6 +12,7 @@ use engine::generic_object_type::GenericObjectType;
 pub struct LogicHandler{
     buffer: Vec<PhysicalBody>,
     state_buffer: Movements,
+    debug: bool,
 }
 
 impl LogicHandler {
@@ -44,6 +45,7 @@ impl LogicHandler {
         LogicHandler{
             buffer: buffer,
             state_buffer: mov,
+            debug: false,
         }
 
     }
@@ -53,7 +55,10 @@ impl LogicHandler {
         let mut result : Vec<Box<GenericObject>> = vec![];
 
         let lists : (Vec<Box<GenericObject>>, Vec<PhysicalBody>) = self.go_threw_buffer(time,keys);
-        LogicHandler::detect_collision_with_player(&lists.1);
+        if LogicHandler::detect_collision_with_player(&lists.1){
+            self.debug = true;
+
+        }
 
         for el in  &lists.0 {
             match el.get_type() {
@@ -74,6 +79,10 @@ impl LogicHandler {
         }
 
         result
+    }
+
+    pub fn get_debug(&self) -> bool {
+        self.debug
     }
 
     fn go_threw_buffer(&mut self, time: (f64,f64), keys: &Vec<&str>) -> (Vec<Box<GenericObject>>, Vec<PhysicalBody>) {
@@ -132,8 +141,10 @@ impl LogicHandler {
             Some(p) => {
                 for o in physical_buffer{
                     if o.get_name() != "player" && p.detect_collision(o) {
-                        println!("Collision!!!");
+                        println!("{:#?}", player);
                         println!("{:#?}", o);
+                        println!("Collision!!!");
+                        return true;
                     }
                 }
 
@@ -143,7 +154,7 @@ impl LogicHandler {
         // println!("{:?}", Some(player).get_name());
 
 
-        true
+        false
     }
 }
 

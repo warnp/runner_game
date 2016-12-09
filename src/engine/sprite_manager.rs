@@ -2,7 +2,6 @@ use engine::sprite::Sprite;
 use engine::vertex::Vertex;
 use std::cell::RefCell;
 use std::rc::Rc;
-use engine::graphic_item::GraphicItem;
 use engine::vertex;
 
 extern crate glium;
@@ -87,7 +86,7 @@ impl SpriteManager {
                        -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
 
-        let mut res = tmp.iter_mut()
+        let res = tmp.iter_mut()
                          .enumerate()
                          .find(|x| (x.1).name == name);
 

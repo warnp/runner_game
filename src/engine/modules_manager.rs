@@ -3,25 +3,17 @@ use engine::sprite::Sprite;
 use engine::shader_manager::Shaders;
 use engine::sprite_manager::SpriteManager;
 use engine::graphics_handler::GraphicsHandler;
-use glium::DisplayBuild;
 use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
 use engine::text_writer::TextWriter;
 use engine::generic_object_type::GenericObjectType;
 use engine::input_manager::InputManager;
-use engine::frame_buffer_manager::FrameBufferManager;
-use glium::Surface;
-use glium::backend::Facade;
-// use std::boxed::Box;
 
 pub struct ModulesManager<'a>{
     display: &'a glium::backend::glutin_backend::GlutinFacade,
     program: Vec<glium::program::Program>,
     textures: glium::texture::Texture2dArray,
-    // compiled_shaders: HashMap<&'a str, Box<glium::program::Program>>,
-    // frame_buffer: glium::framebuffer::SimpleFrameBuffer<'a>,
     frame_texture: glium::texture::Texture2d,
-    // sprite_manager: SpriteManager<'a>,
 
 }
 
@@ -44,8 +36,6 @@ impl<'a> ModulesManager<'a> {
                 program: vec![shaders.get_compiled_shader("screen_shader"), shaders.get_compiled_shader("sprite_shader")],
                 textures: textures,
                 frame_texture: frame_texture,
-                // frame_buffer: frame_buffer,
-                // sprite_manager: buffers,
         }
     }
 

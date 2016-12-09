@@ -1,8 +1,7 @@
 extern crate glium;
 extern crate time;
 use engine::vertex::Vertex;
-use glium::{DisplayBuild, Surface};
-use std::time::Instant;
+use glium::Surface;
 use engine::sprite::Sprite;
 
 
@@ -60,6 +59,7 @@ impl GraphicsHandler {
             ..Default::default()
         };
 
+        //La taille de l'écran est 2 parce que la taille de l'écran va de -1 à 1 soit 2
         let screen = Sprite::new("screen".to_string(), 0.0,0.0,[1.0,0.0,0.0,1.0],1u32,(2.0,2.0),0);
 
         let vertex_buffer = glium::VertexBuffer::dynamic(display, &screen.vertices).unwrap();
