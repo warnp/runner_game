@@ -7,6 +7,7 @@ use game_logic::text::Text;
 use game_logic::movement::{Move, Movements,State, Fall, Walk};
 use game_logic::physical_body::PhysicalBody;
 use engine::generic_object_type::GenericObjectType;
+use std::cell::Ref;
 
 // #[derive(Copy)]
 pub struct LogicHandler{
@@ -23,24 +24,37 @@ impl LogicHandler {
 
 
         let mut buffer = vec![PhysicalBody::new("player".to_string(),
-         [-0.1,0.1],
-         [0.1,-0.1],
+         [-0.05,0.05],
+         [0.05,-0.05],
          Box::new(Actor::new("player".to_string(),
                       [0.0,0.0],
                       3,
                       [0.1,0.1])))
          ];
 
-         for i in 0..10 {
-             let height = x.gen::<u8>();
-             let size_x = x.gen::<u8>();
-             let size_y = x.gen::<u8>();
-
-             let size_x = (size_x as f32) / 511.0;
-             let size_y = (size_y as f32) / 383.0;
-             let height = (height as f32 - 128.0) / 127.0;
-             buffer.push(PhysicalBody::new("obstacle".to_string(), [1.0-size_x/2.0,height + size_y /2.0], [1.0+size_x/2.0,height-size_y/2.0],Box::new(Actor::new("obstacle".to_string(), [1.0,height], 2, [size_x,size_y]))));
-         }
+        //  for i in 0..10 {
+        //      let height = x.gen::<u8>();
+        //      let size_x = x.gen::<u8>();
+        //      let size_y = x.gen::<u8>();
+         //
+        //      let size_x = (size_x as f32) / 511.0;
+        //      let size_y = (size_y as f32) / 383.0;
+        //      let height = (height as f32 - 128.0) / 127.0;
+        //      buffer.push(PhysicalBody::new("obstacle".to_string(),
+        //      [1.0-size_x/2.0,height + size_y /2.0],
+        //       [1.0+size_x/2.0,height-size_y/2.0],
+        //       Box::new(Actor::new("obstacle".to_string(),
+        //                 [1.0,height],
+        //                  2,
+        //                  [size_x,size_y]))));
+        //  }
+         buffer.push(PhysicalBody::new("obstacle".to_string(),
+         [-0.1,0.1],
+          [0.1,-0.1],
+          Box::new(Actor::new("obstacle".to_string(),
+                    [1.0,-0.8],
+                     2,
+                     [0.2,0.2]))));
 
         LogicHandler{
             buffer: buffer,
@@ -50,7 +64,7 @@ impl LogicHandler {
 
     }
 
-    pub fn update(&mut self, time: (f64,f64), keys: &Vec<&str>) -> Vec<Box<GenericObject>>  {
+    pub fn update(&mut self, time: (f64,f64), keys: Ref<Vec<&str>>) -> Vec<Box<GenericObject>>  {
 
         let mut result : Vec<Box<GenericObject>> = vec![];
 
@@ -85,11 +99,13 @@ impl LogicHandler {
         self.debug
     }
 
-    fn go_threw_buffer(&mut self, time: (f64,f64), keys: &Vec<&str>) -> (Vec<Box<GenericObject>>, Vec<PhysicalBody>) {
+    fn go_threw_buffer(&mut self, time: (f64,f64), keys: Ref<Vec<&str>>) -> (Vec<Box<GenericObject>>, Vec<PhysicalBody>) {
 
         let mut lst_physical_bodies : Vec<PhysicalBody>  = vec![];
         let mut result : Vec<Box<GenericObject>> = vec![];
         let mut name : &str;
+
+        println!("{:#?}", keys);
 
         for e in &mut self.buffer {
             let el : Box<Actor> = e.generate_actor();
@@ -101,8 +117,17 @@ impl LogicHandler {
                     pos = 1.5;
                 }
                 let new_position = [pos,  el.get_position().1];
-                lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [new_position[0]-el.get_size().0/2.0,new_position[1] + el.get_size().1 /2.0], [new_position[0]+el.get_size().0/2.0,new_position[1]-el.get_size().1/2.0] ,
-                    Box::new(Actor::new(name.to_string(), new_position, 2,[el.get_size().0,el.get_size().1]))));
+
+                lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
+                                    [new_position[0] - el.get_size().0 / 2.0,
+                                     new_position[1] + el.get_size().1 / 2.0],
+                                    [new_position[0] + el.get_size().0 / 2.0,
+                                     new_position[1] - el.get_size().1 / 2.0],
+                                    Box::new(Actor::new(name.to_string(),
+                                            new_position,
+                                            2,
+                                            [el.get_size().0,
+                                             el.get_size().1]))));
 
             } else if name == "player"{
 
@@ -110,15 +135,15 @@ impl LogicHandler {
                     if el.get_position().1 <= -0.8 {
                         self.state_buffer.update_status(Move::Walk);
                     }
-                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [-0.1,0.1],[0.1,-0.1] ,
+                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [el.get_position().0 -0.05, el.get_position().1 + 0.05],[el.get_position().0 + 0.05,el.get_position().1-0.05] ,
                     Box::new(Actor::new(name.to_string(), [-0.8,el.get_position().1 - 0.15 * time.1 as f32], 3,[el.get_size().0,el.get_size().1]))));
 
                 } else if self.state_buffer.get_status() == Move::Walk {
-                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [-0.1,0.1],[0.1,-0.1] ,
+                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [el.get_position().0 -0.05, el.get_position().1 + 0.05],[el.get_position().0 + 0.05,el.get_position().1-0.05],
                     Box::new(Actor::new(name.to_string(), [-0.8,-0.8], 3,[el.get_size().0,el.get_size().1]))));
 
                 }else {
-                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [-0.1,0.1],[0.1,-0.1] ,
+                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(), [el.get_position().0 -0.05, el.get_position().1 + 0.05],[el.get_position().0 + 0.05,el.get_position().1-0.05] ,
                     Box::new(Actor::new(name.to_string(), [-0.8,0.0], 3,[el.get_size().0,el.get_size().1]))));
                 }
 
@@ -141,8 +166,6 @@ impl LogicHandler {
             Some(p) => {
                 for o in physical_buffer{
                     if o.get_name() != "player" && p.detect_collision(o) {
-                        println!("{:#?}", player);
-                        println!("{:#?}", o);
                         println!("Collision!!!");
                         return true;
                     }

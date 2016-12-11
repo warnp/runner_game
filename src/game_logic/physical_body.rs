@@ -11,11 +11,12 @@ pub struct PhysicalBody {
 }
 
 impl PhysicalBody {
+
     pub fn new(name: String, left_up_corner: [f32;2], right_down_corner: [f32; 2], actor: Box<Actor>) -> PhysicalBody {
 
-        let l_u_c = [actor.get_position().0 + left_up_corner[0], actor.get_position().1 + left_up_corner[1]];
-        let r_d_c = [actor.get_position().0 + right_down_corner[0], actor.get_position().1 + right_down_corner[1]];
-
+        let l_u_c = [left_up_corner[0],left_up_corner[1]];
+        let r_d_c = [right_down_corner[0], right_down_corner[1]];
+        
         PhysicalBody {
             name: name,
             left_up_corner: l_u_c,
