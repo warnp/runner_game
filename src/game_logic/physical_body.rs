@@ -7,21 +7,23 @@ pub struct PhysicalBody {
     left_up_corner: [f32;2],
     right_down_corner: [f32;2],
     actor : Box<Actor>,
+    speed : f32,
 
 }
 
 impl PhysicalBody {
 
-    pub fn new(name: String, left_up_corner: [f32;2], right_down_corner: [f32; 2], actor: Box<Actor>) -> PhysicalBody {
+    pub fn new(name: String, left_up_corner: [f32;2], right_down_corner: [f32; 2], actor: Box<Actor>, speed : f32) -> PhysicalBody {
 
         let l_u_c = [left_up_corner[0],left_up_corner[1]];
         let r_d_c = [right_down_corner[0], right_down_corner[1]];
-        
+
         PhysicalBody {
             name: name,
             left_up_corner: l_u_c,
             right_down_corner: r_d_c,
             actor: actor,
+            speed : speed,
         }
     }
 
@@ -53,6 +55,10 @@ impl PhysicalBody {
 
     pub fn get_aa_bb(&self) ->  ([f32; 2], [f32; 2]) {
         (self.left_up_corner, self.right_down_corner)
+    }
+
+    pub fn get_speed(&self) -> f32 {
+        self.speed
     }
 }
 
