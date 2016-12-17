@@ -25,8 +25,8 @@ impl LogicHandler {
 
 
         let mut buffer = vec![PhysicalBody::new("player".to_string(),
-                                                [-0.05, 0.05],
-                                                [0.05, -0.05],
+                                                [-0.025, 0.05],
+                                                [0.05, -0.025],
                                                 Box::new(Actor::new("player".to_string(),
                                                                     [0.0, 0.0],
                                                                     3,
@@ -145,8 +145,11 @@ impl LogicHandler {
                     if el.get_position().1 <= -0.8 {
                         self.state_buffer.update_status(Move::Walk);
                     }
-                    let speed = e.get_speed() + self.gravity;
-                    println!("{:?}", speed);
+                    let mut speed = 0.0;
+                    if time.1 > 0.0 {
+                        speed = e.get_speed() + self.gravity;
+                    }
+                    // println!("{:?}", speed);
                     lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
                                                 [el.get_position().0 - 0.05,
                                                  el.get_position().1 + 0.05],
@@ -162,7 +165,6 @@ impl LogicHandler {
                                                 speed));
 
                 } else if self.state_buffer.get_status() == Move::Walk {
-
                     if keys == "space_press" {
                         self.state_buffer.update_status(Move::Jump);
                         lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
@@ -175,7 +177,7 @@ impl LogicHandler {
                                                                         3,
                                                                         [el.get_size().0,
                                                                          el.get_size().1])),
-                                                    0.5));
+                                                    1.0));
                     } else {
                         lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
                                                     [el.get_position().0 - 0.05,
@@ -193,7 +195,6 @@ impl LogicHandler {
                 } else if self.state_buffer.get_status() == Move::Jump {
                     let speed = e.get_speed() - self.gravity;
                     lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
-
                                                 [el.get_position().0 - 0.05,
                                                  el.get_position().1 + 0.05],
                                                 [el.get_position().0 + 0.05,
@@ -240,8 +241,6 @@ impl LogicHandler {
             None => (),
         }
         // println!("{:?}", Some(player).get_name());
-
-
         false
     }
 }
@@ -259,11 +258,12 @@ mod tests {
         // assert_eq!(array.len(),1);
     }
 
+    #[ignore]
     #[test]
     fn should_update_something() {
         let mut logic = LogicHandler::new();
 
-        logic.update((0.0, 0.0), &vec![]);
+        // logic.update((0.0, 0.0), &vec![]);
         // assert_eq!(logic.get_buffer((0.0,0.0)).len(),1);
     }
 }

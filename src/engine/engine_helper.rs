@@ -27,10 +27,6 @@ impl EngineHelper {
 
         (fps, time_between)
     }
-
-    pub fn get_iterator(&self) -> u64 {
-        self.iterator
-    }
 }
 
 #[cfg(test)]
