@@ -35,24 +35,22 @@ fn main() {
 
     let mut engine_helper = EngineHelper::new();
 
-    // let mut key_buf = RefCell::new(vec![]);
-    let mut key_buf = "".to_string();
+    // Use a key buffer to be able to make some replays (:
+    let mut key_buf: Vec<String> = vec!["".to_string()];
     loop {
         let fps_timer = engine_helper.get_fps();
-        // let res =
-        //     modules_manager.draw(fps_timer.1, &(&logic_manager).get_buffer(fps_timer), vec![]);
         let local = key_buf.clone();
         let res = modules_manager.draw(fps_timer.1,
-                                       &logic_manager.update(fps_timer, &local),
+                                       &logic_manager.update(fps_timer, &local.last().unwrap()),
                                        vec![],
                                        &frame_texture,
                                        &mut frame_buffer);
 
         if res.1.len() > 0 {
-            key_buf = res.1[0].to_string().clone();
+            key_buf.push(res.1[0].to_string().clone());
         }
 
-        if key_buf == "escape_press".to_string() {
+        if key_buf.contains(&("escape_press".to_string())) {
             return;
         }
 

@@ -25,7 +25,7 @@ impl LogicHandler {
 
         let mut buffer = vec![PhysicalBody::new("player".to_string(),
                                                 [-0.025, 0.05],
-                                                [0.05, -0.025],
+                                                [0.025, -0.05],
                                                 Box::new(Actor::new("player".to_string(),
                                                                     [0.0, 0.0],
                                                                     3,
@@ -240,16 +240,14 @@ impl LogicHandler {
         match (player) {
             Some(p) => {
                 for o in physical_buffer {
-                    println!("{:?}", logic_handler.state_buffer);
-
                     if o.get_name() != "player" &&
-                       p.get_collision_ray([-0.025, -0.05], [0.025, -0.05], &o) &&
+                       p.get_collision_ray([0.0, -0.05], [0.0, -0.05], &o) &&
                        logic_handler.state_buffer.get_status() == Move::Fall {
                         logic_handler.state_buffer.update_status(Move::Walk);
                     }
 
                     if o.get_name() != "player" &&
-                       !p.get_collision_ray([-0.025, -0.05], [0.025, -0.05], &o) &&
+                       !p.get_collision_ray([0.0, -0.05], [0.0, -0.05], &o) &&
                        logic_handler.state_buffer.get_status() == Move::Walk &&
                        logic_handler.state_buffer.get_status() != Move::Jump {
                         logic_handler.state_buffer.update_status(Move::Fall);
