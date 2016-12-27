@@ -1,5 +1,4 @@
 use game_logic::actor::Actor;
-use engine::generic_object::GenericObject;
 
 #[derive(Clone, Debug)]
 pub struct PhysicalBody {
@@ -31,11 +30,7 @@ impl PhysicalBody {
     }
 
     pub fn generate_actor(&self) -> Box<Actor> {
-
-        Box::new(Actor::new((&&self.name).to_string(),
-                            [self.actor.get_position().0, self.actor.get_position().1],
-                            self.actor.get_texture_id(),
-                            [self.actor.get_size().0, self.actor.get_size().1]))
+        self.actor.clone()
     }
 
     pub fn get_name(&self) -> &str {

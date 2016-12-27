@@ -254,7 +254,8 @@ impl LogicHandler {
 
                     }
 
-                    if o.get_name() != "player" && p.detect_collision(o) {
+                    if o.get_name() != "player" && p.detect_collision(o) ||
+                       o.generate_actor().get_position().1 < -2.0 {
                         println!("Collision!!!");
                         return true;
                     }
