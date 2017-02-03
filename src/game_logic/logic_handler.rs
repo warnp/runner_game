@@ -64,6 +64,22 @@ impl LogicHandler {
                                                           2,
                                                           [1.4, 0.2])),
                                       0.0));
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.2, 0.3],
+                                      [0.2, -0.3],
+                                      Box::new(Actor::new("obstacle1".to_string(),
+                                                          [0.1, -0.8],
+                                                          2,
+                                                          [0.4, 0.6])),
+                                      0.0));
+        // buffer.push(PhysicalBody::new("obstacle".to_string(),
+        //                               [-0.7, 0.1],
+        //                               [0.7, -0.1],
+        //                               Box::new(Actor::new("obstacle1".to_string(),
+        //                                                   [1.5, -0.8],
+        //                                                   2,
+        //                                                   [1.4, 0.2])),
+        //                               0.0));
 
         LogicHandler {
             buffer: buffer,
@@ -122,6 +138,7 @@ impl LogicHandler {
         let mut result: Vec<Box<GenericObject>> = vec![];
         let mut name: &str;
 
+        // Inserer ici un générateur de blocs toute les x secondes grâce au timer?
         // println!("{:#?}", keys);
 
         for e in &mut self.buffer {
