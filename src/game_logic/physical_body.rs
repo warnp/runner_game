@@ -70,6 +70,7 @@ impl PhysicalBody {
            self.get_aa_bb().0[1] + ray_left_up[1] >= aa_bb_guest.1[1] &&
            self.get_aa_bb().1[0] + ray_right_down[0] >= aa_bb_guest.0[0] &&
            self.get_aa_bb().1[1] + ray_right_down[1] <= aa_bb_guest.0[1] {
+            println!("ray Collision");
             return true;
         }
 

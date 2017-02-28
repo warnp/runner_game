@@ -5,10 +5,10 @@ authors = ["romain <assie.romain@gmail.com>"]
 
 [dependencies]
 glium="*"
-image="*"
+image="0.12.3"
 time = "0.1"
 rand = "0.3"
-# winapi = "*" 
+# winapi = "*"
 # gilrs = "0.1.0"
 
 

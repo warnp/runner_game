@@ -87,18 +87,15 @@ impl LogicHandler {
             debug: false,
             gravity: 0.02,
         }
-
     }
 
     pub fn update(&mut self, time: (f64, f64), keys: &str) -> Vec<Box<GenericObject>> {
-
         let mut result: Vec<Box<GenericObject>> = vec![];
 
         let lists: (Vec<Box<GenericObject>>, Vec<PhysicalBody>) = self.go_threw_buffer(time, keys);
-        if LogicHandler::detect_collision_with_player(&lists.1, self) {
-            self.debug = true;
-
-        }
+        //        if LogicHandler::detect_collision_with_player(&lists.1, self) {
+        //            self.debug = true;
+        //        }
 
         for el in &lists.0 {
             match el.get_type() {
@@ -133,119 +130,122 @@ impl LogicHandler {
                        time: (f64, f64),
                        keys: &str)
                        -> (Vec<Box<GenericObject>>, Vec<PhysicalBody>) {
-
         let mut lst_physical_bodies: Vec<PhysicalBody> = vec![];
         let mut result: Vec<Box<GenericObject>> = vec![];
         let mut name: &str;
 
         // Inserer ici un générateur de blocs toute les x secondes grâce au timer?
-        // println!("{:#?}", keys);
-
-        for e in &mut self.buffer {
+        for e in self.buffer.iter().filter(|x| x.get_name() == "obstacle") {
             let el: Box<Actor> = e.generate_actor();
-            name = e.get_name();
-            if name == "obstacle" {
-                let mut pos = el.get_position().0 - 0.1 * time.1 as f32;
-                if pos <= -1.5 {
-                    pos = 1.5;
-                }
-                let new_position = [pos, el.get_position().1];
-
-                lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
-                                            [new_position[0] - el.get_size().0 / 2.0,
-                                             new_position[1] + el.get_size().1 / 2.0],
-                                            [new_position[0] + el.get_size().0 / 2.0,
-                                             new_position[1] - el.get_size().1 / 2.0],
-                                            Box::new(Actor::new(name.to_string(),
-                                                                new_position,
-                                                                2,
-                                                                [el.get_size().0,
-                                                                 el.get_size().1])),
-                                            0.0));
-
-            } else if name == "player" {
-                if self.state_buffer.get_status() == Move::Fall {
-                    if el.get_position().1 <= -0.8 {
-                        self.state_buffer.update_status(Move::Walk);
-                    }
-                    let mut speed = 0.0;
-                    if time.1 > 0.0 {
-                        speed = e.get_speed() + self.gravity;
-                    }
-                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
-                                                [el.get_position().0 - 0.025,
-                                                 el.get_position().1 + 0.05],
-                                                [el.get_position().0 + 0.025,
-                                                 el.get_position().1 - 0.05],
-                                                Box::new(Actor::new(name.to_string(),
-                                                                    [-0.8,
-                                                                     el.get_position().1 -
-                                                                     speed * time.1 as f32],
-                                                                    3,
-                                                                    [el.get_size().0,
-                                                                     el.get_size().1])),
-                                                speed));
-
-                } else if self.state_buffer.get_status() == Move::Walk {
-                    if keys == "space_press" {
-                        self.state_buffer.update_status(Move::Jump);
-                        lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
-                                                    [el.get_position().0 - 0.025,
-                                                     el.get_position().1 + 0.05],
-                                                    [el.get_position().0 + 0.025,
-                                                     el.get_position().1 - 0.05],
-                                                    Box::new(Actor::new(name.to_string(),
-                                                                        [-0.8,
-                                                                         el.get_position().1],
-                                                                        3,
-                                                                        [el.get_size().0,
-                                                                         el.get_size().1])),
-                                                    1.0));
-                    } else {
-                        lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
-                                                    [el.get_position().0 - 0.025,
-                                                     el.get_position().1 + 0.05],
-                                                    [el.get_position().0 + 0.025,
-                                                     el.get_position().1 - 0.05],
-                                                    Box::new(Actor::new(name.to_string(),
-                                                                        [-0.8,
-                                                                         el.get_position().1],
-                                                                        3,
-                                                                        [el.get_size().0,
-                                                                         el.get_size().1])),
-                                                    0.0));
-                    }
-
-                } else if self.state_buffer.get_status() == Move::Jump {
-                    let speed = e.get_speed() - self.gravity;
-                    lst_physical_bodies.push(PhysicalBody::new(name.to_string(),
-                                                [el.get_position().0 - 0.025,
-                                                 el.get_position().1 + 0.05],
-                                                [el.get_position().0 + 0.025,
-                                                 el.get_position().1 - 0.05],
-                                                Box::new(Actor::new(name.to_string(),
-                                                                    [-0.8,
-                                                                     speed * time.1 as f32 +
-                                                                     el.get_position().1],
-                                                                    3,
-                                                                    [el.get_size().0,
-                                                                     el.get_size().1])),
-                                                speed));
-                    if e.get_speed() <= 0.0 {
-                        self.state_buffer.update_status(Move::Fall);
-                    }
-                }
-
+            let mut pos = el.get_position().0 - 0.1 * time.1 as f32;
+            if pos <= -1.5 {
+                pos = 1.5;
             }
+            let new_position = [pos, el.get_position().1];
 
-            for el in &lst_physical_bodies {
+            lst_physical_bodies.push(PhysicalBody::new(e.get_name().to_string(),
+                                                       [new_position[0] - el.get_size().0 / 2.0,
+                                                           new_position[1] + el.get_size().1 / 2.0],
+                                                       [new_position[0] + el.get_size().0 / 2.0,
+                                                           new_position[1] - el.get_size().1 / 2.0],
+                                                       Box::new(Actor::new(e.get_name()
+                                                                               .to_string(),
+                                                                           new_position,
+                                                                           2,
+                                                                           [el.get_size().0,
+                                                                               el.get_size().1])),
+                                                       0.0));
+        }
+
+        let player = self.buffer.iter().find(|x| x.get_name() == "player").unwrap();
+
+        let mut collide_one_floor: bool = false;
+        for o in &lst_physical_bodies {
+            if player.get_collision_ray([0.0, -0.05], [0.0, -0.05], o) {
+                self.state_buffer.update_status(Move::Walk);
+                collide_one_floor = true;
+            }
+        }
+
+        if !collide_one_floor && self.state_buffer.get_status() != Move::Jump &&
+            self.state_buffer.get_status() != Move::Fall {
+            self.state_buffer.update_status(Move::Fall)
+        }
+
+        let el: Box<Actor> = player.generate_actor();
+        println!("{:#?}", self.state_buffer.get_status());
+        if self.state_buffer.get_status() == Move::Fall {
+            let mut speed = 0.0;
+            if player.generate_actor().get_position().1 <= -0.8 {
+                self.state_buffer.update_status(Move::Walk);
+            }
+            if time.1 > 0.0 {
+                speed = player.get_speed() + self.gravity;
+            }
+            lst_physical_bodies.push(PhysicalBody::new(player.get_name().to_string(),
+                                                       [el.get_position().0 - 0.025,
+                                                           el.get_position().1 + 0.05],
+                                                       [el.get_position().0 + 0.025,
+                                                           el.get_position().1 - 0.05],
+                                                       Box::new(Actor::new(player.get_name().to_string(),
+                                                                           [-0.8,
+                                                                               el.get_position().1 -
+                                                                                   speed * time.1 as f32],
+                                                                           3,
+                                                                           [el.get_size().0,
+                                                                               el.get_size().1])),
+                                                       speed));
+        } else if self.state_buffer.get_status() == Move::Walk {
+            let mut speed = 0.0;
+            if keys == "space_press" {
+                self.state_buffer.update_status(Move::Jump);
+                speed = 1.0;
+            }
+            lst_physical_bodies.push(PhysicalBody::new(player.get_name().to_string(),
+                                                       [el.get_position().0 - 0.025,
+                                                           el.get_position().1 + 0.05],
+                                                       [el.get_position().0 + 0.025,
+                                                           el.get_position().1 - 0.05],
+                                                       Box::new(Actor::new(player.get_name()
+                                                                               .to_string(),
+                                                                           [-0.8, el.get_position().1],
+                                                                           3,
+                                                                           [el.get_size().0,
+                                                                               el.get_size().1])),
+                                                       speed));
+        } else if self.state_buffer.get_status() == Move::Jump {
+            let speed = player.get_speed() - self.gravity;
+            lst_physical_bodies.push(PhysicalBody::new(player.get_name().to_string(),
+                                                       [el.get_position().0 - 0.025,
+                                                           el.get_position().1 + 0.05],
+                                                       [el.get_position().0 + 0.025,
+                                                           el.get_position().1 - 0.05],
+                                                       Box::new(Actor::new(player.get_name().to_string(),
+                                                                           [-0.8,
+                                                                               speed * time.1 as f32 +
+                                                                               el.get_position().1],
+                                                                           3,
+                                                                           [el.get_size().0,
+                                                                               el.get_size().1])),
+                                                       speed));
+            if player.get_speed() <= 0.0 {
+                self.state_buffer.update_status(Move::Fall);
+            }
+        }
+
+        for el in &lst_physical_bodies {
+            if el.get_name() == "player" &&
+                lst_physical_bodies.iter().filter(|x| x.get_name() == "player").count() == 0 {
+                result.push(el.generate_actor());
+            } else if el.get_name() != " player" {
                 result.push(el.generate_actor());
             }
-
-            result.push(Box::new(Text::new("fps".to_string(),
-                                           [-0.5, 0.8],
-                                           format!("fps : `{fps:.*}`", 2, fps = time.0))));
         }
+
+        result.push(Box::new(Text::new("fps".to_string(),
+                                       [-0.5, 0.8],
+                                       format!("fps : `{fps:.*}`", 2, fps = time.0))));
+
 
         (result, lst_physical_bodies)
     }
@@ -254,28 +254,28 @@ impl LogicHandler {
                                     logic_handler: &mut LogicHandler)
                                     -> bool {
         let player = physical_buffer.iter().find(|x| x.get_name() == "player");
-        match (player) {
+        println!("{:#?}", physical_buffer);
+        match player {
             Some(p) => {
-                for o in physical_buffer {
-                    if o.get_name() != "player" &&
-                       p.get_collision_ray([0.0, -0.05], [0.0, -0.05], &o) &&
-                       logic_handler.state_buffer.get_status() == Move::Fall {
-                        logic_handler.state_buffer.update_status(Move::Walk);
+                //                println!("{:?}", logic_handler.state_buffer.get_status());
+                for o in physical_buffer.iter().filter(|x| x.get_name() != "player") {
+                    if p.get_collision_ray([0.0, 0.0], [0.0, 0.5], &o) {
+                        if logic_handler.state_buffer.get_status() == Move::Fall {
+                            logic_handler.state_buffer.update_status(Move::Walk);
+                            // println!("walk");
+                        }
+                    } else {
+                        if logic_handler.state_buffer.get_status() == Move::Walk &&
+                            logic_handler.state_buffer.get_status() != Move::Jump {
+                            logic_handler.state_buffer.update_status(Move::Fall);
+                            // println!("fall");
+                        }
                     }
 
-                    if o.get_name() != "player" &&
-                       !p.get_collision_ray([0.0, -0.05], [0.0, -0.05], &o) &&
-                       logic_handler.state_buffer.get_status() == Move::Walk &&
-                       logic_handler.state_buffer.get_status() != Move::Jump {
-                        logic_handler.state_buffer.update_status(Move::Fall);
-
-                    }
-
-                    if o.get_name() != "player" && p.detect_collision(o) ||
-                       o.generate_actor().get_position().1 < -2.0 {
-                        println!("Collision!!!");
-                        return true;
-                    }
+                    // if p.detect_collision(o) || p.generate_actor().get_position().1 < -2.0 {
+                    //     println!("Collision!!!");
+                    //     return true;
+                    // }
                 }
             }
             None => (),
