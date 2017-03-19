@@ -68,10 +68,12 @@ impl<'a> ModulesManager<'a> {
         let mut name: String;
         let mut position: (f32, f32, f32);
         let mut description: String;
+        let mut texture_coordinates: ((f32,f32),(f32,f32),(f32,f32),(f32,f32));
         for i in generic_object {
             name = i.get_name();
             position = i.get_position();
             description = i.get_description();
+            texture_coordinates = i.get_texture_coordinates();
             match i.get_type() {
                 GenericObjectType::Sprite => {
                     result_vec.push(Sprite::new(name,
@@ -80,6 +82,7 @@ impl<'a> ModulesManager<'a> {
                                                 [1.0, 0.0, 0.0, 1.0],
                                                 i.get_texture_id() as u32,
                                                 (i.get_size().0, i.get_size().1),
+                                                texture_coordinates,
                                                 0));
                 }
 
@@ -130,6 +133,9 @@ mod tests {
         }
         fn get_size(&self) -> (f32, f32, f32) {
             (0.0, 0.0, 0.0)
+        }
+        fn  get_texture_coordinates(&self) ->((f32,f32),(f32,f32)){
+            ((0.0,0.0),(0.0,0.0))
         }
     }
 }

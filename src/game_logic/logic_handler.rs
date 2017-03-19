@@ -28,7 +28,8 @@ impl LogicHandler {
                                                 Box::new(Actor::new("player".to_string(),
                                                                     [0.0, 0.0],
                                                                     3,
-                                                                    [0.1, 0.1])),
+                                                                    [0.1, 0.1],
+                                                                    ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
                                                 0.0)];
 
         buffer.push(PhysicalBody::new("obstacle".to_string(),
@@ -37,7 +38,8 @@ impl LogicHandler {
                                       Box::new(Actor::new("obstacle".to_string(),
                                                           [1.0, -0.8],
                                                           2,
-                                                          [0.2, 0.2])),
+                                                          [0.2, 0.2],
+                                                          ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
                                       0.0));
         buffer.push(PhysicalBody::new("obstacle".to_string(),
                                       [-0.7, 0.1],
@@ -45,7 +47,8 @@ impl LogicHandler {
                                       Box::new(Actor::new("obstacle1".to_string(),
                                                           [-0.5, -0.8],
                                                           2,
-                                                          [1.4, 0.2])),
+                                                          [1.4, 0.2],
+                                                          ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
                                       0.0));
         buffer.push(PhysicalBody::new("obstacle".to_string(),
                                       [-0.2, 0.3],
@@ -53,7 +56,8 @@ impl LogicHandler {
                                       Box::new(Actor::new("obstacle1".to_string(),
                                                           [0.1, -0.8],
                                                           2,
-                                                          [0.4, 0.6])),
+                                                          [0.4, 0.6],
+                                                          ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
                                       0.0));
 
         LogicHandler {
@@ -75,7 +79,8 @@ impl LogicHandler {
                     result.push(Box::new(Actor::new(el.get_name(),
                                                     [el.get_position().0, el.get_position().1],
                                                     el.get_texture_id(),
-                                                    [el.get_size().0, el.get_size().1])))
+                                                    [el.get_size().0, el.get_size().1],
+                                                    ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))))
                 }
                 GenericObjectType::Text => {
                     result.push(Box::new(Text::new(el.get_name(),
@@ -125,7 +130,8 @@ impl LogicHandler {
                                                                            new_position,
                                                                            2,
                                                                            [el.get_size().0,
-                                                                               el.get_size().1])),
+                                                                               el.get_size().1],
+                                                                           ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
                                                        0.0));
         }
 
@@ -154,9 +160,9 @@ impl LogicHandler {
             if time.1 > 0.0 {
                 speed = player.get_speed() + self.gravity;
             }
-            lst_physical_bodies.push(self.generate_player(&player,speed,-
-                (speed * time.1 as f32)) );
-        //---------------------ON WALK --------------------------//
+            lst_physical_bodies.push(self.generate_player(&player, speed, -
+                (speed * time.1 as f32)));
+            //---------------------ON WALK --------------------------//
         } else if self.state_buffer.get_status() == Move::Walk {
             let mut speed = 0.0;
             if keys == "space_press" {
@@ -164,21 +170,21 @@ impl LogicHandler {
                 speed = 1.0;
             }
 
-            let mut p : PhysicalBody = self.generate_player(&player,speed,0.0);
+            let mut p: PhysicalBody = self.generate_player(&player, speed, 0.0);
 
             //Ajust position, for little stairs maybe
             for o in &lst_physical_bodies {
-                if player.get_collision_ray([0.03,-0.01],[0.03,-0.01],o) &&
-                    !player.get_collision_ray([0.03,0.0],[0.03,0.0],o) {
-                    p = self.generate_player(&player,speed,0.005);
+                if player.get_collision_ray([0.03, -0.01], [0.03, -0.01], o) &&
+                    !player.get_collision_ray([0.03, 0.0], [0.03, 0.0], o) {
+                    p = self.generate_player(&player, speed, 0.005);
                 }
             }
 
             lst_physical_bodies.push(p);
-        //---------------------ON JUMP --------------------------//
+            //---------------------ON JUMP --------------------------//
         } else if self.state_buffer.get_status() == Move::Jump {
             let speed = player.get_speed() - self.gravity;
-            lst_physical_bodies.push(self.generate_player(&player,speed,speed * time.1 as f32));
+            lst_physical_bodies.push(self.generate_player(&player, speed, speed * time.1 as f32));
             if player.get_speed() <= 0.0 {
                 self.state_buffer.update_status(Move::Fall);
             }
@@ -214,10 +220,9 @@ impl LogicHandler {
                                                   el.get_position().1 + position],
                                               3,
                                               [el.get_size().0,
-                                                  el.get_size().1])),
+                                                  el.get_size().1],((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
                           speed)
     }
-
 }
 
 #[cfg(test)]

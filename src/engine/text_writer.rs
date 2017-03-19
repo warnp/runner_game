@@ -684,26 +684,23 @@ impl<'a> TextWriter<'a> {
 
         for st in &return_vec {
 
-            // let to_str = &format!("{}", self.string_name)[..];
-
-            let mut sp = Sprite::new(String::from(self.string_name),
+            let sp = Sprite::new(String::from(self.string_name),
                                      self.text_origin.0 + self.text_size * i * offset,
                                      self.text_origin.1,
                                      [1.0, 1.0, 1.0, 1.0],
                                      0,
                                      (self.text_size, self.text_size),
+                                     *st,
                                      0);
-            sp.vertices[0].tex_coords[0] = (st.0).0;
-            sp.vertices[1].tex_coords[0] = (st.1).0;
-            sp.vertices[2].tex_coords[0] = (st.2).0;
-            sp.vertices[3].tex_coords[0] = (st.3).0;
-
-            sp.vertices[0].tex_coords[1] = (st.0).1;
-            sp.vertices[1].tex_coords[1] = (st.1).1;
-            sp.vertices[2].tex_coords[1] = (st.2).1;
-            sp.vertices[3].tex_coords[1] = (st.3).1;
-
-            // println!("{:?} {:?} {:?} {:?}", st.0, );
+//            sp.vertices[0].tex_coords[0] = (st.0).0;
+//            sp.vertices[1].tex_coords[0] = (st.1).0;
+//            sp.vertices[2].tex_coords[0] = (st.2).0;
+//            sp.vertices[3].tex_coords[0] = (st.3).0;
+//
+//            sp.vertices[0].tex_coords[1] = (st.0).1;
+//            sp.vertices[1].tex_coords[1] = (st.1).1;
+//            sp.vertices[2].tex_coords[1] = (st.2).1;
+//            sp.vertices[3].tex_coords[1] = (st.3).1;
 
             sprites_vec.push(sp);
             i = i + 1.0;

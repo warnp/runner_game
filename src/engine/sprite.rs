@@ -1,7 +1,3 @@
-// use vertex;
-
-// use collision::CollisionMesh;
-// use graphic_item::GraphicItem;
 use std::cmp::{Ord, Ordering};
 use engine::vertex::Vertex;
 use engine::graphic_item::GraphicItem;
@@ -27,36 +23,36 @@ impl Sprite {
                color: [f32; 4],
                tex_id: u32,
                size: (f32, f32),
+               tex_coord:((f32,f32,),(f32,f32),(f32,f32),(f32,f32)),
                order: u16)
                -> Sprite {
-
         Sprite {
             vertices: [Vertex {
                            position: [-0.5 * size.0 + x, 0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
-                           tex_coords: [0.0, 1.0],
+                           tex_coords: [tex_coord.0 .0, tex_coord.0 .1],
                            i_tex_id: tex_id,
                        },
                        Vertex {
                            position: [0.5 * size.0 + x, 0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
-                           tex_coords: [1.0, 1.0],
+                           tex_coords: [tex_coord.1 .0, tex_coord.1 .1],
                            i_tex_id: tex_id,
                        },
                        Vertex {
                            position: [0.5 * size.0 + x, -0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
-                           tex_coords: [1.0, 0.0],
+                           tex_coords: [tex_coord.2 .0, tex_coord.2 .1],
                            i_tex_id: tex_id,
                        },
                        Vertex {
                            position: [-0.5 * size.0 + x, -0.5 * size.1 + y],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
-                           tex_coords: [0.0, 0.0],
+                           tex_coords: [tex_coord.3 .0, tex_coord.3 .1],
                            i_tex_id: tex_id,
                        }],
             indices: [0, 1, 2, 0, 2, 3],
@@ -134,8 +130,8 @@ mod tests {
 
     #[test]
     fn should_get_ordering() {
-        let a = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
-        let b = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 1);
+        let a = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 0);
+        let b = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 1);
 
         let ordered = a.cmp(&b);
         assert!(ordered == Ordering::Less);
@@ -143,8 +139,8 @@ mod tests {
 
     #[test]
     fn should_get_equality() {
-        let a = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
-        let b = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let a = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 0);
+        let b = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 0);
 
         let ordered = a.eq(&b);
         assert!(ordered == true);
@@ -153,7 +149,7 @@ mod tests {
     #[test]
     fn should_calculate_center_of_sprite_position() {
         // Given
-        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 0);
         // when
         let position_result = s.get_position();
 
@@ -163,7 +159,7 @@ mod tests {
 
     #[test]
     fn should_collide() {
-        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 0);
 
         assert!(s.detect_collide([-0.10, 1.0], [0.0, 0.0]));
     }
@@ -171,14 +167,14 @@ mod tests {
     #[test]
     #[should_panic]
     fn should_not_collide() {
-        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (0.1, 0.1), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (0.1, 0.1),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 0);
 
         assert!(s.detect_collide([1.0, -1.0], [2.0, -3.0]));
     }
 
     #[test]
     fn should_get_aa_bb_positions() {
-        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0), 0);
+        let s = Sprite::new("toto".to_string(), 0.0, 0.0, [1.0, 0.0, 0.0, 1.0], 0, (1.0, 1.0),((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)), 0);
 
         let aabb = s.get_aa_bb();
 

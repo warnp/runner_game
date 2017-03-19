@@ -13,15 +13,9 @@ extern crate time;
 pub struct SpriteManager {
     /// Sprite list to handle with
     sprite_list: Rc<RefCell<Vec<Sprite>>>,
- /* vertex_buffer: glium::VertexBuffer<vertex::Vertex>,
-                                                                * generation_id: i32, */
 }
 
 impl SpriteManager {
-    // #[warn(dead_code)]
-    // fn get_time() -> i32 {
-    //     time::now().to_timespec().nsec
-    // }
 
     /// Construct new `SpriteManager`
     ///
@@ -103,7 +97,6 @@ impl SpriteManager {
             (sp.1).vertices[2].position[1] = (sp.1).vertices[2].position[1] + new_y;
             (sp.1).vertices[3].position[1] = (sp.1).vertices[3].position[1] + new_y;
 
-            // self.sprite_list.borrow_mut()[sp.0] = *sp.1;
         }
 
         self.get_buffers(display)
@@ -128,7 +121,6 @@ impl SpriteManager {
                         .find(|x| (x.1).name == name)
                         .unwrap();
 
-
         (sp.1).vertices[0].position[0] = new_x;
         (sp.1).vertices[1].position[0] = new_x;
         (sp.1).vertices[2].position[0] = new_x;
@@ -138,8 +130,6 @@ impl SpriteManager {
         (sp.1).vertices[1].position[1] = new_y;
         (sp.1).vertices[2].position[1] = new_y;
         (sp.1).vertices[3].position[1] = new_y;
-
-        // self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
         self.get_buffers(&display)
 
@@ -180,8 +170,6 @@ impl SpriteManager {
         (sp.1).vertices[1].tex_coords[1] = new_coordinates[1];
         (sp.1).vertices[2].tex_coords[1] = new_coordinates[1] + uv_size.1;
         (sp.1).vertices[3].tex_coords[1] = new_coordinates[1] + uv_size.1;
-
-        // self.sprite_list.borrow_mut()[sp.0] = *sp.1;
 
         self.get_buffers(display)
     }

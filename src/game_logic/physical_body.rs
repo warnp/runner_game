@@ -16,7 +16,6 @@ impl PhysicalBody {
                actor: Box<Actor>,
                speed: f32)
                -> PhysicalBody {
-
         let l_u_c = [left_up_corner[0], left_up_corner[1]];
         let r_d_c = [right_down_corner[0], right_down_corner[1]];
 
@@ -38,13 +37,12 @@ impl PhysicalBody {
     }
 
     pub fn detect_collision(&self, body: &PhysicalBody) -> bool {
-
         let aa_bb_guest = body.get_aa_bb();
 
         if self.left_up_corner[0] <= aa_bb_guest.1[0] &&
-           self.left_up_corner[1] >= aa_bb_guest.1[1] &&
-           self.right_down_corner[0] >= aa_bb_guest.0[0] &&
-           self.right_down_corner[1] <= aa_bb_guest.0[1] {
+            self.left_up_corner[1] >= aa_bb_guest.1[1] &&
+            self.right_down_corner[0] >= aa_bb_guest.0[0] &&
+            self.right_down_corner[1] <= aa_bb_guest.0[1] {
             return true;
         }
 
@@ -67,10 +65,9 @@ impl PhysicalBody {
         let aa_bb_guest = body.get_aa_bb();
 
         if self.get_aa_bb().0[0] + ray_left_up[0] <= aa_bb_guest.1[0] &&
-           self.get_aa_bb().0[1] + ray_left_up[1] >= aa_bb_guest.1[1] &&
-           self.get_aa_bb().1[0] + ray_right_down[0] >= aa_bb_guest.0[0] &&
-           self.get_aa_bb().1[1] + ray_right_down[1] <= aa_bb_guest.0[1] {
-            println!("ray Collision");
+            self.get_aa_bb().0[1] + ray_left_up[1] >= aa_bb_guest.1[1] &&
+            self.get_aa_bb().1[0] + ray_right_down[0] >= aa_bb_guest.0[0] &&
+            self.get_aa_bb().1[1] + ray_right_down[1] <= aa_bb_guest.0[1] {
             return true;
         }
 

@@ -36,6 +36,9 @@ impl GenericObject for Text{
     fn get_size(&self)->(f32,f32,f32){
         (0.0,0.0,0.0)
     }
+    fn get_texture_coordinates(&self)->((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
+        ((0.0,0.0),(0.0,0.0),(0.0,0.0),(0.0,0.0))
+    }
 }
 
 #[cfg(test)]
