@@ -8,7 +8,6 @@ use game_logic::movement::{Move, Movements, State, Fall, Walk};
 use game_logic::physical_body::PhysicalBody;
 use engine::generic_object_type::GenericObjectType;
 
-// #[derive(Copy)]
 pub struct LogicHandler {
     buffer: Vec<PhysicalBody>,
     state_buffer: Movements,
@@ -29,17 +28,17 @@ impl LogicHandler {
                                                                     [0.0, 0.0],
                                                                     3,
                                                                     [0.1, 0.1],
-                                                                    ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
+                                                                    ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
                                                 0.0)];
 
         buffer.push(PhysicalBody::new("obstacle".to_string(),
                                       [-0.1, 0.1],
                                       [0.1, -0.1],
-                                      Box::new(Actor::new("obstacle".to_string(),
+                                      Box::new(Actor::new("bonus".to_string(),
                                                           [1.0, -0.8],
-                                                          2,
+                                                          3,
                                                           [0.2, 0.2],
-                                                          ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
+                                                          ((0.0, 1.0), (0.1, 1.0), (0.1, 0.1), (0.0, 0.1)))),
                                       0.0));
         buffer.push(PhysicalBody::new("obstacle".to_string(),
                                       [-0.7, 0.1],
@@ -48,16 +47,16 @@ impl LogicHandler {
                                                           [-0.5, -0.8],
                                                           2,
                                                           [1.4, 0.2],
-                                                          ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
+                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
                                       0.0));
         buffer.push(PhysicalBody::new("obstacle".to_string(),
                                       [-0.2, 0.3],
                                       [0.2, -0.3],
-                                      Box::new(Actor::new("obstacle1".to_string(),
+                                      Box::new(Actor::new("obstacle2".to_string(),
                                                           [0.1, -0.8],
-                                                          2,
+                                                          1,
                                                           [0.4, 0.6],
-                                                          ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
+                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
                                       0.0));
 
         LogicHandler {
@@ -80,7 +79,7 @@ impl LogicHandler {
                                                     [el.get_position().0, el.get_position().1],
                                                     el.get_texture_id(),
                                                     [el.get_size().0, el.get_size().1],
-                                                    ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))))
+                                                    el.get_texture_coordinates())))
                 }
                 GenericObjectType::Text => {
                     result.push(Box::new(Text::new(el.get_name(),
@@ -119,19 +118,28 @@ impl LogicHandler {
                 pos = 1.5;
             }
             let new_position = [pos, el.get_position().1];
-
+            let tex_coord =  if(el.get_name() == "bonus"){
+                                let mut tmp = el.get_texture_coordinates();
+                                (tmp.0).0 = (tmp.0).0 + 0.1 * time.1 as f32;
+                                (tmp.1).0 = (tmp.1).0 + 0.1 * time.1 as f32;
+                                (tmp.2).0 = (tmp.2).0 + 0.1 * time.1 as f32;
+                                (tmp.3).0 = (tmp.3).0 + 0.1 * time.1 as f32;
+                                tmp
+                            }else{
+                                el.get_texture_coordinates()
+                            };
             lst_physical_bodies.push(PhysicalBody::new(e.get_name().to_string(),
                                                        [new_position[0] - el.get_size().0 / 2.0,
                                                            new_position[1] + el.get_size().1 / 2.0],
                                                        [new_position[0] + el.get_size().0 / 2.0,
                                                            new_position[1] - el.get_size().1 / 2.0],
-                                                       Box::new(Actor::new(e.get_name()
+                                                       Box::new(Actor::new(el.get_name()
                                                                                .to_string(),
                                                                            new_position,
-                                                                           2,
+                                                                           el.get_texture_id(),
                                                                            [el.get_size().0,
                                                                                el.get_size().1],
-                                                                           ((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
+                                                                           tex_coord)),
                                                        0.0));
         }
 
@@ -220,7 +228,7 @@ impl LogicHandler {
                                                   el.get_position().1 + position],
                                               3,
                                               [el.get_size().0,
-                                                  el.get_size().1],((0.0,1.0),(1.0,1.0),(1.0,0.0),(0.0,0.0)))),
+                                                  el.get_size().1], ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
                           speed)
     }
 }

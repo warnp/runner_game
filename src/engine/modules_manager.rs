@@ -51,7 +51,6 @@ impl<'a> ModulesManager<'a> {
 
         let bunch_of_generic_sprite_objects =
             self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
-
         GraphicsHandler::draw(&self.display,
                               bunch_of_generic_sprite_objects,
                               &self.textures,
@@ -76,6 +75,9 @@ impl<'a> ModulesManager<'a> {
             texture_coordinates = i.get_texture_coordinates();
             match i.get_type() {
                 GenericObjectType::Sprite => {
+//                    println!("{:#?}",name);
+
+//                    println!("{:#?}",texture_coordinates);
                     result_vec.push(Sprite::new(name,
                                                 position.0,
                                                 position.1,

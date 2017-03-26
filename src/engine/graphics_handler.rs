@@ -34,7 +34,6 @@ impl GraphicsHandler {
 
             ..Default::default()
         };
-
         frame_buffer.clear_color(1.0f32, 1.0f32, 1.0f32, 1.0f32);
         frame_buffer.draw(&ui_vertex_buffer, &ui_index_buffer, &program[1], &ui_uniform, &ui_params).unwrap();
 

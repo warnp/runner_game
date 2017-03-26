@@ -760,7 +760,6 @@ mod tests {
         assert!(coordinates[1].vertices[0].tex_coords == [15.0 / 16.0, 10.0 / 16.0]);
         assert!(coordinates[2].vertices[0].tex_coords == [12.0 / 16.0, 10.0 / 16.0]);
         assert!(coordinates[3].vertices[0].tex_coords == [2.0 / 16.0, 12.0 / 16.0]);
-        println!("{:?}", coordinates[1].vertices[0].position);
         assert!(coordinates[1].vertices[0].position == [-1.5, 0.5])
 
     }

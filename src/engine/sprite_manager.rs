@@ -42,7 +42,6 @@ impl SpriteManager {
         let vertices_array = self.sprite_list_to_vertex_list();
         let index_list = self.sprite_list_to_indices_buffer();
 
-
         (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(),
          glium::index::IndexBuffer::new(display,
                                         glium::index::PrimitiveType::TrianglesList,
