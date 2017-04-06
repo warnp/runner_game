@@ -1,6 +1,6 @@
 use engine::generic_object_type::GenericObjectType;
 
-pub trait GenericObject {
+pub trait GenericObject{
     //fn key_reader(&self, key: &str);
     fn get_type(&self) -> GenericObjectType;
     fn get_position(&self) -> (f32,f32,f32);
@@ -9,6 +9,7 @@ pub trait GenericObject {
     fn get_texture_id(&self)->i32;
     fn get_size(&self)->(f32, f32, f32);
     fn get_texture_coordinates(&self)->((f32,f32),(f32,f32),(f32,f32),(f32,f32));
+    fn get_order(&self)->u16;
 }
 
 impl <F: ?Sized> GenericObject for Box<F>
@@ -37,6 +38,9 @@ impl <F: ?Sized> GenericObject for Box<F>
     }
     fn get_texture_coordinates(&self)->((f32,f32),(f32,f32),(f32,f32),(f32,f32)){
         (**self).get_texture_coordinates()
+    }
+    fn get_order(&self)->u16{
+        (**self).get_order()
     }
 
 }

@@ -22,7 +22,8 @@ impl<'a> ModulesManager<'a> {
         let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..],
                               &include_bytes!("../../content/11532.png")[..],
                               &include_bytes!("../../content/NatureForests.png")[..],
-                              &include_bytes!("../../content/hero.png")[..]],
+                              &include_bytes!("../../content/hero.png")[..],
+                              &include_bytes!("../../content/background.png")[..]],
                                        &display);
 
 
@@ -68,16 +69,17 @@ impl<'a> ModulesManager<'a> {
         let mut position: (f32, f32, f32);
         let mut description: String;
         let mut texture_coordinates: ((f32,f32),(f32,f32),(f32,f32),(f32,f32));
+        let mut order: u16;
+        //TODO Ajouter un ordonnanceur de sprites
         for i in generic_object {
             name = i.get_name();
             position = i.get_position();
             description = i.get_description();
             texture_coordinates = i.get_texture_coordinates();
-            match i.get_type() {
-                GenericObjectType::Sprite => {
-//                    println!("{:#?}",name);
+            order = i.get_order();
 
-//                    println!("{:#?}",texture_coordinates);
+            match i.get_type() {
+                GenericObjectType::SPRITE => {
                     result_vec.push(Sprite::new(name,
                                                 position.0,
                                                 position.1,
@@ -85,23 +87,24 @@ impl<'a> ModulesManager<'a> {
                                                 i.get_texture_id() as u32,
                                                 (i.get_size().0, i.get_size().1),
                                                 texture_coordinates,
-                                                0));
+                                                order));
                 }
 
-                GenericObjectType::Text => {
+                GenericObjectType::TEXT => {
                     let text_writer = TextWriter::new(0,
                                                       (256, 256),
                                                       (16, 16),
                                                       0.05,
                                                       (position.0, position.1),
                                                       &name,
-                                                      true);
+                                                      true, order);
                     result_vec.extend_from_slice(&text_writer.get_string(description.as_str()));
                 }
 
             }
 
         }
+        result_vec.sort_by(|a,b| a.order.cmp(&b.order));
         SpriteManager::new(result_vec)
     }
 }
@@ -118,7 +121,7 @@ mod tests {
     }
     impl GenericObject for ObjTest {
         fn get_type(&self) -> GenericObjectType {
-            GenericObjectType::Sprite
+            GenericObjectType::SPRITE
         }
 
         fn get_position(&self) -> (f32, f32, f32) {

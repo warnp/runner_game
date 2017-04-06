@@ -49,7 +49,7 @@ pub enum Move {
     Jump,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Movements{
     state: Move,
 }

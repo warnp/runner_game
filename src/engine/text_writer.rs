@@ -8,6 +8,7 @@ pub struct TextWriter<'a> {
     pub text_size: f32,
     pub text_origin: (f32, f32),
     pub right_to_left: bool,
+    pub order:u16,
 }
 
 impl<'a> TextWriter<'a> {
@@ -17,7 +18,8 @@ impl<'a> TextWriter<'a> {
                text_size: f32,
                text_origin: (f32, f32),
                string_name: &'a str,
-               right_to_left: bool)
+               right_to_left: bool,
+                order:u16)
                -> TextWriter<'a> {
 
         TextWriter {
@@ -28,6 +30,7 @@ impl<'a> TextWriter<'a> {
             text_origin: text_origin,
             string_name: string_name,
             right_to_left: right_to_left,
+            order: order,
         }
     }
 
@@ -691,7 +694,7 @@ impl<'a> TextWriter<'a> {
                                      0,
                                      (self.text_size, self.text_size),
                                      *st,
-                                     0);
+                                     self.order);
 //            sp.vertices[0].tex_coords[0] = (st.0).0;
 //            sp.vertices[1].tex_coords[0] = (st.1).0;
 //            sp.vertices[2].tex_coords[0] = (st.2).0;

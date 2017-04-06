@@ -8,11 +8,15 @@ use game_logic::movement::{Move, Movements, State, Fall, Walk};
 use game_logic::physical_body::PhysicalBody;
 use engine::generic_object_type::GenericObjectType;
 
+#[derive(Clone)]
 pub struct LogicHandler {
     buffer: Vec<PhysicalBody>,
+    sprites: Vec<Box<Actor>>,
     state_buffer: Movements,
     debug: bool,
     gravity: f32,
+    animation_timer: u64,
+    animation_counter: u8,
 }
 
 impl LogicHandler {
@@ -28,7 +32,7 @@ impl LogicHandler {
                                                                     [0.0, 0.0],
                                                                     3,
                                                                     [0.1, 0.1],
-                                                                    ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
+                                                                    ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
                                                 0.0)];
 
         buffer.push(PhysicalBody::new("obstacle".to_string(),
@@ -36,9 +40,9 @@ impl LogicHandler {
                                       [0.1, -0.1],
                                       Box::new(Actor::new("bonus".to_string(),
                                                           [1.0, -0.8],
-                                                          3,
+                                                          1,
                                                           [0.2, 0.2],
-                                                          ((0.0, 1.0), (0.1, 1.0), (0.1, 0.1), (0.0, 0.1)))),
+                                                          ((0.0, 0.975), (0.1024, 0.975), (0.1024, 0.875), (0.0, 0.875)), 999)),
                                       0.0));
         buffer.push(PhysicalBody::new("obstacle".to_string(),
                                       [-0.7, 0.1],
@@ -47,7 +51,7 @@ impl LogicHandler {
                                                           [-0.5, -0.8],
                                                           2,
                                                           [1.4, 0.2],
-                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
+                                                          ((0.0, 1.0), (4.0, 1.0), (4.0, 0.0), (0.0, 0.0)), 999)),
                                       0.0));
         buffer.push(PhysicalBody::new("obstacle".to_string(),
                                       [-0.2, 0.3],
@@ -56,14 +60,44 @@ impl LogicHandler {
                                                           [0.1, -0.8],
                                                           1,
                                                           [0.4, 0.6],
-                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
+                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
                                       0.0));
+
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.2, 0.3],
+                                      [0.2, -0.3],
+                                      Box::new(Actor::new("obstacle2".to_string(),
+                                                          [0.6, -0.8],
+                                                          1,
+                                                          [0.4, 0.6],
+                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
+                                      0.0));
+
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.1, 0.1],
+                                      [0.1, -0.1],
+                                      Box::new(Actor::new("bonus1".to_string(),
+                                                          [1.4, -0.8],
+                                                          1,
+                                                          [0.2, 0.2],
+                                                          ((0.0, 0.975), (0.1024, 0.975), (0.1024, 0.875), (0.0, 0.875)), 999)),
+                                      0.0));
+
+        let mut sprites = vec![Box::new(Actor::new("building".to_string(),
+                                                   [0.0, 0.0],
+                                                   5,
+                                                   [4.0, 2.0],
+                                                   ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 0))
+        ];
 
         LogicHandler {
             buffer: buffer,
             state_buffer: mov,
+            sprites: sprites,
             debug: false,
             gravity: 0.02,
+            animation_timer: 0,
+            animation_counter: 0,
         }
     }
 
@@ -74,27 +108,25 @@ impl LogicHandler {
 
         for el in &lists.0 {
             match el.get_type() {
-                GenericObjectType::Sprite => {
+                GenericObjectType::SPRITE => {
                     result.push(Box::new(Actor::new(el.get_name(),
                                                     [el.get_position().0, el.get_position().1],
                                                     el.get_texture_id(),
                                                     [el.get_size().0, el.get_size().1],
-                                                    el.get_texture_coordinates())))
+                                                    el.get_texture_coordinates(), el.get_order())))
                 }
-                GenericObjectType::Text => {
+                GenericObjectType::TEXT => {
                     result.push(Box::new(Text::new(el.get_name(),
                                                    [el.get_position().0, el.get_position().1],
+                                                   el.get_order(),
                                                    el.get_description())))
                 }
             }
         }
-
         self.buffer.clear();
-
         for el in lists.1 {
             self.buffer.push(el);
         }
-
         result
     }
 
@@ -109,6 +141,10 @@ impl LogicHandler {
         let mut lst_physical_bodies: Vec<PhysicalBody> = vec![];
         let mut result: Vec<Box<GenericObject>> = vec![];
         let mut name: &str;
+        if self.animation_timer >= u64::max_value() - 100 {
+            self.animation_timer = 0
+        }
+        self.animation_timer += 1;
 
         // Inserer ici un générateur de blocs toute les x secondes grâce au timer?
         for e in self.buffer.iter().filter(|x| x.get_name() == "obstacle") {
@@ -118,16 +154,26 @@ impl LogicHandler {
                 pos = 1.5;
             }
             let new_position = [pos, el.get_position().1];
-            let tex_coord =  if(el.get_name() == "bonus"){
-                                let mut tmp = el.get_texture_coordinates();
-                                (tmp.0).0 = (tmp.0).0 + 0.1 * time.1 as f32;
-                                (tmp.1).0 = (tmp.1).0 + 0.1 * time.1 as f32;
-                                (tmp.2).0 = (tmp.2).0 + 0.1 * time.1 as f32;
-                                (tmp.3).0 = (tmp.3).0 + 0.1 * time.1 as f32;
-                                tmp
-                            }else{
-                                el.get_texture_coordinates()
-                            };
+
+            let tex_coord = if el.get_name() == "bonus" && self.animation_timer % 10 == 0 {
+                let mut tmp = el.get_texture_coordinates();
+                (tmp.0).0 = (tmp.0).0 + 0.1024;//* time.1 as f32;
+                (tmp.1).0 = (tmp.1).0 + 0.1024;//* time.1 as f32;
+                (tmp.2).0 = (tmp.2).0 + 0.1024;//* time.1 as f32;
+                (tmp.3).0 = (tmp.3).0 + 0.1024;//* time.1 as f32;
+                self.animation_counter += 1;
+                if self.animation_counter >= 4 {
+                    (tmp.0).0 = 0.0;//* time.1 as f32;
+                    (tmp.1).0 = 0.1024;//* time.1 as f32;
+                    (tmp.2).0 = 0.1024;//* time.1 as f32;
+                    (tmp.3).0 = 0.0;//* time.1 as f32;
+
+                    self.animation_counter = 0;
+                }
+                tmp
+            } else {
+                el.get_texture_coordinates()
+            };
             lst_physical_bodies.push(PhysicalBody::new(e.get_name().to_string(),
                                                        [new_position[0] - el.get_size().0 / 2.0,
                                                            new_position[1] + el.get_size().1 / 2.0],
@@ -139,7 +185,7 @@ impl LogicHandler {
                                                                            el.get_texture_id(),
                                                                            [el.get_size().0,
                                                                                el.get_size().1],
-                                                                           tex_coord)),
+                                                                           tex_coord, 999)),
                                                        0.0));
         }
 
@@ -208,10 +254,12 @@ impl LogicHandler {
         }
 
         result.push(Box::new(Text::new("fps".to_string(),
-                                       [-0.5, 0.8],
+                                       [-0.5, 0.8], 999,
                                        format!("fps : `{fps:.*}`", 2, fps = time.0))));
 
-
+        for el in self.sprites.clone() {
+            result.push(el.clone());
+        }
         (result, lst_physical_bodies)
     }
 
@@ -228,7 +276,7 @@ impl LogicHandler {
                                                   el.get_position().1 + position],
                                               3,
                                               [el.get_size().0,
-                                                  el.get_size().1], ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)))),
+                                                  el.get_size().1], ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
                           speed)
     }
 }

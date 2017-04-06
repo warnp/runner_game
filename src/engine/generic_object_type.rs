@@ -1,4 +1,4 @@
 pub enum GenericObjectType {
-    Sprite,
-    Text,
+    SPRITE,
+    TEXT,
 }
