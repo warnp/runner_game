@@ -149,7 +149,7 @@ impl LogicHandler {
         // Inserer ici un générateur de blocs toute les x secondes grâce au timer?
         for e in self.buffer.iter().filter(|x| x.get_name() == "obstacle") {
             let el: Box<Actor> = e.generate_actor();
-            let mut pos = el.get_position().0 - 0.1 * time.1 as f32;
+            let mut pos = el.get_position().0 - (0.15 + self.animation_timer as f32 * 0.0001) * time.1 as f32;
             if pos <= -1.5 {
                 pos = 1.5;
             }

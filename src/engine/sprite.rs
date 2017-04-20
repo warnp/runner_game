@@ -13,7 +13,7 @@ pub struct Sprite {
     pub indices: [u16; 6],
     pub name: String, /* pub transform: [[f32; 4]; 4],
                         * pub display: &glium::glutin::WindowBuilder, */
-    pub order: u16,
+    pub order: u8,
 }
 
 impl Sprite {
@@ -24,7 +24,7 @@ impl Sprite {
                tex_id: u32,
                size: (f32, f32),
                tex_coord:((f32,f32,),(f32,f32),(f32,f32),(f32,f32)),
-               order: u16)
+               order: u8)
                -> Sprite {
         Sprite {
             vertices: [Vertex {

@@ -69,7 +69,7 @@ impl<'a> ModulesManager<'a> {
         let mut position: (f32, f32, f32);
         let mut description: String;
         let mut texture_coordinates: ((f32,f32),(f32,f32),(f32,f32),(f32,f32));
-        let mut order: u16;
+        let mut order: u8;
         //TODO Ajouter un ordonnanceur de sprites
         for i in generic_object {
             name = i.get_name();

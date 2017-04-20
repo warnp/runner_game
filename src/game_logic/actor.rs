@@ -9,11 +9,11 @@ pub struct Actor {
     image: i32,
     size: [f32; 2],
     texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
-    order: u16,
+    order: u8,
 }
 
 impl Actor {
-    pub fn new(name: String, position: [f32; 2], image: i32, size: [f32; 2], texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)), order: u16) -> Actor {
+    pub fn new(name: String, position: [f32; 2], image: i32, size: [f32; 2], texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)), order: u8) -> Actor {
         Actor {
             name: name,
             position: position,
@@ -47,7 +47,7 @@ impl GenericObject for Actor {
     fn get_texture_coordinates(&self) -> ((f32, f32), (f32, f32), (f32, f32), (f32, f32)) {
         self.texture_coordinates
     }
-    fn get_order(&self) -> u16 {
+    fn get_order(&self) -> u8 {
         self.order
     }
 }

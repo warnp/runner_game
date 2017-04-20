@@ -8,7 +8,7 @@ pub struct TextWriter<'a> {
     pub text_size: f32,
     pub text_origin: (f32, f32),
     pub right_to_left: bool,
-    pub order:u16,
+    pub order:u8,
 }
 
 impl<'a> TextWriter<'a> {
@@ -19,7 +19,7 @@ impl<'a> TextWriter<'a> {
                text_origin: (f32, f32),
                string_name: &'a str,
                right_to_left: bool,
-                order:u16)
+                order:u8)
                -> TextWriter<'a> {
 
         TextWriter {

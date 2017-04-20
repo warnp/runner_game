@@ -28,7 +28,6 @@ impl SpriteManager {
     /// ```
     pub fn new(sprites: Vec<Sprite>)
                -> SpriteManager {
-        println!("sprite {:#?}", sprites);
         SpriteManager {
             sprite_list: Rc::new(RefCell::new(sprites)),
         }

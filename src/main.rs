@@ -37,6 +37,7 @@ fn main() {
 
     // Use a key buffer to be able to make some replays (:
     let mut key_buf: Vec<String> = vec!["".to_string()];
+    let mut i : u64 = 0;
     loop {
         let fps_timer = engine_helper.get_fps();
         let local = key_buf.clone();
@@ -48,6 +49,7 @@ fn main() {
 
         if res.1.len() > 0 {
             key_buf.push(res.1[0].to_string().clone());
+            println!("{:#?} :: {:#?}", i,key_buf);
         }
 
         if key_buf.contains(&("escape_press".to_string())) {
@@ -57,6 +59,7 @@ fn main() {
         if logic_manager.get_debug() {
             return;
         }
+        i = i +1;
     }
 
 }

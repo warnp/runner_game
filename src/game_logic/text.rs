@@ -6,11 +6,11 @@ pub struct Text {
     name: String,
     text_content: String,
     position: [f32; 2],
-    order: u16,
+    order: u8,
 }
 
 impl Text {
-    pub fn new(name: String, position: [f32; 2], order: u16, content: String) -> Text {
+    pub fn new(name: String, position: [f32; 2], order: u8, content: String) -> Text {
         Text {
             name: name,
             text_content: content,
@@ -42,7 +42,7 @@ impl GenericObject for Text {
     fn get_texture_coordinates(&self) -> ((f32, f32), (f32, f32), (f32, f32), (f32, f32)) {
         ((0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0))
     }
-    fn get_order(&self) -> u16 {
+    fn get_order(&self) -> u8 {
         self.order
     }
 }
