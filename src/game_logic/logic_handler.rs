@@ -17,6 +17,7 @@ pub struct LogicHandler {
     gravity: f32,
     animation_timer: u64,
     animation_counter: u8,
+    pause: bool,
 }
 
 impl LogicHandler {
@@ -98,6 +99,7 @@ impl LogicHandler {
             gravity: 0.02,
             animation_timer: 0,
             animation_counter: 0,
+            pause: true,
         }
     }
 
@@ -149,9 +151,12 @@ impl LogicHandler {
         // Inserer ici un générateur de blocs toute les x secondes grâce au timer?
         for e in self.buffer.iter().filter(|x| x.get_name() == "obstacle") {
             let el: Box<Actor> = e.generate_actor();
-            let mut pos = el.get_position().0 - (0.15 + self.animation_timer as f32 * 0.0001) * time.1 as f32;
-            if pos <= -1.5 {
-                pos = 1.5;
+            let mut pos = el.get_position().0;
+            if !self.pause {
+                pos = el.get_position().0 - (0.15 + self.animation_timer as f32 * 0.0001) * time.1 as f32;
+                if pos <= -1.5 {
+                    pos = 1.5;
+                }
             }
             let new_position = [pos, el.get_position().1];
 
@@ -208,29 +213,36 @@ impl LogicHandler {
         //---------------------ON FALL --------------------------//
         if self.state_buffer.get_status() == Move::Fall {
             let mut speed = 0.0;
-            if player.generate_actor().get_position().1 <= -0.8 {
-                self.state_buffer.update_status(Move::Walk);
-            }
-            if time.1 > 0.0 {
-                speed = player.get_speed() + self.gravity;
+
+            if !self.pause {
+                if player.generate_actor().get_position().1 <= -0.8 {
+                    self.state_buffer.update_status(Move::Walk);
+                }
+                if time.1 > 0.0 {
+                    speed = player.get_speed() + self.gravity;
+                }
             }
             lst_physical_bodies.push(self.generate_player(&player, speed, -
                 (speed * time.1 as f32)));
             //---------------------ON WALK --------------------------//
         } else if self.state_buffer.get_status() == Move::Walk {
             let mut speed = 0.0;
-            if keys == "space_press" {
-                self.state_buffer.update_status(Move::Jump);
-                speed = 1.0;
+            if !self.pause {
+                if keys == "space_press" {
+                    self.state_buffer.update_status(Move::Jump);
+                    speed = 1.0;
+                }
             }
 
             let mut p: PhysicalBody = self.generate_player(&player, speed, 0.0);
 
             //Ajust position, for little stairs maybe
-            for o in &lst_physical_bodies {
-                if player.get_collision_ray([0.03, -0.01], [0.03, -0.01], o) &&
-                    !player.get_collision_ray([0.03, 0.0], [0.03, 0.0], o) {
-                    p = self.generate_player(&player, speed, 0.005);
+            if !self.pause {
+                for o in &lst_physical_bodies {
+                    if player.get_collision_ray([0.03, -0.01], [0.03, -0.01], o) &&
+                        !player.get_collision_ray([0.03, 0.0], [0.03, 0.0], o) {
+                        p = self.generate_player(&player, speed, 0.005);
+                    }
                 }
             }
 
@@ -243,6 +255,17 @@ impl LogicHandler {
                 self.state_buffer.update_status(Move::Fall);
             }
         }
+
+        //TODO Make a state pattern for that
+        println!("{:#?}",keys);
+        if !self.pause && keys == "a_press" {
+            println!("HELLOOOOOOO");
+            self.pause = true;
+        } else if self.pause && keys == "a_press" {
+            self.pause = false;
+        }
+
+        println!("{:#?}", self.pause);
 
         for el in &lst_physical_bodies {
             if el.get_name() == "player" &&
