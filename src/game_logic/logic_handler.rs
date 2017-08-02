@@ -1,10 +1,9 @@
 extern crate rand;
 
-use rand::Rng;
 use engine::generic_object::GenericObject;
 use game_logic::actor::Actor;
 use game_logic::text::Text;
-use game_logic::movement::{Move, Movements, State, Fall, Walk};
+use game_logic::movement::{Move, Movements};
 use game_logic::physical_body::PhysicalBody;
 use engine::generic_object_type::GenericObjectType;
 
@@ -22,79 +21,15 @@ pub struct LogicHandler {
 
 impl LogicHandler {
     pub fn new() -> LogicHandler {
-        let mut mov = Movements::new();
-        let mut x = rand::thread_rng();
+        let mov = Movements::new();
 
 
-        let mut buffer = vec![PhysicalBody::new("player".to_string(),
-                                                [-0.025, 0.05],
-                                                [0.025, -0.05],
-                                                Box::new(Actor::new("player".to_string(),
-                                                                    [0.0, 0.0],
-                                                                    3,
-                                                                    [0.1, 0.1],
-                                                                    ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
-                                                0.0)];
-
-        buffer.push(PhysicalBody::new("obstacle".to_string(),
-                                      [-0.1, 0.1],
-                                      [0.1, -0.1],
-                                      Box::new(Actor::new("bonus".to_string(),
-                                                          [1.0, -0.8],
-                                                          1,
-                                                          [0.2, 0.2],
-                                                          ((0.0, 0.975), (0.1024, 0.975), (0.1024, 0.875), (0.0, 0.875)), 999)),
-                                      0.0));
-        buffer.push(PhysicalBody::new("obstacle".to_string(),
-                                      [-0.7, 0.1],
-                                      [0.7, -0.1],
-                                      Box::new(Actor::new("obstacle1".to_string(),
-                                                          [-0.5, -0.8],
-                                                          2,
-                                                          [1.4, 0.2],
-                                                          ((0.0, 1.0), (4.0, 1.0), (4.0, 0.0), (0.0, 0.0)), 999)),
-                                      0.0));
-        buffer.push(PhysicalBody::new("obstacle".to_string(),
-                                      [-0.2, 0.3],
-                                      [0.2, -0.3],
-                                      Box::new(Actor::new("obstacle2".to_string(),
-                                                          [0.1, -0.8],
-                                                          1,
-                                                          [0.4, 0.6],
-                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
-                                      0.0));
-
-        buffer.push(PhysicalBody::new("obstacle".to_string(),
-                                      [-0.2, 0.3],
-                                      [0.2, -0.3],
-                                      Box::new(Actor::new("obstacle2".to_string(),
-                                                          [0.6, -0.8],
-                                                          1,
-                                                          [0.4, 0.6],
-                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
-                                      0.0));
-
-        buffer.push(PhysicalBody::new("obstacle".to_string(),
-                                      [-0.1, 0.1],
-                                      [0.1, -0.1],
-                                      Box::new(Actor::new("bonus1".to_string(),
-                                                          [1.4, -0.8],
-                                                          1,
-                                                          [0.2, 0.2],
-                                                          ((0.0, 0.975), (0.1024, 0.975), (0.1024, 0.875), (0.0, 0.875)), 999)),
-                                      0.0));
-
-        let mut sprites = vec![Box::new(Actor::new("building".to_string(),
-                                                   [0.0, 0.0],
-                                                   5,
-                                                   [4.0, 2.0],
-                                                   ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 0))
-        ];
+        let buffers = LogicHandler::generate_logic_handler();
 
         LogicHandler {
-            buffer: buffer,
+            buffer: buffers.0,
             state_buffer: mov,
-            sprites: sprites,
+            sprites: buffers.1,
             debug: false,
             gravity: 0.02,
             animation_timer: 0,
@@ -136,20 +71,24 @@ impl LogicHandler {
         self.debug
     }
 
+    pub fn get_pause(&self) -> bool {
+        self.pause
+    }
+
     fn go_threw_buffer(&mut self,
                        time: (f64, f64),
                        keys: &str)
                        -> (Vec<Box<GenericObject>>, Vec<PhysicalBody>) {
         let mut lst_physical_bodies: Vec<PhysicalBody> = vec![];
         let mut result: Vec<Box<GenericObject>> = vec![];
-        let mut name: &str;
         if self.animation_timer >= u64::max_value() - 100 {
             self.animation_timer = 0
         }
         self.animation_timer += 1;
 
         // Inserer ici un générateur de blocs toute les x secondes grâce au timer?
-        for e in self.buffer.iter().filter(|x| x.get_name() == "obstacle") {
+        let tmp_buffer = self.buffer.clone();
+        for e in tmp_buffer.iter().filter(|x| x.get_name() == "obstacle") {
             let el: Box<Actor> = e.generate_actor();
             let mut pos = el.get_position().0;
             if !self.pause {
@@ -190,11 +129,11 @@ impl LogicHandler {
                                                                            el.get_texture_id(),
                                                                            [el.get_size().0,
                                                                                el.get_size().1],
-                                                                           tex_coord, 999)),
+                                                                           tex_coord, 255)),
                                                        0.0));
         }
 
-        let player = self.buffer.iter().find(|x| x.get_name() == "player").unwrap();
+        let player = tmp_buffer.iter().find(|x| x.get_name() == "player").unwrap();
 
         let mut collide_one_floor: bool = false;
         for o in &lst_physical_bodies {
@@ -209,7 +148,6 @@ impl LogicHandler {
             self.state_buffer.update_status(Move::Fall)
         }
 
-        let el: Box<Actor> = player.generate_actor();
         //---------------------ON FALL --------------------------//
         if self.state_buffer.get_status() == Move::Fall {
             let mut speed = 0.0;
@@ -243,6 +181,17 @@ impl LogicHandler {
                         !player.get_collision_ray([0.03, 0.0], [0.03, 0.0], o) {
                         p = self.generate_player(&player, speed, 0.005);
                     }
+
+                    if player.get_collision_ray([0.03, 0.1], [0.03, 0.1], o) {
+                        self.pause = true;
+//                        let buffers = LogicHandler::generate_logic_handler();
+//                        self.buffer = buffers.0;
+//                        self.sprites = buffers.1;
+                        self.animation_timer = 0;
+                        self.state_buffer = Movements::new();
+                        self.buffer.clear();
+                        self.sprites.clear();
+                    }
                 }
             }
 
@@ -256,16 +205,13 @@ impl LogicHandler {
             }
         }
 
-        //TODO Make a state pattern for that
-        println!("{:#?}",keys);
-        if !self.pause && keys == "a_press" {
-            println!("HELLOOOOOOO");
-            self.pause = true;
-        } else if self.pause && keys == "a_press" {
-            self.pause = false;
+        if keys == "a_press" {
+            if !self.pause {
+                self.pause = true;
+            } else {
+                self.pause = false;
+            }
         }
-
-        println!("{:#?}", self.pause);
 
         for el in &lst_physical_bodies {
             if el.get_name() == "player" &&
@@ -277,8 +223,17 @@ impl LogicHandler {
         }
 
         result.push(Box::new(Text::new("fps".to_string(),
-                                       [-0.5, 0.8], 999,
+                                       [-0.5, 0.8], 255,
                                        format!("fps : `{fps:.*}`", 2, fps = time.0))));
+
+        if self.pause {
+            result.push(Box::new(Text::new("pause_menu_0".to_string(),
+                                           [0.2, 0.2], 255,
+                                           "--PAUSE--".to_string())));
+            result.push(Box::new(Text::new("pause_menu_1".to_string(),
+                                           [1.0, -0.1], 255,
+                                           "Appuyez sur -A- pour reprendre le jeu.".to_string())));
+        }
 
         for el in self.sprites.clone() {
             result.push(el.clone());
@@ -299,8 +254,72 @@ impl LogicHandler {
                                                   el.get_position().1 + position],
                                               3,
                                               [el.get_size().0,
-                                                  el.get_size().1], ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 999)),
+                                                  el.get_size().1], ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 255)),
                           speed)
+    }
+
+    fn generate_logic_handler() -> (Vec<PhysicalBody>, Vec<Box<Actor>>) {
+        let mut buffer = vec![PhysicalBody::new("player".to_string(),
+                                                [-0.025, 0.05],
+                                                [0.025, -0.05],
+                                                Box::new(Actor::new("player".to_string(),
+                                                                    [0.0, 0.0],
+                                                                    3,
+                                                                    [0.1, 0.1],
+                                                                    ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 255)),
+                                                0.0)];
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.1, 0.1],
+                                      [0.1, -0.1],
+                                      Box::new(Actor::new("bonus".to_string(),
+                                                          [1.0, -0.8],
+                                                          1,
+                                                          [0.2, 0.2],
+                                                          ((0.0, 0.975), (0.1024, 0.975), (0.1024, 0.875), (0.0, 0.875)), 255)),
+                                      0.0));
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.7, 0.1],
+                                      [0.7, -0.1],
+                                      Box::new(Actor::new("obstacle1".to_string(),
+                                                          [-0.5, -0.8],
+                                                          2,
+                                                          [1.4, 0.2],
+                                                          ((0.0, 1.0), (4.0, 1.0), (4.0, 0.0), (0.0, 0.0)), 255)),
+                                      0.0));
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.2, 0.3],
+                                      [0.2, -0.3],
+                                      Box::new(Actor::new("obstacle2".to_string(),
+                                                          [0.1, -0.8],
+                                                          1,
+                                                          [0.4, 0.6],
+                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 255)),
+                                      0.0));
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.2, 0.3],
+                                      [0.2, -0.3],
+                                      Box::new(Actor::new("obstacle2".to_string(),
+                                                          [0.6, -0.8],
+                                                          1,
+                                                          [0.4, 0.6],
+                                                          ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 255)),
+                                      0.0));
+        buffer.push(PhysicalBody::new("obstacle".to_string(),
+                                      [-0.1, 0.1],
+                                      [0.1, -0.1],
+                                      Box::new(Actor::new("bonus1".to_string(),
+                                                          [1.4, -0.8],
+                                                          1,
+                                                          [0.2, 0.2],
+                                                          ((0.0, 0.975), (0.1024, 0.975), (0.1024, 0.875), (0.0, 0.875)), 255)),
+                                      0.0));
+        let sprites = vec![Box::new(Actor::new("building".to_string(),
+                                               [0.0, 0.0],
+                                               4,
+                                               [4.0, 2.0],
+                                               ((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)), 0))
+        ];
+        (buffer, sprites)
     }
 }
 

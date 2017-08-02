@@ -1,6 +1,5 @@
 use engine::generic_object::GenericObject;
 use engine::generic_object_type::GenericObjectType;
-use std::cmp::Ordering;
 
 #[derive(Clone, Debug)]
 pub struct Actor {

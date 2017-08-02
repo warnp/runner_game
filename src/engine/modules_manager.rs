@@ -23,7 +23,8 @@ impl<'a> ModulesManager<'a> {
                               &include_bytes!("../../content/11532.png")[..],
                               &include_bytes!("../../content/NatureForests.png")[..],
                               &include_bytes!("../../content/hero.png")[..],
-                              &include_bytes!("../../content/background.png")[..]],
+                              &include_bytes!("../../content/background.png")[..],
+                              &include_bytes!("../../content/game_over.png")[..]],
                                        &display);
 
 

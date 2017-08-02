@@ -6,7 +6,6 @@ pub struct InputManager;
 impl InputManager {
     pub fn get_input(display: &glium::backend::glutin_backend::GlutinFacade) -> Vec<&str> {
         let mut result: Vec<&str> = vec![];
-        // println!("{}", &display.poll_events());
 
         for ev in display.poll_events() {
             match ev {
@@ -42,13 +41,7 @@ impl InputManager {
                 }
                 _ => (),
             }
-            // println!("{:#?}", ev);
         }
         result
     }
 }
-
-// #[test]
-// mod tests {
-//
-// }
