@@ -28,7 +28,7 @@ impl<'a> Shaders<'a> {
                         vertex_shader: r#"
             #version 140
 
-            in vec2 position;
+            in vec3 position;
             in vec3 normal;
             in vec4 color;
             in vec2 tex_coords;
@@ -44,7 +44,7 @@ impl<'a> Shaders<'a> {
             void main(){
                 // colorV = color;
                 v_tex_coords = tex_coords;
-                gl_Position = matrix * vec4(position, 0.0,1.0);
+                gl_Position = matrix * vec4(position,1.0);
                 v_tex_id = i_tex_id;
             }
             "#,
@@ -71,7 +71,7 @@ impl<'a> Shaders<'a> {
                             vertex_shader:r#"
                                   #version 140
 
-                                  in vec2 position;
+                                  in vec3 position;
                                   in vec2 tex_coords;
 
                                   uniform mat4 matrix;
@@ -80,7 +80,7 @@ impl<'a> Shaders<'a> {
 
                                   void main(){
                                       frag_texcoord = tex_coords;
-                                      gl_Position = matrix * vec4(position, 0.0,1.0);
+                                      gl_Position = matrix * vec4(position,1.0);
                                   }
                               "#,
 
@@ -134,7 +134,7 @@ impl<'a> Shaders<'a> {
                                  r#"
                                     #version 140
 
-                                    in vec2 position;
+                                    in vec3 position;
                                     in vec3 normal;
                                     in vec4 color;
                                     in vec2 tex_coords;
@@ -149,7 +149,7 @@ impl<'a> Shaders<'a> {
 
                                     void main(){
                                     v_tex_coords = tex_coords;
-                                    gl_Position = matrix * vec4(position, 0.0,1.0);
+                                    gl_Position = matrix * vec4(position,1.0);
                                     v_tex_id = i_tex_id;
                                     }
                                 "#,
