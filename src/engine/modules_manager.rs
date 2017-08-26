@@ -55,18 +55,18 @@ impl<'a> ModulesManager<'a> {
                 thirdd_objects: Vec<(f32, f32, f32)>)
                     -> (&ModulesManager, Vec<&str>) {
 
-    let bunch_of_generic_sprite_objects =
-    self.generic_sprite_object_interpretor(generics_objects).get_buffers( self.display);
+        let bunch_of_generic_sprite_objects =
+        self.generic_sprite_object_interpretor(generics_objects).get_buffers( self.display);
 
-    let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
-    GraphicsHandler::draw( & self.display,
-    bunch_of_generic_sprite_objects,
-    & self.textures,
-    ui_texture,
-    & self.program,
-    frame_buffer,
-    bunch_of_thirdd_objects);
-    ( self, InputManager::get_input( self.display))
+        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
+        GraphicsHandler::draw( & self.display,
+                                bunch_of_generic_sprite_objects,
+                                & self.textures,
+                                ui_texture,
+                                & self.program,
+                                frame_buffer,
+                                bunch_of_thirdd_objects);
+        ( self, InputManager::get_input( self.display))
     }
 
     pub fn generic_sprite_object_interpretor(&self,

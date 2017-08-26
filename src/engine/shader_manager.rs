@@ -166,7 +166,8 @@ impl<'a> Shaders<'a> {
                                     uniform sampler2DArray tex;
 
                                     void main(){
-                                        color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
+                                        //color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
+                                        color  = vec4(1.0,0.0,0.0,1.0);
                                     }
                                     "#,
                             });

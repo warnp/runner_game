@@ -42,7 +42,6 @@ fn main() {
         .build_glium()
         .unwrap();
 
-    let mut logic_manager = LogicHandler::new();
     let mut modules_manager = ModulesManager::new(&display);
     let frame_texture = glium::texture::Texture2d::empty_with_format(&display,
                                                                      glium::texture::UncompressedFloatFormat::F32F32F32F32,
@@ -55,22 +54,7 @@ fn main() {
 
     // Use a key buffer to be able to make some replays (:
     let mut key_buf: Vec<String> = vec!["".to_string()];
-    //    let i = Arc::new(AtomicUsize::new(0));
 
-    //    let val_i = i.clone();
-    //    thread::spawn(move || {
-    //        let keyboardHandler = glium::glutin::HeadlessRendererBuilder::new(1, 1)
-    //            .build_glium()
-    //            .unwrap();
-    //
-    //        loop {
-    //            let keys = InputManager::get_input(&keyboardHandler);
-    //            //Essayer d'optimiser l'ordering, celui-ci consomme pas mal de cpu au final
-    //            //            println!("{:#?} :: ", val_i.load(Ordering::SeqCst));
-    //            println!("{:#?} :: ", keys);
-    //            std::thread::sleep_ms(50);
-    //        };
-    //    });
     let mut pause = false;
 
     loop {
@@ -79,17 +63,17 @@ fn main() {
 
         let local_keys = key_buf.clone();
         let res = modules_manager.draw(fps_timer.1,
-                                       &logic_manager.update(fps_timer, &local_keys.last().unwrap()),
+                                       &vec![],
                                        vec![],
                                        &frame_texture,
                                        &mut frame_buffer,
-                                        vec![]);
+                                        vec![(0.0,0.0,1.0)]);
 
         if res.1.len() > 0 {
             key_buf.push(res.1[0].to_string().clone());
         };
 
-        if key_buf.last().unwrap() == "a_press" && logic_manager.get_pause() == pause {
+        if key_buf.last().unwrap() == "a_press" {
             key_buf = vec!["".to_string()];
             pause = !pause;
         }
@@ -98,10 +82,5 @@ fn main() {
             return;
         };
 
-        if logic_manager.get_debug() {
-            return;
-        };
-        //        let val = i.fetch_add(1, Ordering::SeqCst);
-        //        println!("Hello {:?}", val);
     }
 }

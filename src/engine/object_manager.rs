@@ -29,7 +29,6 @@ impl ObjectManager {
         (glium::VertexBuffer::dynamic(display, &vertice_array).unwrap(),
          glium::index::IndexBuffer::new(display,
                                         glium::index::PrimitiveType::TrianglesList,
-                                        &indice_array)
-             .unwrap())
+                                        &indice_array).unwrap())
     }
 }
