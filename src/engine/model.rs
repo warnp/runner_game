@@ -3,8 +3,8 @@ use engine::graphic_item::GraphicItem;
 
 #[derive(Clone, Debug)]
 pub struct Model {
-    pub vertices: [Vertex; 6],
-    pub indices: [u16; 6],
+    pub vertices: Vec<Vertex>,
+    pub indices: Vec<u16>,
     pub name: String
 }
 
@@ -14,59 +14,59 @@ impl Model {
                 y:f32,
                 z:f32,
                 color: [f32; 4],
-                size: (f23, f32, f32)) -> Model {
+                size: (f32, f32, f32)) -> Model {
         Model {
-            vertices: [
+            vertices: vec![
                 Vertex {
                     position: [-0.5 * size.0 + x, 0.5 * size.1 + y,0.5* size.2 - z],
                     normal: [0.0, 0.0, -1.0],
                     color: color,
-                    tex_coords: [tex_coord.0 .0, tex_coord.0 .1],
-                    i_tex_id: tex_id,
+                    tex_coords: [0.0, 0.0],
+                    i_tex_id: 0,
                 },
                 Vertex {
                     position: [0.5 * size.0 + x, 0.5 * size.1 + y,0.5* size.2 - z],
                     normal: [0.0, 0.0, -1.0],
                     color: color,
-                    tex_coords: [tex_coord.1 .0, tex_coord.1 .1],
-                    i_tex_id: tex_id,
+                    tex_coords: [0.0, 0.0],
+                    i_tex_id: 0,
                 },
                 Vertex {
                     position: [0.5 * size.0 + x, -0.5 * size.1 + y,0.5* size.2 - z],
                     normal: [0.0, 0.0, -1.0],
                     color: color,
-                    tex_coords: [tex_coord.2 .0, tex_coord.2 .1],
-                    i_tex_id: tex_id,
+                    tex_coords: [0.0, 0.0],
+                    i_tex_id: 0,
                 },
                 Vertex {
                     position: [-0.5 * size.0 + x, -0.5 * size.1 + y,0.5* size.2 - z],
                     normal: [0.0, 0.0, -1.0],
                     color: color,
-                    tex_coords: [tex_coord.3 .0, tex_coord.3 .1],
-                    i_tex_id: tex_id,
+                    tex_coords: [0.0, 0.0],
+                    i_tex_id: 0,
                 },
                 Vertex {
                     position: [-0.5 * size.0 + x, 0.5 * size.1 + y,0.5* size.2 + z],
                     normal: [0.0, 0.0, -1.0],
                     color: color,
-                    tex_coords: [tex_coord.0 .0, tex_coord.0 .1],
-                    i_tex_id: tex_id,
+                    tex_coords: [0.0, 0.0],
+                    i_tex_id: 0,
                 },
                 Vertex {
                     position: [0.5 * size.0 + x, -0.5 * size.1 + y,0.5* size.2 + z],
                     normal: [0.0, 0.0, -1.0],
                     color: color,
-                    tex_coords: [tex_coord.2 .0, tex_coord.2 .1],
-                    i_tex_id: tex_id,
+                    tex_coords: [0.0, 0.0],
+                    i_tex_id: 0,
                 },
                 Vertex {
                     position: [-0.5 * size.0 + x, -0.5 * size.1 + y,0.5* size.2 + z],
                     normal: [0.0, 0.0, -1.0],
                     color: color,
-                    tex_coords: [tex_coord.3 .0, tex_coord.3 .1],
-                    i_tex_id: tex_id,
+                    tex_coords: [0.0, 0.0],
+                    i_tex_id: 0,
                 }],
-            indices: [0,1,2,
+            indices: vec![0,1,2,
                       0,2,3,
                       1,4,5,
                       1,5,2,

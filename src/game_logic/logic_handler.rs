@@ -5,7 +5,7 @@ use game_logic::actor::Actor;
 use game_logic::text::Text;
 use game_logic::movement::{Move, Movements};
 use game_logic::physical_body::PhysicalBody;
-use engine::generic_object_type::GenericObjectType;
+use engine::generic_object_type::GenericSpriteType;
 
 #[derive(Clone)]
 pub struct LogicHandler {
@@ -45,14 +45,14 @@ impl LogicHandler {
 
         for el in &lists.0 {
             match el.get_type() {
-                GenericObjectType::SPRITE => {
+                GenericSpriteType::SPRITE => {
                     result.push(Box::new(Actor::new(el.get_name(),
                                                     [el.get_position().0, el.get_position().1],
                                                     el.get_texture_id(),
                                                     [el.get_size().0, el.get_size().1],
                                                     el.get_texture_coordinates(), el.get_order())))
                 }
-                GenericObjectType::TEXT => {
+                GenericSpriteType::TEXT => {
                     result.push(Box::new(Text::new(el.get_name(),
                                                    [el.get_position().0, el.get_position().1],
                                                    el.get_order(),

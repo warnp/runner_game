@@ -1,4 +1,4 @@
-pub enum GenericObjectType {
+pub enum GenericSpriteType {
     SPRITE,
     TEXT,
 }

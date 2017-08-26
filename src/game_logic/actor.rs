@@ -1,5 +1,5 @@
 use engine::generic_object::GenericObject;
-use engine::generic_object_type::GenericObjectType;
+use engine::generic_object_type::GenericSpriteType;
 
 #[derive(Clone, Debug)]
 pub struct Actor {
@@ -25,8 +25,8 @@ impl Actor {
 }
 
 impl GenericObject for Actor {
-    fn get_type(&self) -> GenericObjectType {
-        GenericObjectType::SPRITE
+    fn get_type(&self) -> GenericSpriteType {
+        GenericSpriteType::SPRITE
     }
     fn get_position(&self) -> (f32, f32, f32) {
         (self.position[0], self.position[1], 0.0)
@@ -56,7 +56,7 @@ impl GenericObject for Actor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use engine::generic_object_type::GenericObjectType;
+    use engine::generic_object_type::GenericSpriteType;
 
 
     fn get_actor() -> Actor {
@@ -88,6 +88,6 @@ mod tests {
     fn should_get_type() {
         let actor = get_actor();
 
-        assert_eq!(actor.get_type(), GenericObjectType::SPRITE);
+        assert_eq!(actor.get_type(), GenericSpriteType::SPRITE);
     }
 }

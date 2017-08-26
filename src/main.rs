@@ -82,7 +82,8 @@ fn main() {
                                        &logic_manager.update(fps_timer, &local_keys.last().unwrap()),
                                        vec![],
                                        &frame_texture,
-                                       &mut frame_buffer);
+                                       &mut frame_buffer,
+                                        vec![]);
 
         if res.1.len() > 0 {
             key_buf.push(res.1[0].to_string().clone());

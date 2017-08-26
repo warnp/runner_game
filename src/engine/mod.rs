@@ -23,3 +23,5 @@ pub mod generic_control;
 pub mod generic_object_type;
 pub mod frame_buffer_manager;
 pub mod layer_type;
+pub mod model;
+pub mod object_manager;
