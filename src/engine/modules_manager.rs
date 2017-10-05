@@ -40,7 +40,8 @@ impl<'a> ModulesManager<'a> {
         ModulesManager {
             display: display,
             program: vec![shaders.get_compiled_shader("screen_shader"),
-                          shaders.get_compiled_shader("sprite_shader")],
+                          shaders.get_compiled_shader("sprite_shader"),
+                          shaders.get_compiled_shader("object_shader")],
             textures: textures,
             frame_texture: frame_texture,
         }
@@ -59,11 +60,11 @@ impl<'a> ModulesManager<'a> {
         self.generic_sprite_object_interpretor(generics_objects).get_buffers( self.display);
 
         let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
-        GraphicsHandler::draw( & self.display,
+        GraphicsHandler::draw( &self.display,
                                 bunch_of_generic_sprite_objects,
                                 & self.textures,
                                 ui_texture,
-                                & self.program,
+                                &self.program,
                                 frame_buffer,
                                 bunch_of_thirdd_objects);
         ( self, InputManager::get_input( self.display))
@@ -118,7 +119,7 @@ impl<'a> ModulesManager<'a> {
         let mut result_vec = Vec::new();
 
         for e in thirdd_objects {
-            result_vec.push(Model::new("cube".to_string(),e.0, e.1, e.2,[1.0, 0.0, 0.0, 0.0],(0.1, 0.1, 0.1)));
+            result_vec.push(Model::new("cube".to_string(),e.0, e.1, e.2,[1.0, 0.0, 0.0, 0.0],(1.0, 1.0, 1.0)));
         }
         ObjectManager::get_buffers(&self.display, result_vec)
     }

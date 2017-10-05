@@ -71,7 +71,7 @@ impl<'a> Shaders<'a> {
                             vertex_shader:r#"
                                   #version 140
 
-                                  in vec3 position;
+                                  in vec4 position;
                                   in vec2 tex_coords;
 
                                   uniform mat4 matrix;
@@ -80,7 +80,7 @@ impl<'a> Shaders<'a> {
 
                                   void main(){
                                       frag_texcoord = tex_coords;
-                                      gl_Position = matrix * vec4(position,1.0);
+                                      gl_Position = matrix * position;
                                   }
                               "#,
 
@@ -134,7 +134,7 @@ impl<'a> Shaders<'a> {
                                  r#"
                                     #version 140
 
-                                    in vec3 position;
+                                    in vec4 position;
                                     in vec3 normal;
                                     in vec4 color;
                                     in vec2 tex_coords;
@@ -149,7 +149,7 @@ impl<'a> Shaders<'a> {
 
                                     void main(){
                                     v_tex_coords = tex_coords;
-                                    gl_Position = matrix * vec4(position,1.0);
+                                    gl_Position = matrix * position;
                                     v_tex_id = i_tex_id;
                                     }
                                 "#,
@@ -171,6 +171,30 @@ impl<'a> Shaders<'a> {
                                     }
                                     "#,
                             });
+        hash.insert("object_shader",
+                    ShaderCouple{
+                        vertex_shader:
+                        r#"
+                                    #version 140
+
+                                    in vec4 position;
+
+                                    uniform mat4 u_matrix;
+
+                                    void main(){
+                                        gl_Position = u_matrix * position;
+                                    }
+                                "#,
+                        pixel_shader:
+                        r#"
+                                    #version 140
+
+                                    void main(){
+                                        //color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
+                                        gl_FragColor  = vec4(1.0,0.0,0.0,1.0);
+                                    }
+                                    "#,
+                    });
         let mut hash_compiled = HashMap::new();
 
         for (name, s) in hash.iter() {

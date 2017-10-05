@@ -25,3 +25,4 @@ pub mod frame_buffer_manager;
 pub mod layer_type;
 pub mod model;
 pub mod object_manager;
+pub mod camera;

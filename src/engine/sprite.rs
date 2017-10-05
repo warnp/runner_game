@@ -28,28 +28,28 @@ impl Sprite {
                -> Sprite {
         Sprite {
             vertices: [Vertex {
-                           position: [-0.5 * size.0 + x, 0.5 * size.1 + y,0.0],
+                           position: [-0.5 * size.0 + x, 0.5 * size.1 + y,0.0,1.0],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [tex_coord.0 .0, tex_coord.0 .1],
                            i_tex_id: tex_id,
                        },
                        Vertex {
-                           position: [0.5 * size.0 + x, 0.5 * size.1 + y,0.0],
+                           position: [0.5 * size.0 + x, 0.5 * size.1 + y,0.0,1.0],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [tex_coord.1 .0, tex_coord.1 .1],
                            i_tex_id: tex_id,
                        },
                        Vertex {
-                           position: [0.5 * size.0 + x, -0.5 * size.1 + y,0.0],
+                           position: [0.5 * size.0 + x, -0.5 * size.1 + y,0.0,1.0],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [tex_coord.2 .0, tex_coord.2 .1],
                            i_tex_id: tex_id,
                        },
                        Vertex {
-                           position: [-0.5 * size.0 + x, -0.5 * size.1 + y,0.0],
+                           position: [-0.5 * size.0 + x, -0.5 * size.1 + y,0.0,1.0],
                            normal: [0.0, 0.0, -1.0],
                            color: color,
                            tex_coords: [tex_coord.3 .0, tex_coord.3 .1],
@@ -91,7 +91,7 @@ impl CollisionMesh for Sprite {
         return false;
     }
 
-    fn get_aa_bb(&self) -> ([f32; 3], [f32; 3]) {
+    fn get_aa_bb(&self) -> ([f32; 4], [f32; 4]) {
         let aa = self.vertices[0].position;
         let bb = self.vertices[2].position;
 
