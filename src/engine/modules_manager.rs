@@ -14,14 +14,14 @@ use engine::object_manager::ObjectManager;
 use engine::vertex;
 
 pub struct ModulesManager<'a> {
-    display: &'a glium::backend::glutin_backend::GlutinFacade,
+    display: &'a glium::Display,
     program: Vec<glium::program::Program>,
     textures: glium::texture::Texture2dArray,
     frame_texture: glium::texture::Texture2d,
 }
 
 impl<'a> ModulesManager<'a> {
-    pub fn new(display: &glium::backend::glutin_backend::GlutinFacade) -> ModulesManager {
+    pub fn new(display: &glium::Display) -> ModulesManager {
         let mut shaders = Shaders::new(vec![&include_bytes!("../../content/VFKM2.png")[..],
                                             &include_bytes!("../../content/11532.png")[..],
                                             &include_bytes!("../../content/NatureForests.png")[..],
@@ -53,7 +53,7 @@ impl<'a> ModulesManager<'a> {
                 generics_controls: Vec<Box<GenericControl>>,
                 ui_texture: &glium::texture::Texture2d,
                 frame_buffer: &mut glium::framebuffer::SimpleFrameBuffer,
-                thirdd_objects: Vec<(f32, f32, f32)>)
+                thirdd_objects: Vec<(f32, f32, f32)>, time:f64)
                     -> (&ModulesManager, Vec<&str>) {
 
         let bunch_of_generic_sprite_objects =
@@ -66,8 +66,8 @@ impl<'a> ModulesManager<'a> {
                                 ui_texture,
                                 &self.program,
                                 frame_buffer,
-                                bunch_of_thirdd_objects);
-        ( self, InputManager::get_input( self.display))
+                                bunch_of_thirdd_objects, time);
+        ( self, vec![])//InputManager::get_input( self.display))
     }
 
     pub fn generic_sprite_object_interpretor(&self,

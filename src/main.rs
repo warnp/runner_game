@@ -13,7 +13,7 @@ use engine::modules_manager::ModulesManager;
 //use engine::input_manager::InputManager;
 
 
-use glium::DisplayBuild;
+//use glium::DisplayBuild;
 use game_logic::logic_handler::LogicHandler;
 
 //use std::sync::atomic::Ordering;
@@ -26,20 +26,20 @@ use game_logic::logic_handler::LogicHandler;
 //use std::time::Duration;
 
 fn main() {
-//    let endpoint = rodio::get_default_endpoint().unwrap();
+    //    let endpoint = rodio::get_default_endpoint().unwrap();
 
-//    let file = File::open("./content/5032.wav").unwrap();
-//    let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
-//    let source = source.repeat_infinite();
+    //    let file = File::open("./content/5032.wav").unwrap();
+    //    let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
+    //    let source = source.repeat_infinite();
 
-//    rodio::play_raw(&endpoint, source.convert_samples());
+    //    rodio::play_raw(&endpoint, source.convert_samples());
 
 
     //-----------Faire un handler pour les controls
-    let display = glium::glutin::WindowBuilder::new()
-        .with_vsync()
-        .with_dimensions(800, 600)
-        .build_glium()
+    let mut events_loop = glium::glutin::EventsLoop::new();
+    let window = glium::glutin::WindowBuilder::new();
+    let context = glium::glutin::ContextBuilder::new();
+    let display = glium::Display::new(window, context, &events_loop)
         .unwrap();
 
     let mut modules_manager = ModulesManager::new(&display);
@@ -56,8 +56,9 @@ fn main() {
     let mut key_buf: Vec<String> = vec!["".to_string()];
 
     let mut pause = false;
-
-    loop {
+let mut close = false;
+    let mut frames = 0.0;
+    while !close {
         let fps_timer = engine_helper.get_fps();
 
 
@@ -67,7 +68,7 @@ fn main() {
                                        vec![],
                                        &frame_texture,
                                        &mut frame_buffer,
-                                        vec![(0.0,0.0,1.0)]);
+                                       vec![(0.0, 0.0, 1.0)], frames);
 
         if res.1.len() > 0 {
             key_buf.push(res.1[0].to_string().clone());
@@ -82,5 +83,26 @@ fn main() {
             return;
         };
 
+        frames = frames + 1.0;
+        events_loop.poll_events(|ev|{
+           match ev {
+               glium::glutin::Event::WindowEvent{
+                   event, ..
+               } => match event {
+                   glium::glutin::WindowEvent::Closed => close = true,
+                   glium::glutin::WindowEvent::KeyboardInput {
+                           input, ..
+                       } => {
+                       println!("{:?}", input);
+
+                       if input.scancode == 1 {
+                           close = true;
+                       }
+                   },
+                   _ => (),
+               },
+               _ => (),
+           }
+        });
     }
 }

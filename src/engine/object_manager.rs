@@ -7,7 +7,7 @@ extern crate glium;
 pub struct ObjectManager {}
 
 impl ObjectManager {
-    pub fn get_buffers(display: &glium::backend::glutin_backend::GlutinFacade, models: Vec<Model>) ->
+    pub fn get_buffers(display: &glium::Display, models: Vec<Model>) ->
     (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut vertice_array = Vec::new();
         for model in &models {
@@ -28,7 +28,7 @@ impl ObjectManager {
 
         (glium::VertexBuffer::dynamic(display, &vertice_array).unwrap(),
          glium::index::IndexBuffer::new(display,
-                                        glium::index::PrimitiveType::TrianglesList,
+                                        glium::index::PrimitiveType::TriangleStrip,
                                         &indice_array).unwrap())
     }
 }

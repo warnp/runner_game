@@ -19,7 +19,7 @@ pub struct Shaders<'a> {
 }
 
 impl<'a> Shaders<'a> {
-    pub fn new(textures: Vec<&'a [u8]>, display: &glium::backend::glutin_backend::GlutinFacade) -> Shaders<'a> {
+    pub fn new(textures: Vec<&'a [u8]>, display: &glium::Display) -> Shaders<'a> {
 
         let mut hash = HashMap::new();
 
@@ -175,13 +175,18 @@ impl<'a> Shaders<'a> {
                     ShaderCouple{
                         vertex_shader:
                         r#"
-                                    #version 140
+                                    #version 150
 
                                     in vec4 position;
+                                    in vec3 normal;
+
+                                    out vec3 v_normal;
 
                                     uniform mat4 u_matrix;
+//                                    uniform mat4 perspective;
 
                                     void main(){
+                                        v_normal = transpose(inverse(mat3(u_matrix))) * normal;
                                         gl_Position = u_matrix * position;
                                     }
                                 "#,
@@ -189,9 +194,16 @@ impl<'a> Shaders<'a> {
                         r#"
                                     #version 140
 
+                                    const vec3 light = vec3(-1.0, 0.4, 0.9);
+
+                                    in vec3 v_normal;
+
                                     void main(){
                                         //color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
-                                        gl_FragColor  = vec4(1.0,0.0,0.0,1.0);
+                                        float brightness = dot(normalize(v_normal), normalize(light));
+
+                                        //gl_FragColor  = mix(vec4(0.6,0.0,0.0,1.0), vec4(1.0,0.0,0.0,1.0), brightness);
+                                        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
                                     }
                                     "#,
                     });
@@ -213,7 +225,7 @@ impl<'a> Shaders<'a> {
 
     }
 
-    pub fn compile_shaders(&mut self, display: &glium::backend::glutin_backend::GlutinFacade) {
+    pub fn compile_shaders(&mut self, display: &glium::Display) {
         for (name, s) in self.shaders_list.iter() {
             self.compiled_shaders.insert(name,
                                          Box::new(glium::Program::from_source(display,
@@ -236,14 +248,15 @@ impl<'a> Shaders<'a> {
     }
 
     pub fn get_texture_array(&self,
-                             display: &glium::backend::glutin_backend::GlutinFacade)
+                             display: &glium::Display)
                              -> glium::texture::Texture2dArray {
         let mut tex_vec = Vec::new();
 
         for tex in &self.textures {
+//            let image = self.set_image(tex).unwrap().to_rgba();
             let image = self.set_image(tex).unwrap().to_rgba();
             let image_dimensions = image.dimensions();
-            let image = glium::texture::RawImage2d::from_raw_rgba_reversed(image.into_raw(), image_dimensions );
+            let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions );
             tex_vec.push(image);
         }
 

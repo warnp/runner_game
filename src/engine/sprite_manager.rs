@@ -36,7 +36,7 @@ impl SpriteManager {
 
 
 
-    pub fn get_buffers(&self, display: &glium::backend::glutin_backend::GlutinFacade) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
+    pub fn get_buffers(&self, display: &glium::Display) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         let vertices_array = self.sprite_list_to_vertex_list();
         let index_list = self.sprite_list_to_indices_buffer();
@@ -49,7 +49,7 @@ impl SpriteManager {
     }
 
     pub fn add_sprite(&mut self,
-                      sprite: Sprite,display: &glium::backend::glutin_backend::GlutinFacade)
+                      sprite: Sprite,display: &glium::Display)
                       -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         self.sprite_list.borrow_mut().push(sprite);
@@ -60,7 +60,7 @@ impl SpriteManager {
 
 
     pub fn delete_sprite(&mut self,
-                         sprite_name: &str, display: &glium::backend::glutin_backend::GlutinFacade)
+                         sprite_name: &str, display: &glium::Display)
                          -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
 
@@ -74,7 +74,7 @@ impl SpriteManager {
     pub fn move_sprite(&self,
                        name: &str,
                        new_x: f32,
-                       new_y: f32, display: &glium::backend::glutin_backend::GlutinFacade)
+                       new_y: f32, display: &glium::Display)
                        -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
 
@@ -109,7 +109,7 @@ impl SpriteManager {
                                (&self,
                                 name: &str,
                                 new_x: f32,
-                                new_y: f32, display: &glium::backend::glutin_backend::GlutinFacade)
+                                new_y: f32, display: &glium::Display)
                                 -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
 
         let mut tmp = self.sprite_list.borrow_mut().clone();
@@ -149,7 +149,7 @@ impl SpriteManager {
     fn set_uv(&self,
               name: &str,
               new_coordinates: [f32; 2],
-              uv_size: (f32, f32), display: &glium::backend::glutin_backend::GlutinFacade)
+              uv_size: (f32, f32), display: &glium::Display)
               -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
 

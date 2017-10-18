@@ -9,7 +9,7 @@ pub struct FrameBufferManager<'a>{
 impl<'a> FrameBufferManager<'a>{
 
 
-    pub fn new(display: &glium::backend::glutin_backend::GlutinFacade) -> FrameBufferManager<'a>{
+    pub fn new(display: &glium::Display) -> FrameBufferManager<'a>{
         let frame_texture = glium::texture::Texture2d::empty_with_format(display,
              glium::texture::UncompressedFloatFormat::F32F32F32F32,
               glium::texture::MipmapsOption::NoMipmap,
@@ -23,7 +23,7 @@ impl<'a> FrameBufferManager<'a>{
         }
     }
 
-    pub fn init_frame_buffer(&'a mut self, display: &glium::backend::glutin_backend::GlutinFacade){
+    pub fn init_frame_buffer(&'a mut self, display: &glium::Display){
         let mut frame_buffer = glium::framebuffer::SimpleFrameBuffer::new(display, &self.frame_texture).unwrap();
         self.frame_buffer = Some(frame_buffer);
     }

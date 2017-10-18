@@ -26,3 +26,4 @@ pub mod layer_type;
 pub mod model;
 pub mod object_manager;
 pub mod camera;
+pub mod matrix_helper;
