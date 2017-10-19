@@ -9,10 +9,11 @@ use glium::PolygonMode;
 use engine::sprite::Sprite;
 use engine::camera::Camera;
 use engine::matrix_helper::MatrixHelper;
-use self::cgmath::{Matrix4, Vector3};
+use self::cgmath::{Matrix4, Vector3, Point3};
 use self::cgmath::prelude::*;
 use self::cgmath::conv::*;
 use self::cgmath::perspective;
+use self::cgmath::PerspectiveFov;
 use self::cgmath::{Deg, Rad};
 use std::ops::Mul;
 
@@ -38,40 +39,41 @@ impl GraphicsHandler {
         let fov: f32 = pi / 3.0;
         let f = 1.0 / (fov / 2.0).tan();
 
-        let proj = perspective(Deg(30.0), 4.0 / 3.0, 0.1, 2000.0);
+        //        let proj = PerspectiveFov{aspect:4.0/3.0, far:2000.0, fovy: Deg(30.0), near:0.1}.to_perspective();
 
 
-        let scale = Matrix4::from_scale(0.1);
-        let translate = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: -10.0 });
-        let rotate = Matrix4::from_angle_y(Rad((time as f32 * 0.01) % (2.0 * pi)));
+        let scale = Matrix4::from_scale(1.0);
+        //        let translate = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: -10.0 });
+        let rotate = Matrix4::from_angle_y(Rad((time as f32 * 0.001)));
 
-        let scale = translate.mul(rotate);
+//        let proj = proj.mul(rotate);
 
-        let scale = proj.mul(scale);
+        //        let scale = proj.mul(scale);
+        let proj = perspective(Deg(65.0), 1024.0 / 768.0, 1.0, 2000.0);
 
-        let scale: [[f32; 4]; 4] = array4x4(scale);
+        let camera_matrix = Matrix4::look_at(Point3 { x: 0.0, y: 0.0, z: -5.0 }, Point3 { x: 0.0, y: 0.0, z: 0.0 }, Vector3 { x: 0.0, y: 1.0, z: 0.0 });
+        let view_matrix = camera_matrix.invert().unwrap();
+        let proj_view = proj.mul(view_matrix);
+
+        let matrix = proj_view.mul(rotate);
+
+        let matrix: [[f32; 4]; 4] = array4x4(matrix);
         let thirdd_uniform = uniform!(
-            u_matrix: scale,
+            u_matrix: matrix,
 
         );
 
         let thirdd_params = glium::DrawParameters {
             blend: glium::Blend::alpha_blending(),
-            //            draw_primitives: true,
-            //            line_width: Some(0.5),
             //            polygon_mode: PolygonMode::Line,
-            //            polygon_mode: PolygonMode::Point,
-            //            point_size: Some(10.0),
-            //                        primitive_restart_index: true,
-            //            multisampling: true,
-            smooth: Some(glium::draw_parameters::Smooth::Nicest),
             //            backface_culling: glium::BackfaceCullingMode::CullCounterClockwise,
+            //            depth_test: glium::draw_parameters::DepthTest::IfLess,
             ..Default::default()
         };
 
 
         frame_buffer.clear_color(1.0f32, 1.0f32, 0.0f32, 1.0f32);
-        frame_buffer.draw(&thirdd_vertex_buffer, &thirdd_index_buffer, &program[2], &thirdd_uniform, &thirdd_params).unwrap();
+        frame_buffer.draw(&thirdd_vertex_buffer, /*&thirdd_index_buffer*/glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip), &program[2], &thirdd_uniform, &thirdd_params).unwrap();
         //        frame_buffer.draw(&thirdd_vertex_buffer, &thirdd_index_buffer, &program[1], &thirdd_uniform, &thirdd_params ).unwrap();
 
         //---------------------------3D-DRAW-END----------------------------//

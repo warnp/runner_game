@@ -183,7 +183,6 @@ impl<'a> Shaders<'a> {
                                     out vec3 v_normal;
 
                                     uniform mat4 u_matrix;
-//                                    uniform mat4 perspective;
 
                                     void main(){
                                         v_normal = transpose(inverse(mat3(u_matrix))) * normal;
@@ -194,7 +193,7 @@ impl<'a> Shaders<'a> {
                         r#"
                                     #version 140
 
-                                    const vec3 light = vec3(-1.0, 0.4, 0.9);
+                                    const vec3 light = vec3(-10.0, 10.0, 0.0);
 
                                     in vec3 v_normal;
 
@@ -202,8 +201,8 @@ impl<'a> Shaders<'a> {
                                         //color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
                                         float brightness = dot(normalize(v_normal), normalize(light));
 
-                                        //gl_FragColor  = mix(vec4(0.6,0.0,0.0,1.0), vec4(1.0,0.0,0.0,1.0), brightness);
-                                        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+                                        gl_FragColor  = mix(vec4(0.6,0.0,0.0,1.0), vec4(1.0,0.0,0.0,1.0), brightness);
+//                                        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
                                     }
                                     "#,
                     });
