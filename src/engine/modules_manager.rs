@@ -12,6 +12,7 @@ use engine::input_manager::InputManager;
 use engine::model::Model;
 use engine::object_manager::ObjectManager;
 use engine::vertex;
+use engine::teapot;
 
 pub struct ModulesManager<'a> {
     display: &'a glium::Display,
@@ -53,21 +54,21 @@ impl<'a> ModulesManager<'a> {
                 generics_controls: Vec<Box<GenericControl>>,
                 ui_texture: &glium::texture::Texture2d,
                 frame_buffer: &mut glium::framebuffer::SimpleFrameBuffer,
-                thirdd_objects: Vec<(f32, f32, f32)>, time:f64)
-                    -> (&ModulesManager, Vec<&str>) {
-
+                thirdd_objects: Vec<(f32, f32, f32)>, time: f64)
+                -> (&ModulesManager, Vec<&str>) {
         let bunch_of_generic_sprite_objects =
-        self.generic_sprite_object_interpretor(generics_objects).get_buffers( self.display);
+            self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
-        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
-        GraphicsHandler::draw( &self.display,
-                                bunch_of_generic_sprite_objects,
-                                & self.textures,
-                                ui_texture,
-                                &self.program,
-                                frame_buffer,
-                                bunch_of_thirdd_objects, time);
-        ( self, vec![])//InputManager::get_input( self.display))
+        //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
+        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display,&teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display,glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
+            GraphicsHandler::draw(&self.display,
+                                  bunch_of_generic_sprite_objects,
+                                  &self.textures,
+                                  ui_texture,
+                                  &self.program,
+                                  frame_buffer,
+                                  bunch_of_thirdd_objects, time);
+        (self, vec![])//InputManager::get_input( self.display))
     }
 
     pub fn generic_sprite_object_interpretor(&self,
@@ -119,7 +120,7 @@ impl<'a> ModulesManager<'a> {
         let mut result_vec = Vec::new();
 
         for e in thirdd_objects {
-            result_vec.push(Model::new("cube".to_string(),e.0, e.1, e.2,[1.0, 0.0, 0.0, 0.0],(1.0, 1.0, 1.0)));
+            result_vec.push(Model::new("cube".to_string(), e.0, e.1, e.2, [1.0, 0.0, 0.0, 0.0], (1.0, 1.0, 1.0)));
         }
         ObjectManager::get_buffers(&self.display, result_vec)
     }

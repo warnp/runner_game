@@ -26,6 +26,8 @@ use game_logic::logic_handler::LogicHandler;
 //use std::time::Duration;
 
 fn main() {
+    let screen_size = (800, 600);
+
     //    let endpoint = rodio::get_default_endpoint().unwrap();
 
     //    let file = File::open("./content/5032.wav").unwrap();
@@ -37,7 +39,7 @@ fn main() {
 
     //-----------Faire un handler pour les controls
     let mut events_loop = glium::glutin::EventsLoop::new();
-    let window = glium::glutin::WindowBuilder::new();
+    let window = glium::glutin::WindowBuilder::new().with_dimensions(screen_size.0,screen_size.1);
     let context = glium::glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &events_loop)
         .unwrap();
@@ -45,8 +47,9 @@ fn main() {
     let mut modules_manager = ModulesManager::new(&display);
     let frame_texture = glium::texture::Texture2d::empty_with_format(&display,
                                                                      glium::texture::UncompressedFloatFormat::F32F32F32F32,
-                                                                     glium::texture::MipmapsOption::NoMipmap, 800, 600).unwrap();
-    let mut frame_buffer = glium::framebuffer::SimpleFrameBuffer::new(&display, &frame_texture)
+                                                                     glium::texture::MipmapsOption::NoMipmap, screen_size.0, screen_size.1).unwrap();
+    let depth_text = glium::texture::depth_texture2d::DepthTexture2d::empty_with_format(&display, glium::texture::DepthFormat::I24, glium::texture::MipmapsOption::NoMipmap, screen_size.0, screen_size.1).unwrap();
+    let mut frame_buffer = glium::framebuffer::SimpleFrameBuffer::with_depth_buffer(&display, &frame_texture, &depth_text)
         .unwrap();
 
 
@@ -56,7 +59,7 @@ fn main() {
     let mut key_buf: Vec<String> = vec!["".to_string()];
 
     let mut pause = false;
-let mut close = false;
+    let mut close = false;
     let mut frames = 0.0;
     while !close {
         let fps_timer = engine_helper.get_fps();
@@ -84,25 +87,25 @@ let mut close = false;
         };
 
         frames = frames + 1.0;
-        events_loop.poll_events(|ev|{
-           match ev {
-               glium::glutin::Event::WindowEvent{
-                   event, ..
-               } => match event {
-                   glium::glutin::WindowEvent::Closed => close = true,
-                   glium::glutin::WindowEvent::KeyboardInput {
-                           input, ..
-                       } => {
-                       println!("{:?}", input);
+        events_loop.poll_events(|ev| {
+            match ev {
+                glium::glutin::Event::WindowEvent {
+                    event, ..
+                } => match event {
+                    glium::glutin::WindowEvent::Closed => close = true,
+                    glium::glutin::WindowEvent::KeyboardInput {
+                        input, ..
+                    } => {
+                        println!("{:?}", input);
 
-                       if input.scancode == 1 {
-                           close = true;
-                       }
-                   },
-                   _ => (),
-               },
-               _ => (),
-           }
+                        if input.scancode == 1 {
+                            close = true;
+                        }
+                    }
+                    _ => (),
+                },
+                _ => (),
+            }
         });
     }
 }

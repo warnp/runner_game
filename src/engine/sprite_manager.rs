@@ -85,15 +85,15 @@ impl SpriteManager {
         if res.is_some() {
             let mut sp = res.unwrap();
 
-            (sp.1).vertices[0].position[0] = (sp.1).vertices[0].position[0] + new_x;
-            (sp.1).vertices[1].position[0] = (sp.1).vertices[1].position[0] + new_x;
-            (sp.1).vertices[2].position[0] = (sp.1).vertices[2].position[0] + new_x;
-            (sp.1).vertices[3].position[0] = (sp.1).vertices[3].position[0] + new_x;
+            (sp.1).vertices[0].position.0 = (sp.1).vertices[0].position.0 + new_x;
+            (sp.1).vertices[1].position.0 = (sp.1).vertices[1].position.0 + new_x;
+            (sp.1).vertices[2].position.0 = (sp.1).vertices[2].position.0 + new_x;
+            (sp.1).vertices[3].position.0 = (sp.1).vertices[3].position.0 + new_x;
 
-            (sp.1).vertices[0].position[1] = (sp.1).vertices[0].position[1] + new_y;
-            (sp.1).vertices[1].position[1] = (sp.1).vertices[1].position[1] + new_y;
-            (sp.1).vertices[2].position[1] = (sp.1).vertices[2].position[1] + new_y;
-            (sp.1).vertices[3].position[1] = (sp.1).vertices[3].position[1] + new_y;
+            (sp.1).vertices[0].position.1 = (sp.1).vertices[0].position.1 + new_y;
+            (sp.1).vertices[1].position.1 = (sp.1).vertices[1].position.1 + new_y;
+            (sp.1).vertices[2].position.1 = (sp.1).vertices[2].position.1 + new_y;
+            (sp.1).vertices[3].position.1 = (sp.1).vertices[3].position.1 + new_y;
 
         }
 
@@ -119,15 +119,15 @@ impl SpriteManager {
                         .find(|x| (x.1).name == name)
                         .unwrap();
 
-        (sp.1).vertices[0].position[0] = new_x;
-        (sp.1).vertices[1].position[0] = new_x;
-        (sp.1).vertices[2].position[0] = new_x;
-        (sp.1).vertices[3].position[0] = new_x;
+        (sp.1).vertices[0].position.0 = new_x;
+        (sp.1).vertices[1].position.0 = new_x;
+        (sp.1).vertices[2].position.0 = new_x;
+        (sp.1).vertices[3].position.0 = new_x;
 
-        (sp.1).vertices[0].position[1] = new_y;
-        (sp.1).vertices[1].position[1] = new_y;
-        (sp.1).vertices[2].position[1] = new_y;
-        (sp.1).vertices[3].position[1] = new_y;
+        (sp.1).vertices[0].position.1 = new_y;
+        (sp.1).vertices[1].position.1 = new_y;
+        (sp.1).vertices[2].position.1 = new_y;
+        (sp.1).vertices[3].position.1 = new_y;
 
         self.get_buffers(&display)
 
@@ -146,31 +146,31 @@ impl SpriteManager {
         self.sprite_list.borrow_mut().sort_by(|a, b| a.cmp(b));
     }
 
-    fn set_uv(&self,
-              name: &str,
-              new_coordinates: [f32; 2],
-              uv_size: (f32, f32), display: &glium::Display)
-              -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
-        let mut tmp = self.sprite_list.borrow_mut().clone();
-
-        let mut sp = tmp.iter_mut()
-                        .enumerate()
-                        .find(|x| (x.1).name == name)
-                        .unwrap();
-
-
-        (sp.1).vertices[0].tex_coords[0] = new_coordinates[0];
-        (sp.1).vertices[1].tex_coords[0] = new_coordinates[0] + uv_size.0;
-        (sp.1).vertices[2].tex_coords[0] = new_coordinates[0] + uv_size.0;
-        (sp.1).vertices[3].tex_coords[0] = new_coordinates[0];
-
-        (sp.1).vertices[0].tex_coords[1] = new_coordinates[1];
-        (sp.1).vertices[1].tex_coords[1] = new_coordinates[1];
-        (sp.1).vertices[2].tex_coords[1] = new_coordinates[1] + uv_size.1;
-        (sp.1).vertices[3].tex_coords[1] = new_coordinates[1] + uv_size.1;
-
-        self.get_buffers(display)
-    }
+//    fn set_uv(&self,
+//              name: &str,
+//              new_coordinates: [f32; 2],
+//              uv_size: (f32, f32), display: &glium::Display)
+//              -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
+//        let mut tmp = self.sprite_list.borrow_mut().clone();
+//
+//        let mut sp = tmp.iter_mut()
+//                        .enumerate()
+//                        .find(|x| (x.1).name == name)
+//                        .unwrap();
+//
+//
+//        (sp.1).vertices[0].tex_coords[0] = new_coordinates[0];
+//        (sp.1).vertices[1].tex_coords[0] = new_coordinates[0] + uv_size.0;
+//        (sp.1).vertices[2].tex_coords[0] = new_coordinates[0] + uv_size.0;
+//        (sp.1).vertices[3].tex_coords[0] = new_coordinates[0];
+//
+//        (sp.1).vertices[0].tex_coords[1] = new_coordinates[1];
+//        (sp.1).vertices[1].tex_coords[1] = new_coordinates[1];
+//        (sp.1).vertices[2].tex_coords[1] = new_coordinates[1] + uv_size.1;
+//        (sp.1).vertices[3].tex_coords[1] = new_coordinates[1] + uv_size.1;
+//
+//        self.get_buffers(display)
+//    }
 
 
     fn sprite_list_to_vertex_list(&self) -> Vec<Vertex> {

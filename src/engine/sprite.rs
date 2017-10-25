@@ -1,5 +1,5 @@
 use std::cmp::{Ord, Ordering};
-use engine::vertex::Vertex;
+use engine::vertex::{Vertex, TexCoords, Normal};
 use engine::graphic_item::GraphicItem;
 use engine::collision::CollisionMesh;
 use engine::layer_type::LayerType;
@@ -14,6 +14,8 @@ pub struct Sprite {
     pub name: String, /* pub transform: [[f32; 4]; 4],
                         * pub display: &glium::glutin::WindowBuilder, */
     pub order: u8,
+    pub tex_coords: [TexCoords;4],
+    pub normal: [Normal;4]
 }
 
 impl Sprite {
@@ -28,36 +30,41 @@ impl Sprite {
                -> Sprite {
         Sprite {
             vertices: [Vertex {
-                           position: [-0.5 * size.0 + x, 0.5 * size.1 + y,0.0,1.0],
-                           normal: [0.0, 0.0, -1.0],
-                           color: color,
-                           tex_coords: [tex_coord.0 .0, tex_coord.0 .1],
-                           i_tex_id: tex_id,
+                           position: (-0.5 * size.0 + x, 0.5 * size.1 + y,0.0),
+//                           normal: [0.0, 0.0, -1.0],
+//                           color: color,
+//                           tex_coords: [tex_coord.0 .0, tex_coord.0 .1],
+//                           i_tex_id: tex_id,
                        },
                        Vertex {
-                           position: [0.5 * size.0 + x, 0.5 * size.1 + y,0.0,1.0],
-                           normal: [0.0, 0.0, -1.0],
-                           color: color,
-                           tex_coords: [tex_coord.1 .0, tex_coord.1 .1],
-                           i_tex_id: tex_id,
+                           position: (0.5 * size.0 + x, 0.5 * size.1 + y,0.0),
+//                           normal: [0.0, 0.0, -1.0],
+//                           color: color,
+//                           tex_coords: [tex_coord.1 .0, tex_coord.1 .1],
+//                           i_tex_id: tex_id,
                        },
                        Vertex {
-                           position: [0.5 * size.0 + x, -0.5 * size.1 + y,0.0,1.0],
-                           normal: [0.0, 0.0, -1.0],
-                           color: color,
-                           tex_coords: [tex_coord.2 .0, tex_coord.2 .1],
-                           i_tex_id: tex_id,
+                           position: (0.5 * size.0 + x, -0.5 * size.1 + y,0.0),
+//                           normal: [0.0, 0.0, -1.0],
+//                           color: color,
+//                           tex_coords: [tex_coord.2 .0, tex_coord.2 .1],
+//                           i_tex_id: tex_id,
                        },
                        Vertex {
-                           position: [-0.5 * size.0 + x, -0.5 * size.1 + y,0.0,1.0],
-                           normal: [0.0, 0.0, -1.0],
-                           color: color,
-                           tex_coords: [tex_coord.3 .0, tex_coord.3 .1],
-                           i_tex_id: tex_id,
+                           position: (-0.5 * size.0 + x, -0.5 * size.1 + y,0.0),
+//                           normal: [0.0, 0.0, -1.0],
+//                           color: color,
+//                           tex_coords: [tex_coord.3 .0, tex_coord.3 .1],
+//                           i_tex_id: tex_id,
                        }],
             indices: [0, 1, 2, 0, 2, 3],
             name: name, // transform: transform,
             order: order,
+            tex_coords: [ TexCoords { tex_coords: (tex_coord.0 .0, tex_coord.0 .1)},
+                TexCoords { tex_coords: (tex_coord.1 .0, tex_coord.1 .1)},
+                TexCoords { tex_coords: (tex_coord.2 .0, tex_coord.2 .1)},
+                TexCoords { tex_coords: (tex_coord.3 .0, tex_coord.3 .1)}],
+            normal: [Normal {normal:(0.0, 0.0, -1.0)},Normal {normal:(0.0, 0.0, -1.0)},Normal {normal:(0.0, 0.0, -1.0)},Normal {normal:(0.0, 0.0, -1.0)}]
         }
 
     }
@@ -67,12 +74,12 @@ impl Sprite {
 impl GraphicItem for Sprite {
     fn get_position(&self) -> [f32; 2] {
 
-        let x = (self.vertices[0].position[0] + self.vertices[1].position[0] +
-                 self.vertices[2].position[0] +
-                 self.vertices[3].position[0]) as f32 / 4.0;
-        let y = (self.vertices[0].position[1] + self.vertices[1].position[1] +
-                 self.vertices[2].position[1] +
-                 self.vertices[3].position[1]) as f32;
+        let x = (self.vertices[0].position.0 + self.vertices[1].position.0 +
+                 self.vertices[2].position.0 +
+                 self.vertices[3].position.0) as f32 / 4.0;
+        let y = (self.vertices[0].position.1 + self.vertices[1].position.1 +
+                 self.vertices[2].position.1 +
+                 self.vertices[3].position.1) as f32;
         [x, y]
     }
 
@@ -83,17 +90,17 @@ impl GraphicItem for Sprite {
 
 impl CollisionMesh for Sprite {
     fn detect_collide(&self, aa: [f32; 2], bb: [f32; 2]) -> bool {
-        if self.vertices[0].position[0] <= bb[0] && self.vertices[0].position[1] >= bb[1] &&
-           self.vertices[2].position[0] >= aa[0] &&
-           self.vertices[2].position[1] <= aa[1] {
+        if self.vertices[0].position.0 <= bb[0] && self.vertices[0].position.1 >= bb[1] &&
+           self.vertices[2].position.0 >= aa[0] &&
+           self.vertices[2].position.1 <= aa[1] {
             return true;
         }
         return false;
     }
 
     fn get_aa_bb(&self) -> ([f32; 4], [f32; 4]) {
-        let aa = self.vertices[0].position;
-        let bb = self.vertices[2].position;
+        let aa = [self.vertices[0].position.0,self.vertices[0].position.1,self.vertices[0].position.2,1.0];
+        let bb = [self.vertices[2].position.0,self.vertices[2].position.1,self.vertices[2].position.2,1.0];
 
         (aa, bb)
     }
