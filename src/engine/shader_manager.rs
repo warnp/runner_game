@@ -180,12 +180,14 @@ impl<'a> Shaders<'a> {
                                     in vec3 position;
                                     in vec3 normal;
 
+                                    uniform mat4 u_matrix;
+                                    uniform mat4 u_world;
+
                                     out vec3 v_normal;
 
-                                    uniform mat4 u_matrix;
-
                                     void main(){
-                                        v_normal = transpose(inverse(mat3(u_matrix))) * normal;
+                                        // v_normal = transpose(inverse(mat3(u_world))) * normal;
+                                        v_normal = mat3(u_world) * normal;
                                         gl_Position = u_matrix * vec4(position,1.0);
                                     }
                                 "#,
@@ -196,13 +198,20 @@ impl<'a> Shaders<'a> {
                                     const vec3 light = vec3(-10.0, 10.0, 0.0);
 
                                     in vec3 v_normal;
+                                    in vec3 fragVert;
+                                    uniform mat4 u_matrix;
 
                                     void main(){
                                         //color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
+                                        //vec3 fragPosition = vec3(model * vec4(fragVert, 1);
+                                        //vec3 surfaceToLight = light - fragPosition;
                                         float brightness = dot(normalize(v_normal), normalize(light));
 
-                                        gl_FragColor  = mix(vec4(0.6,0.0,0.0,1.0), vec4(1.0,0.0,0.0,1.0), brightness);
-//                                        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+                                        //float brightness = dot(v_normal,surfaceToLight)/(length(surfaceToLight)*length(v_normal));
+
+                                        //gl_FragColor  = mix(vec4(0.6,0.0,0.0,1.0), vec4(1.0,0.0,0.0,1.0), brightness);
+                                        gl_FragColor = vec4(0.6,0.0,0.0,1.0);
+                                        gl_FragColor.rgb *=  brightness;
                                     }
                                     "#,
                     });

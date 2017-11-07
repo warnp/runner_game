@@ -12,6 +12,7 @@ cgmath = "*"
 # winapi = "*"
 # gilrs = "0.1.0"
 rodio = "*"
+xml-rs = "0.7"
 
 
 [features]

@@ -13,6 +13,7 @@ use engine::model::Model;
 use engine::object_manager::ObjectManager;
 use engine::vertex;
 use engine::teapot;
+use engine::foo_object;
 
 pub struct ModulesManager<'a> {
     display: &'a glium::Display,
@@ -60,7 +61,7 @@ impl<'a> ModulesManager<'a> {
             self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
         //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
-        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display,&teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display,glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
+        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &foo_object::VERTICES).unwrap(), glium::VertexBuffer::new(self.display,&foo_object::NORMALS).unwrap(), glium::IndexBuffer::new(self.display,glium::index::PrimitiveType::TrianglesList, &foo_object::INDICES).unwrap());
             GraphicsHandler::draw(&self.display,
                                   bunch_of_generic_sprite_objects,
                                   &self.textures,

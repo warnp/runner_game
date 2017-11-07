@@ -49,17 +49,19 @@ impl GraphicsHandler {
         //##############################################################################
         //##############################################################################
 
-
-        let rotate = Matrix4::from_angle_y(Rad((time as f32 * 0.001)));
+        let world = Matrix4::identity();
+        let world = world.mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
 
 //        let proj_view = Camera::look_at(65.0,800.0/600.0,1.0,2000.0,Point3 { x: 0.0, y: 0.0, z: -500.0 },Point3 { x: 0.0, y: 0.0, z: 0.0 },Vector3 { x: 0.0, y: 1.0, z: 0.0 });
-        let proj_view = Camera::fps(65.0,800.0/600.0,1.0,2000.0,0.0,0.0,0.0, Vector3{x:0.0,y:0.0,z:500.0});
+        let proj_view = Camera::fps(65.0,800.0/600.0,1.0,2000.0,0.0,0.0,0.0, Vector3{x:0.0,y:0.0,z:5.0});
 
-        let matrix = proj_view.mul(rotate);
+        let matrix = proj_view.mul(world);
 
         let matrix: [[f32; 4]; 4] = array4x4(matrix);
+        let world: [[f32;4];4] = array4x4(world);
         let thirdd_uniform = uniform!(
             u_matrix: matrix,
+            u_world: world,
 
         );
 
