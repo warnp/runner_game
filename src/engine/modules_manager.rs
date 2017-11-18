@@ -9,7 +9,7 @@ use engine::generic_control::GenericControl;
 use engine::text_writer::TextWriter;
 use engine::generic_object_type::GenericSpriteType;
 use engine::input_manager::InputManager;
-use engine::model::Model;
+use engine::model::{Cube,Model,Light};
 use engine::object_manager::ObjectManager;
 use engine::vertex;
 use engine::teapot;
@@ -19,7 +19,6 @@ pub struct ModulesManager<'a> {
     display: &'a glium::Display,
     program: Vec<glium::program::Program>,
     textures: glium::texture::Texture2dArray,
-    frame_texture: glium::texture::Texture2d,
 }
 
 impl<'a> ModulesManager<'a> {
@@ -35,17 +34,14 @@ impl<'a> ModulesManager<'a> {
 
         shaders.compile_shaders(&display);
 
-        let frame_texture = glium::texture::Texture2d::empty_with_format(display,
-                                                                         glium::texture::UncompressedFloatFormat::F32F32F32F32,
-                                                                         glium::texture::MipmapsOption::NoMipmap, 800, 600).unwrap();
         let textures = shaders.get_texture_array(&display);
         ModulesManager {
             display: display,
             program: vec![shaders.get_compiled_shader("screen_shader"),
                           shaders.get_compiled_shader("sprite_shader"),
-                          shaders.get_compiled_shader("object_shader")],
+                          shaders.get_compiled_shader("object_shader"),
+                          shaders.get_compiled_shader("light_shader")],
             textures: textures,
-            frame_texture: frame_texture,
         }
     }
 
@@ -53,22 +49,22 @@ impl<'a> ModulesManager<'a> {
                 delta_time: f64,
                 generics_objects: &Vec<Box<GenericObject>>,
                 generics_controls: Vec<Box<GenericControl>>,
-                ui_texture: &glium::texture::Texture2d,
-                frame_buffer: &mut glium::framebuffer::SimpleFrameBuffer,
                 thirdd_objects: Vec<(f32, f32, f32)>, time: f64)
                 -> (&ModulesManager, Vec<&str>) {
         let bunch_of_generic_sprite_objects =
             self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
         //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
-        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &foo_object::VERTICES).unwrap(), glium::VertexBuffer::new(self.display,&foo_object::NORMALS).unwrap(), glium::IndexBuffer::new(self.display,glium::index::PrimitiveType::TrianglesList, &foo_object::INDICES).unwrap());
+        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display,&teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display,glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
             GraphicsHandler::draw(&self.display,
                                   bunch_of_generic_sprite_objects,
                                   &self.textures,
-                                  ui_texture,
                                   &self.program,
-                                  frame_buffer,
-                                  bunch_of_thirdd_objects, time);
+                                  vec![Box::new( Cube::new("Toto".to_string(), 2.0, 0.0, 0.0, [1.0,0.0,0.0,1.0], (10.0, 10.0, 10.0)))],
+                                  bunch_of_thirdd_objects,
+                                  vec![Light{name: "lumiere".to_string(), intensity:128, position:(50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0},
+                                       Light{name: "lumiere".to_string(), intensity:128, position:(-50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0}],
+                                  time);
         (self, vec![])//InputManager::get_input( self.display))
     }
 
@@ -121,7 +117,7 @@ impl<'a> ModulesManager<'a> {
         let mut result_vec = Vec::new();
 
         for e in thirdd_objects {
-            result_vec.push(Model::new("cube".to_string(), e.0, e.1, e.2, [1.0, 0.0, 0.0, 0.0], (1.0, 1.0, 1.0)));
+            result_vec.push(Cube::new("cube".to_string(), e.0, e.1, e.2, [1.0, 0.0, 0.0, 0.0], (1.0, 1.0, 1.0)));
         }
         ObjectManager::get_buffers(&self.display, result_vec)
     }

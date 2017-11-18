@@ -1,4 +1,4 @@
-use engine::model::Model;
+use engine::model::Cube;
 use engine::vertex;
 
 extern crate glium;
@@ -7,7 +7,7 @@ extern crate glium;
 pub struct ObjectManager {}
 
 impl ObjectManager {
-    pub fn get_buffers(display: &glium::Display, models: Vec<Model>) ->
+    pub fn get_buffers(display: &glium::Display, models: Vec<Cube>) ->
     (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let mut vertice_array = Vec::new();
         for model in &models {

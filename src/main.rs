@@ -10,6 +10,7 @@ mod engine;
 
 use engine::engine_helper::EngineHelper;
 use engine::modules_manager::ModulesManager;
+use game_logic::text::Text;
 //use engine::input_manager::InputManager;
 
 
@@ -45,12 +46,6 @@ fn main() {
         .unwrap();
 
     let mut modules_manager = ModulesManager::new(&display);
-    let frame_texture = glium::texture::Texture2d::empty_with_format(&display,
-                                                                     glium::texture::UncompressedFloatFormat::F32F32F32F32,
-                                                                     glium::texture::MipmapsOption::NoMipmap, screen_size.0, screen_size.1).unwrap();
-    let depth_text = glium::texture::depth_texture2d::DepthTexture2d::empty_with_format(&display, glium::texture::DepthFormat::I24, glium::texture::MipmapsOption::NoMipmap, screen_size.0, screen_size.1).unwrap();
-    let mut frame_buffer = glium::framebuffer::SimpleFrameBuffer::with_depth_buffer(&display, &frame_texture, &depth_text)
-        .unwrap();
 
 
     let mut engine_helper = EngineHelper::new();
@@ -62,15 +57,14 @@ fn main() {
     let mut close = false;
     let mut frames = 0.0;
     while !close {
+
         let fps_timer = engine_helper.get_fps();
 
 
         let local_keys = key_buf.clone();
         let res = modules_manager.draw(fps_timer.1,
-                                       &vec![],
+                                       &vec![Box::new(Text::new("fps".to_string(),[-0.5, 0.8], 255, "Salut".to_string()))],
                                        vec![],
-                                       &frame_texture,
-                                       &mut frame_buffer,
                                        vec![(0.0, 0.0, 1.0)], frames);
 
         if res.1.len() > 0 {

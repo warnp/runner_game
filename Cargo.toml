@@ -13,7 +13,7 @@ cgmath = "*"
 # gilrs = "0.1.0"
 rodio = "*"
 xml-rs = "0.7"
-
+notify = "4.0.0"
 
 [features]
 integration=[]

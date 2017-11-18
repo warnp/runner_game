@@ -1,8 +1,12 @@
+extern crate image;
+extern crate glium;
+extern crate notify;
+
 use std::collections::HashMap;
 use std::io::Cursor;
-extern crate image;
-
-extern crate glium;
+use self::notify::{RecommendedWatcher, Watcher, RecursiveMode};
+use std::path::Path;
+use std::sync::mpsc::channel;
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct ShaderCouple<'a> {
@@ -88,42 +92,25 @@ impl<'a> Shaders<'a> {
                               pixel_shader: r#"
                                   #version 140
 
+                                  uniform sampler2D diffuse_texture;
+                                  uniform sampler2D light_texture;
                                   uniform sampler2D ui_texture;
                                   smooth in vec2 frag_texcoord;
 
                                   out vec4 color;
 
-                                //   float kernel[9] = float[](
-                                //       1,1,1,
-                                //       1,-8,1,
-                                //       1,1,1
-                                //   );
-                                  //
-                                //   const float offset = 1.0/300.0;
-
                                   void main(){
-                                    //   vec2 offsets[9] = vec2[](
-                                    //         vec2(-offset, offset),  // top-left
-                                    //         vec2(0.0f,    offset),  // top-center
-                                    //         vec2(offset,  offset),  // top-right
-                                    //         vec2(-offset, 0.0f),    // center-left
-                                    //         vec2(0.0f,    0.0f),    // center-center
-                                    //         vec2(offset,  0.0f),    // center-right
-                                    //         vec2(-offset, -offset), // bottom-left
-                                    //         vec2(0.0f,    -offset), // bottom-center
-                                    //         vec2(offset,  -offset)  // bottom-right
-                                    //     );
 
-                                      vec3 tex = texture(ui_texture, frag_texcoord).rgb;
-                                    //   vec3 sample[9];
-                                    //   for(int i = 0; i < 9; i++){
-                                    //       sample[i] = vec3(texture(ui_texture, frag_texcoord + offsets[i]));
-                                    //   }
-                                    //   vec3 col = vec3(0.0);
-                                    //   for(int i = 0; i < 9; i++){
-                                    //       col += sample[i] * kernel[i];
-                                    //   }
-                                      color = vec4(tex, 1.0);
+                                      vec3 difftex = texture(diffuse_texture, frag_texcoord).rgb;
+                                      vec3 lighttex = texture(light_texture, frag_texcoord).rgb;
+                                      vec3 uitex = texture(ui_texture, frag_texcoord).rgb;
+
+                                        if(uitex.r == 0){
+                                            color = vec4(difftex * lighttex, 1.0);
+
+                                        }else{
+                                            color = vec4(difftex * lighttex, 1.0) + vec4(uitex, 1.0);
+                                        }
                                   }
                               "#,
                         });
@@ -166,7 +153,7 @@ impl<'a> Shaders<'a> {
                                     uniform sampler2DArray tex;
 
                                     void main(){
-                                        //color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
+//                                        color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
                                         color  = vec4(1.0,0.0,0.0,1.0);
                                     }
                                     "#,
@@ -186,7 +173,6 @@ impl<'a> Shaders<'a> {
                                     out vec3 v_normal;
 
                                     void main(){
-                                        // v_normal = transpose(inverse(mat3(u_world))) * normal;
                                         v_normal = mat3(u_world) * normal;
                                         gl_Position = u_matrix * vec4(position,1.0);
                                     }
@@ -195,28 +181,81 @@ impl<'a> Shaders<'a> {
                         r#"
                                     #version 140
 
-                                    const vec3 light = vec3(-10.0, 10.0, 0.0);
 
                                     in vec3 v_normal;
                                     in vec3 fragVert;
                                     uniform mat4 u_matrix;
 
+                                    out vec4 diffuse_output;
+                                    out vec4 normal_output;
+                                    out vec4 position_output;
+
                                     void main(){
-                                        //color = texture(tex, vec3(v_tex_coords, float(v_tex_id)));
-                                        //vec3 fragPosition = vec3(model * vec4(fragVert, 1);
-                                        //vec3 surfaceToLight = light - fragPosition;
-                                        float brightness = dot(normalize(v_normal), normalize(light));
-
-                                        //float brightness = dot(v_normal,surfaceToLight)/(length(surfaceToLight)*length(v_normal));
-
-                                        //gl_FragColor  = mix(vec4(0.6,0.0,0.0,1.0), vec4(1.0,0.0,0.0,1.0), brightness);
-                                        gl_FragColor = vec4(0.6,0.0,0.0,1.0);
-                                        gl_FragColor.rgb *=  brightness;
+                                        diffuse_output = vec4(1.0,0.0,0.0,1.0);
+                                        position_output = vec4(v_normal,1.0);
+                                        normal_output = vec4(v_normal,1.0);
                                     }
                                     "#,
                     });
+        hash.insert("light_shader",
+                    ShaderCouple{
+                        vertex_shader:
+                        r#"
+                                    #version 140
+
+                                    in vec3 position;
+                                    in vec2 tex_coords;
+
+                                    out vec2 frag_coords;
+
+                                    uniform mat4 matrix;
+
+                                    void main(){
+                                        frag_coords = tex_coords;
+                                        gl_Position = matrix * vec4(position,1.0);
+                                    }
+                                "#,
+                        pixel_shader:
+                        r#"
+                                    #version 140
+
+                                    uniform sampler2D position_texture;
+                                    uniform sampler2D normal_texture;
+                                    uniform vec4 light_position;
+                                    uniform vec3 light_color;
+                                    uniform vec3 light_attenuation;
+                                    uniform float light_radius;
+
+                                    in vec2 frag_coords;
+
+                                    out vec4 color;
+
+
+                                    void main(){
+                                        vec4 position = texture(position_texture, frag_coords);
+                                        vec4 normal = texture(normal_texture, frag_coords);
+                                        vec3 light_vector = light_position.xyz - position.xyz;
+                                        float light_distance = abs(length(light_vector));
+                                        vec3 normal_vector = normalize(normal.xyz);
+                                        float diffuse = max(dot(normal_vector, light_vector), 0.0);
+                                        if(diffuse > 0.0){
+                                            float attenuation_factor = 1.0 /(
+                                                light_attenuation.x +
+                                                (light_attenuation.y * light_distance) +
+                                                (light_attenuation.y * light_distance * light_distance)
+                                            );
+                                            attenuation_factor *= (1.0 - pow((light_distance /light_radius), 2.0));
+                                            attenuation_factor = max(attenuation_factor, 0.0);
+                                            diffuse *= attenuation_factor;
+                                        }
+                                        color  = vec4(light_color * diffuse,1.0);
+                                    }
+                                    "#,
+                    });
+
         let mut hash_compiled = HashMap::new();
 
+        self.watch_shader_files(Path::new("./"));
         for (name, s) in hash.iter() {
             hash_compiled.insert(*name, Box::new(glium::Program::from_source(display,
                                                  s.vertex_shader,
@@ -271,8 +310,20 @@ impl<'a> Shaders<'a> {
         glium::texture::Texture2dArray::new(display, tex_vec).unwrap()
     }
 
+    fn watch_shader_files<P : AsRef<Path>>(&self,path: P) -> notify::Result<()> {
+        let (tx,rx) = channel();
+        let mut watcher: RecommandedWatcher = try!(Watcher::new_raw(tx));
 
-    // TODO implémenter get_binary() pour sauvegarder le shader
+        try!(watcher.watch(path, RecursiveMode::Recursive));
+
+        loop {
+            match rx.recv() {
+                Ok(notify::RawEvent{path: Some(path), op: Ok(op), cookie}) => println!("{:?} {:?} ({:?})", op, path, cookie),
+                Ok(event) => println!("broken event: {:?}", event),
+                Err(e) => println!("watch error: {:?}", e),
+            }
+        }
+    }
 }
 
 
