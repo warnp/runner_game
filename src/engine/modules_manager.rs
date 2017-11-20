@@ -63,7 +63,8 @@ impl<'a> ModulesManager<'a> {
                                   vec![Box::new( Cube::new("Toto".to_string(), 2.0, 0.0, 0.0, [1.0,0.0,0.0,1.0], (10.0, 10.0, 10.0)))],
                                   bunch_of_thirdd_objects,
                                   vec![Light{name: "lumiere".to_string(), intensity:128, position:(50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0},
-                                       Light{name: "lumiere".to_string(), intensity:128, position:(-50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0}],
+//                                       Light{name: "lumiere".to_string(), intensity:128, position:(-50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0}
+                                  ],
                                   time);
         (self, vec![])//InputManager::get_input( self.display))
     }

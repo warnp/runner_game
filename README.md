@@ -9,3 +9,4 @@ For now the game is separated  in two folder, one would become the library, the 
 
 To play with this game, you may use [rustup](https://github.com/rust-lang-nursery/rustup.rs) to get the latest stable version of rust.
 Then, to build the game, use the command ```cargo build --release``` in the project folder. Then ```cargo run``` to launch the game.
+

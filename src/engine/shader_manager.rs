@@ -3,10 +3,17 @@ extern crate glium;
 extern crate notify;
 
 use std::collections::HashMap;
-use std::io::Cursor;
 use self::notify::{RecommendedWatcher, Watcher, RecursiveMode};
 use std::path::Path;
 use std::sync::mpsc::channel;
+use std::sync::Arc;
+use std::thread;
+use std::ffi::OsStr;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::{BufReader, Cursor};
+use std::error::Error;
+use std::borrow::Borrow;
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct ShaderCouple<'a> {
@@ -24,7 +31,6 @@ pub struct Shaders<'a> {
 
 impl<'a> Shaders<'a> {
     pub fn new(textures: Vec<&'a [u8]>, display: &glium::Display) -> Shaders<'a> {
-
         let mut hash = HashMap::new();
 
         hash.insert("simple_shader",
@@ -71,8 +77,8 @@ impl<'a> Shaders<'a> {
             "#,
                     });
         hash.insert("screen_shader",
-                        ShaderCouple {
-                            vertex_shader:r#"
+                    ShaderCouple {
+                        vertex_shader: r#"
                                   #version 140
 
                                   in vec3 position;
@@ -88,8 +94,8 @@ impl<'a> Shaders<'a> {
                                   }
                               "#,
 
-                              // fragment shader
-                              pixel_shader: r#"
+                        // fragment shader
+                        pixel_shader: r#"
                                   #version 140
 
                                   uniform sampler2D diffuse_texture;
@@ -113,12 +119,12 @@ impl<'a> Shaders<'a> {
                                         }
                                   }
                               "#,
-                        });
+                    });
 
-            hash.insert("sprite_shader",
-                            ShaderCouple{
-                                vertex_shader:
-                                 r#"
+        hash.insert("sprite_shader",
+                    ShaderCouple {
+                        vertex_shader:
+                        r#"
                                     #version 140
 
                                     in vec3 position;
@@ -140,8 +146,8 @@ impl<'a> Shaders<'a> {
                                     v_tex_id = i_tex_id;
                                     }
                                 "#,
-                            pixel_shader:
-                                r#"
+                        pixel_shader:
+                        r#"
                                     #version 140
 
                                     in vec4 colorV;
@@ -157,9 +163,9 @@ impl<'a> Shaders<'a> {
                                         color  = vec4(1.0,0.0,0.0,1.0);
                                     }
                                     "#,
-                            });
+                    });
         hash.insert("object_shader",
-                    ShaderCouple{
+                    ShaderCouple {
                         vertex_shader:
                         r#"
                                     #version 150
@@ -198,7 +204,7 @@ impl<'a> Shaders<'a> {
                                     "#,
                     });
         hash.insert("light_shader",
-                    ShaderCouple{
+                    ShaderCouple {
                         vertex_shader:
                         r#"
                                     #version 140
@@ -254,14 +260,66 @@ impl<'a> Shaders<'a> {
                     });
 
         let mut hash_compiled = HashMap::new();
+        //        let arc_display = Arc::new(display);
+        //        let clone_display = arc_display.clone();
 
-        self.watch_shader_files(Path::new("./"));
+        thread::spawn(move || {
+            let (tx, rx) = channel();
+            let mut watcher: RecommendedWatcher = Watcher::new_raw(tx).unwrap();
+
+            let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
+
+            let display = glium::HeadlessRenderer::new(context).unwrap();
+
+
+            let plop = watcher.watch(Path::new("./"), RecursiveMode::Recursive);
+
+            loop {
+                match rx.recv() {
+                    Ok(notify::RawEvent { path: Some(path), op: Ok(op), cookie }) => {
+                        println!("{:?} {:?} ({:?})", op, path, cookie);
+                        let extension = path.extension();
+                        if extension == Some(OsStr::new("shader")) {
+                            let mut file = File::open(path.clone()).unwrap();
+                            let buff = BufReader::new(file);
+                            let mut vertex_shader = String::new();
+                            let mut pixel_shader = String::new();
+
+                            let mut vert_or_pixel = 0;
+
+                            for line in buff.lines() {
+                                let l = line.unwrap();
+
+                                //Si on atteint le séparateur on passe à l'étage shader suivant
+                                if l == "=================".to_string() {
+                                    vert_or_pixel = 1;
+                                }
+                                if vert_or_pixel == 0 {
+                                    vertex_shader.push_str(&l);
+                                } else {
+                                    pixel_shader.push_str(&l);
+                                }
+                            }
+                            let program = glium::Program::from_source(&display, &vertex_shader, &pixel_shader, None);
+                            match program {
+                                Ok(prog) => println!("pouet"),
+                                Err(E) => println!("{}", E.description()),
+                            }
+                        }
+                    }
+                    Ok(event) => println!("broken event: {:?}", event),
+                    Err(e) => println!("watch error: {:?}", e),
+                }
+            }
+        });
+
+
         for (name, s) in hash.iter() {
             hash_compiled.insert(*name, Box::new(glium::Program::from_source(display,
-                                                 s.vertex_shader,
-                                                 s.pixel_shader,
-                                                 None)
-                         .unwrap()));
+                                                                             s.vertex_shader,
+                                                                             s.pixel_shader,
+                                                                             None)
+                .unwrap()));
         }
 
         Shaders {
@@ -269,7 +327,6 @@ impl<'a> Shaders<'a> {
             compiled_shaders: hash_compiled,
             textures: textures,
         }
-
     }
 
     pub fn compile_shaders(&mut self, display: &glium::Display) {
@@ -279,9 +336,8 @@ impl<'a> Shaders<'a> {
                                                                               s.vertex_shader,
                                                                               s.pixel_shader,
                                                                               None)
-                                                      .unwrap()));
+                                             .unwrap()));
         }
-
     }
 
     pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> glium::program::Program {
@@ -289,9 +345,7 @@ impl<'a> Shaders<'a> {
     }
 
     fn set_image(&self, texture: &'a [u8]) -> image::ImageResult<image::DynamicImage> {
-
         image::load(Cursor::new(texture), image::PNG)
-
     }
 
     pub fn get_texture_array(&self,
@@ -300,29 +354,14 @@ impl<'a> Shaders<'a> {
         let mut tex_vec = Vec::new();
 
         for tex in &self.textures {
-//            let image = self.set_image(tex).unwrap().to_rgba();
+            //            let image = self.set_image(tex).unwrap().to_rgba();
             let image = self.set_image(tex).unwrap().to_rgba();
             let image_dimensions = image.dimensions();
-            let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions );
+            let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
             tex_vec.push(image);
         }
 
         glium::texture::Texture2dArray::new(display, tex_vec).unwrap()
-    }
-
-    fn watch_shader_files<P : AsRef<Path>>(&self,path: P) -> notify::Result<()> {
-        let (tx,rx) = channel();
-        let mut watcher: RecommandedWatcher = try!(Watcher::new_raw(tx));
-
-        try!(watcher.watch(path, RecursiveMode::Recursive));
-
-        loop {
-            match rx.recv() {
-                Ok(notify::RawEvent{path: Some(path), op: Ok(op), cookie}) => println!("{:?} {:?} ({:?})", op, path, cookie),
-                Ok(event) => println!("broken event: {:?}", event),
-                Err(e) => println!("watch error: {:?}", e),
-            }
-        }
     }
 }
 
@@ -338,14 +377,13 @@ mod shader_manager_tests {
     #[test]
     #[ignore]
     fn should_return_a_shader() {
-
         let display = glium::glutin::WindowBuilder::new()
-                          .with_visibility(false)
-                          .build_glium()
-                          .unwrap();
+            .with_visibility(false)
+            .build_glium()
+            .unwrap();
 
-      let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
-                                             &include_bytes!("../../content/11532.png")[..]], &display);
+        let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
+                                           &include_bytes!("../../content/11532.png")[..]], &display);
         let lst_shaders = shader.get_compiled_shader("toto");
         // assert!(lst_shaders.len() == 1);
         // Shall not pass for the moment, need to find a property to evaluate
@@ -354,14 +392,13 @@ mod shader_manager_tests {
     #[cfg(not(feature = "integration"))]
     #[test]
     fn should_get_texture_array() {
-
         let display = glium::glutin::WindowBuilder::new()
-                          .with_visibility(false)
-                          .build_glium()
-                          .unwrap();
+            .with_visibility(false)
+            .build_glium()
+            .unwrap();
 
-      let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
-                                         &include_bytes!("../../content/11532.png")[..]], &display);
+        let mut shader = Shaders::new(vec![&include_bytes!("../../content/NatureForests.png")[..],
+                                           &include_bytes!("../../content/11532.png")[..]], &display);
 
         let lst_shaders = shader.get_texture_array(&display);
         assert!(lst_shaders.get_array_size() == Some(2));
