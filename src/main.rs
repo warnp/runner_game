@@ -2,6 +2,7 @@
 extern crate glium;
 extern crate time;
 extern crate rand;
+
 //extern crate rodio;
 
 
@@ -56,6 +57,8 @@ fn main() {
     let mut pause = false;
     let mut close = false;
     let mut frames = 0.0;
+
+
     while !close {
 
         let fps_timer = engine_helper.get_fps();

@@ -14,11 +14,14 @@ use engine::object_manager::ObjectManager;
 use engine::vertex;
 use engine::teapot;
 use engine::foo_object;
+use std::sync::mpsc::Receiver;
+
 
 pub struct ModulesManager<'a> {
     display: &'a glium::Display,
     program: Vec<glium::program::Program>,
     textures: glium::texture::Texture2dArray,
+    receiver: Receiver<glium::program::Binary>
 }
 
 impl<'a> ModulesManager<'a> {
@@ -32,7 +35,7 @@ impl<'a> ModulesManager<'a> {
                                        &display);
 
 
-        shaders.compile_shaders(&display);
+        let rx = shaders.find_compiled_shader();
 
         let textures = shaders.get_texture_array(&display);
         ModulesManager {
@@ -42,6 +45,7 @@ impl<'a> ModulesManager<'a> {
                           shaders.get_compiled_shader("object_shader"),
                           shaders.get_compiled_shader("light_shader")],
             textures: textures,
+            receiver: rx
         }
     }
 
@@ -51,6 +55,12 @@ impl<'a> ModulesManager<'a> {
                 generics_controls: Vec<Box<GenericControl>>,
                 thirdd_objects: Vec<(f32, f32, f32)>, time: f64)
                 -> (&ModulesManager, Vec<&str>) {
+        match self.receiver.try_recv() {
+            Ok(t) => println!(" tape m'en 5"),
+            Err(e) => ()
+        }
+
+
         let bunch_of_generic_sprite_objects =
             self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 

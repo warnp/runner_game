@@ -11,9 +11,12 @@ use std::thread;
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::{BufReader, Cursor};
+use std::io::{BufReader, BufWriter, Cursor};
 use std::error::Error;
 use std::borrow::Borrow;
+use std::str;
+use std::sync::mpsc;
+use std::sync::mpsc::{Receiver};
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct ShaderCouple<'a> {
@@ -21,8 +24,9 @@ pub struct ShaderCouple<'a> {
     pub pixel_shader: &'a str,
 }
 
-#[derive(Debug)]
+//#[derive(Debug)]
 pub struct Shaders<'a> {
+    display: &'a glium::Display,
     pub shaders_list: HashMap<&'a str, ShaderCouple<'a>>,
     compiled_shaders: HashMap<&'a str, Box<glium::program::Program>>,
 
@@ -30,7 +34,7 @@ pub struct Shaders<'a> {
 }
 
 impl<'a> Shaders<'a> {
-    pub fn new(textures: Vec<&'a [u8]>, display: &glium::Display) -> Shaders<'a> {
+    pub fn new(textures: Vec<&'a [u8]>, display: &'a glium::Display) -> Shaders<'a> {
         let mut hash = HashMap::new();
 
         hash.insert("simple_shader",
@@ -272,7 +276,7 @@ impl<'a> Shaders<'a> {
             let display = glium::HeadlessRenderer::new(context).unwrap();
 
 
-            let plop = watcher.watch(Path::new("./"), RecursiveMode::Recursive);
+            let files_watched = watcher.watch(Path::new("./content/shader_dev"), RecursiveMode::Recursive);
 
             loop {
                 match rx.recv() {
@@ -280,30 +284,40 @@ impl<'a> Shaders<'a> {
                         println!("{:?} {:?} ({:?})", op, path, cookie);
                         let extension = path.extension();
                         if extension == Some(OsStr::new("shader")) {
-                            let mut file = File::open(path.clone()).unwrap();
-                            let buff = BufReader::new(file);
-                            let mut vertex_shader = String::new();
-                            let mut pixel_shader = String::new();
+                            let mut file = File::open(path.clone());
+                            match file {
+                                Ok(file) => {
+                                    let mut buff = BufReader::new(file);
+                                    let mut raw_shader_data = Vec::new();
 
-                            let mut vert_or_pixel = 0;
+                                    buff.read_to_end(&mut raw_shader_data);
 
-                            for line in buff.lines() {
-                                let l = line.unwrap();
+                                    let string_shader_data = str::from_utf8(&raw_shader_data);
 
-                                //Si on atteint le séparateur on passe à l'étage shader suivant
-                                if l == "=================".to_string() {
-                                    vert_or_pixel = 1;
+                                    match string_shader_data {
+                                        Ok(string) => {
+                                            if string != "" {
+                                                let plop = String::from(string);
+                                                let s: Vec<&str> = plop.split("//=================").collect();
+                                                println!("Compilation shaders");
+                                                let program = glium::Program::from_source(&display, s.get(0).unwrap(), s.get(1).unwrap(), None);
+                                                match program {
+                                                    Ok(prog) => {
+                                                        println!("Compilation shaders réussi!");
+                                                        println!("Création du fichier fx");
+                                                        let binary = prog.get_binary();
+                                                        let mut file = File::create("./content/shader/shader.fx").unwrap();
+                                                        BufWriter::new(file).write_all(&binary.unwrap().content);
+                                                        println!("Fichier fx créé");
+                                                    }
+                                                    Err(e) => println!("Error compile : {:#?}", e),
+                                                }
+                                            }
+                                        }
+                                        Err(e) => println!("Erreur dans le fichier")
+                                    }
                                 }
-                                if vert_or_pixel == 0 {
-                                    vertex_shader.push_str(&l);
-                                } else {
-                                    pixel_shader.push_str(&l);
-                                }
-                            }
-                            let program = glium::Program::from_source(&display, &vertex_shader, &pixel_shader, None);
-                            match program {
-                                Ok(prog) => println!("pouet"),
-                                Err(E) => println!("{}", E.description()),
+                                Err(e) => println!("Error open shader file : {}", e.description()),
                             }
                         }
                     }
@@ -323,21 +337,56 @@ impl<'a> Shaders<'a> {
         }
 
         Shaders {
+            display: display,
             shaders_list: hash,
             compiled_shaders: hash_compiled,
             textures: textures,
         }
     }
 
-    pub fn compile_shaders(&mut self, display: &glium::Display) {
-        for (name, s) in self.shaders_list.iter() {
-            self.compiled_shaders.insert(name,
-                                         Box::new(glium::Program::from_source(display,
-                                                                              s.vertex_shader,
-                                                                              s.pixel_shader,
-                                                                              None)
-                                             .unwrap()));
-        }
+    pub fn find_compiled_shader(&self)  -> Receiver<glium::program::Binary> {
+        let (sender, receiver) = mpsc::channel();
+        let thread = thread::spawn(move || {
+            let (tx, rx) = channel();
+            let mut watcher: RecommendedWatcher = Watcher::new_raw(tx).unwrap();
+
+            let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
+
+            let display = glium::HeadlessRenderer::new(context).unwrap();
+
+
+            let files_watched = watcher.watch(Path::new("./content/shader"), RecursiveMode::Recursive);
+            loop {
+                match rx.recv() {
+                    Ok(notify::RawEvent { path: Some(path), op: Ok(op), cookie }) => {
+                        println!("{:?} {:?} ({:?})", op, path, cookie);
+                        let extension = path.extension();
+                        if extension == Some(OsStr::new("fx")) {
+                            let mut file = File::open(path.clone());
+
+                            match file {
+                                Ok(file) => {
+                                    let mut buff = BufReader::new(file);
+                                    let mut raw_shader_data = Vec::new();
+                                    buff.read_to_end(&mut raw_shader_data);
+                                    let binary = glium::program::Binary { format: 1, content: raw_shader_data };
+                                    sender.send(binary).unwrap();
+                                }
+                                Err(e) => println!("Fail to open shader fx file")
+                            }
+                        }
+                    }
+                    Ok(event) => println!("broken event: {:?}", event),
+                    Err(e) => println!("Fichier shader fx en erreur")
+                }
+            }
+        });
+        println!("plop");
+        receiver
+        //                let result_binary = receiver.recv().unwrap();
+        //        println!("{:?}", result_binary.content);
+
+        //            glium::Program::new(self.display, result_binary);
     }
 
     pub fn get_compiled_shader(&mut self, shader_name: &'a str) -> glium::program::Program {
