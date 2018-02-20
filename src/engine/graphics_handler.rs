@@ -3,7 +3,8 @@ extern crate time;
 
 extern crate cgmath;
 
-use engine::vertex::{Vertex, Normal};
+use std::collections::HashMap;
+use engine::vertex::{Vertex, Normal,TexCoords};
 use glium::Surface;
 use glium::PolygonMode;
 use engine::sprite::Sprite;
@@ -22,11 +23,11 @@ pub struct GraphicsHandler;
 
 impl GraphicsHandler {
     pub fn draw(display: &glium::Display,
-                ui_buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>),
+                ui_buffers: (glium::VertexBuffer<Vertex>, glium::VertexBuffer<TexCoords>,glium::IndexBuffer<u16>),
                 objects_textures: &glium::texture::Texture2dArray,
-                program: &Vec<glium::program::Program>,
+                programs: &HashMap<String, Box<glium::Program>>,
                 models: Vec<Box<Model>>,
-                instancied_thirdd_buffers: (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>),
+//                instancied_thirdd_buffers: (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>),
                 lights: Vec<Light>,
                 time: f64) {
         //--------------------------BUFFER-INIT-----------------------------//
@@ -55,9 +56,9 @@ impl GraphicsHandler {
         let output = &[("diffuse_output", diffuse_texture), ("normal_output", normal_texture), ("position_output", position_texture)];
         let mut output_buffer = glium::framebuffer::MultiOutputFrameBuffer::with_depth_buffer(display, output.iter().cloned(), &depth_text).unwrap();
 
-        let thirdd_vertex_buffer = instancied_thirdd_buffers.0;
-        let thirdd_normal_buffer = instancied_thirdd_buffers.1;
-        let thirdd_index_buffer = instancied_thirdd_buffers.2;
+//        let thirdd_vertex_buffer = instancied_thirdd_buffers.0;
+//        let thirdd_normal_buffer = instancied_thirdd_buffers.1;
+//        let thirdd_index_buffer = instancied_thirdd_buffers.2;
 
         let zfar = 1024.0;
         let znear = 0.1;
@@ -69,6 +70,7 @@ impl GraphicsHandler {
 
         //--------------------------DIFFUSE-START---------------------------//
         let world = Matrix4::identity();
+        //Rotation
         let world = world.mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
 
         let proj_view = Camera::fps(65.0, 800.0 / 600.0, 1.0, 2000.0, 0.0, 0.0, 0.0, Vector3 { x: 0.0, y: 0.0, z: 200.0 });
@@ -84,8 +86,8 @@ impl GraphicsHandler {
         );
 
         let thirdd_params = glium::DrawParameters {
-            //            polygon_mode: PolygonMode::Line,
-            draw_primitives: true,
+                        polygon_mode: PolygonMode::Line,
+//            draw_primitives: true,
             depth: glium::Depth {
                 test: glium::draw_parameters::DepthTest::IfLessOrEqual,
                 write: true,
@@ -107,8 +109,13 @@ impl GraphicsHandler {
         //---------------------------STENCIL-END---------------------------//
 
         //---------------------------DRAW-GEOMETRY-START----------------------//
-        output_buffer.clear_color_and_depth((0.0, 0.0, 0.0, 0.0), 1.0);
-        output_buffer.draw((&thirdd_vertex_buffer, &thirdd_normal_buffer), &thirdd_index_buffer, &program[2], &thirdd_uniform, &thirdd_params).unwrap();
+        output_buffer.clear_color_and_depth((1.0, 1.0, 1.0, 0.0), 1.0);
+        match programs.get("object_shader") {
+            Some(t) => {
+//                output_buffer.draw((&thirdd_vertex_buffer, &thirdd_normal_buffer), &thirdd_index_buffer, &t, &thirdd_uniform, &thirdd_params).unwrap();
+            }
+            None => ()
+        }
 
         for model in models {
             let model_matrix = proj_view.mul(model.get_matrix());
@@ -121,7 +128,13 @@ impl GraphicsHandler {
             );
 
             let buff = model.get_buffer(display);
-            output_buffer.draw((&buff.0, &buff.1), &buff.2, &program[2], &model_uniform, &thirdd_params).unwrap();
+
+            match programs.get("object_shader") {
+                Some(t) => {
+                    output_buffer.draw((&buff.0, &buff.1), &buff.2, &t, &model_uniform, &thirdd_params).unwrap();
+                }
+                None => ()
+            }
         }
         //---------------------------DRAW-GEOMETRY-END----------------------//
 
@@ -157,13 +170,13 @@ impl GraphicsHandler {
             blend: glium::Blend {
                 color: glium::BlendingFunction::Addition {
                     source: glium::LinearBlendingFactor::One,
-                    destination: glium::LinearBlendingFactor::One
+                    destination: glium::LinearBlendingFactor::One,
                 },
                 alpha: glium::BlendingFunction::Addition {
                     source: glium::LinearBlendingFactor::One,
-                    destination: glium::LinearBlendingFactor::One
+                    destination: glium::LinearBlendingFactor::One,
                 },
-                constant_value: (1.0, 1.0, 1.0, 1.0)
+                constant_value: (1.0, 1.0, 1.0, 1.0),
             },
             ..Default::default()
         };
@@ -179,14 +192,21 @@ impl GraphicsHandler {
                 light_color: light.color,
                 light_radius: light.radius,
             );
-            light_buffer.draw((&quad_vertex_buffer, &quad_tex_coords_buffer), &quad_index_buffer, &program[3], &light_uniform, &light_params).unwrap();
+
+            match programs.get("light_shader") {
+                Some(t) => {
+                    light_buffer.draw((&quad_vertex_buffer, &quad_tex_coords_buffer), &quad_index_buffer, &t, &light_uniform, &light_params).unwrap();
+                }
+                None => ()
+            }
         }
         //---------------------------DRAW-LIGHTS-END----------------------//
 
 
         //--------------------------UI-DRAW-START---------------------------//
         let ui_vertex_buffer = ui_buffers.0;
-        let ui_index_buffer = ui_buffers.1;
+        let ui_index_buffer = ui_buffers.2;
+        let ui_tex_coords_buffer = ui_buffers.1;
         let ui_uniform = uniform! {
                                 matrix: [
                                     [600.0/800.0, 0.0 , 0.0 , 0.0],
@@ -203,8 +223,15 @@ impl GraphicsHandler {
 
             ..Default::default()
         };
-        ui_buffer.clear_color(0.0f32, 0.0f32, 0.0f32, 1.0f32);
-        ui_buffer.draw(&ui_vertex_buffer, &ui_index_buffer, &program[1], &ui_uniform, &ui_params).unwrap();
+        ui_buffer.clear_color(0.0f32, 0.0f32, 0.0f32, 0.0f32);
+
+        match programs.get("sprite_shader") {
+            Some(t) => {
+                ui_buffer.draw((&ui_vertex_buffer,&ui_tex_coords_buffer), &ui_index_buffer, &t, &ui_uniform, &ui_params).unwrap();
+            }
+            None => ()
+        }
+
 
         //--------------------------UI-DRAW-END-----------------------------//
 
@@ -220,8 +247,13 @@ impl GraphicsHandler {
 
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
-        target.draw((&quad_vertex_buffer, &quad_tex_coords_buffer), &quad_index_buffer, &program[0], &uniforms, &Default::default())
-            .unwrap();
+        match programs.get("screen_shader") {
+            Some(program) => {
+                target.draw((&quad_vertex_buffer, &quad_tex_coords_buffer), &quad_index_buffer, program, &uniforms, &Default::default())
+                    .unwrap();
+            }
+            None => ()
+        }
 
         let errors = target.finish().unwrap();
 

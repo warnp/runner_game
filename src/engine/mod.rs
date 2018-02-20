@@ -29,3 +29,4 @@ pub mod camera;
 pub mod matrix_helper;
 pub mod teapot;
 pub mod foo_object;
+pub mod importer;

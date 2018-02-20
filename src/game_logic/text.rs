@@ -1,5 +1,5 @@
 use engine::generic_object::GenericObject;
-use engine::generic_object_type::GenericSpriteType;
+use engine::generic_object_type::GenericObjectType;
 
 pub struct Text {
     name: String,
@@ -20,8 +20,8 @@ impl Text {
 }
 
 impl GenericObject for Text {
-    fn get_type(&self) -> GenericSpriteType {
-        GenericSpriteType::TEXT
+    fn get_type(&self) -> GenericObjectType {
+        GenericObjectType::TEXT
     }
     fn get_position(&self) -> (f32, f32, f32) {
         (self.position[0], self.position[1], 0.0)

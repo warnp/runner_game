@@ -1,6 +1,5 @@
 #version 140
 
-
 in vec3 position;
 in vec2 tex_coords;
 
@@ -28,12 +27,12 @@ void main(){
 
   vec3 difftex = texture(diffuse_texture, frag_texcoord).rgb;
   vec3 lighttex = texture(light_texture, frag_texcoord).rgb;
-  vec3 uitex = texture(ui_texture, frag_texcoord).rgb;
+  vec4 uitex = texture(ui_texture, frag_texcoord).rgba;
 
-	if(uitex.r == 0){
-		color = vec4(difftex * lighttex, 1.0);
+	if(uitex.a > 0.0){
+		color = uitex;
 
 	}else{
-		color = vec4(difftex * lighttex, 1.0) + vec4(uitex, 1.0);
+		color = vec4(difftex * lighttex, 1.0);
 	}
 }

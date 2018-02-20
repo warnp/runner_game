@@ -7,9 +7,9 @@ use engine::graphics_handler::GraphicsHandler;
 use engine::generic_object::GenericObject;
 use engine::generic_control::GenericControl;
 use engine::text_writer::TextWriter;
-use engine::generic_object_type::GenericSpriteType;
+use engine::generic_object_type::GenericObjectType;
 use engine::input_manager::InputManager;
-use engine::model::{Cube,Model,Light};
+use engine::model::{Cube, Model, Light, Lod};
 use engine::object_manager::ObjectManager;
 use engine::vertex;
 use engine::teapot;
@@ -19,9 +19,9 @@ use std::sync::mpsc::Receiver;
 
 pub struct ModulesManager<'a> {
     display: &'a glium::Display,
-    program: Vec<glium::program::Program>,
     textures: glium::texture::Texture2dArray,
-    receiver: Receiver<glium::program::Binary>
+    shader_manager: Shaders<'a>,
+    object_manager: ObjectManager,
 }
 
 impl<'a> ModulesManager<'a> {
@@ -35,17 +35,18 @@ impl<'a> ModulesManager<'a> {
                                        &display);
 
 
-        let rx = shaders.find_compiled_shader();
-
         let textures = shaders.get_texture_array(&display);
+        let mut objects = ObjectManager::new();
+        objects.preload_object_list();
+
+        println!("Models {:#?}", objects.available_models);
+
+
         ModulesManager {
             display: display,
-            program: vec![shaders.get_compiled_shader("screen_shader"),
-                          shaders.get_compiled_shader("sprite_shader"),
-                          shaders.get_compiled_shader("object_shader"),
-                          shaders.get_compiled_shader("light_shader")],
             textures: textures,
-            receiver: rx
+            shader_manager: shaders,
+            object_manager: objects,
         }
     }
 
@@ -55,27 +56,35 @@ impl<'a> ModulesManager<'a> {
                 generics_controls: Vec<Box<GenericControl>>,
                 thirdd_objects: Vec<(f32, f32, f32)>, time: f64)
                 -> (&ModulesManager, Vec<&str>) {
-        match self.receiver.try_recv() {
-            Ok(t) => println!(" tape m'en 5"),
-            Err(e) => ()
-        }
 
+        //For debug!
+        self.shader_manager.update_program_list();
+        self.object_manager.update_realtime_objects_list();
 
+//        let available_objects = self.object_manager.get_objects_availables();
+
+        self.object_manager.update_loaded_model_list(generics_objects.iter()
+                .map(|element|element.get_name()).collect::<Vec<String>>());
+
+        self.object_manager.load_models_into_buffer();
+
+        let model_to_load = self.object_manager.available_models.iter().map(|x| Box::new(x.clone()) as Box<Model>).collect::<Vec<Box<Model>>>();
         let bunch_of_generic_sprite_objects =
             self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
         //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
-        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display,&teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display,glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
-            GraphicsHandler::draw(&self.display,
-                                  bunch_of_generic_sprite_objects,
-                                  &self.textures,
-                                  &self.program,
-                                  vec![Box::new( Cube::new("Toto".to_string(), 2.0, 0.0, 0.0, [1.0,0.0,0.0,1.0], (10.0, 10.0, 10.0)))],
-                                  bunch_of_thirdd_objects,
-                                  vec![Light{name: "lumiere".to_string(), intensity:128, position:(50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0},
+//        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display, &teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display, glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
+
+        GraphicsHandler::draw(&self.display,
+                              bunch_of_generic_sprite_objects,
+                              &self.textures,
+                              &self.shader_manager.compiled_programms,
+                              model_to_load,
+//                              bunch_of_thirdd_objects,
+                              vec![Light { name: "lumiere".to_string(), intensity: 128, position: (50.0, 10.0, 0.0, 0.0), attenuation: (1.0, 0.00124, 0.00001), color: (1.0, 1.0, 1.0), radius: 200.0 },
 //                                       Light{name: "lumiere".to_string(), intensity:128, position:(-50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0}
-                                  ],
-                                  time);
+                              ],
+                              time);
         (self, vec![])//InputManager::get_input( self.display))
     }
 
@@ -97,7 +106,7 @@ impl<'a> ModulesManager<'a> {
             order = i.get_order();
 
             match i.get_type() {
-                GenericSpriteType::SPRITE => {
+                GenericObjectType::SPRITE => {
                     result_vec.push(Sprite::new(name,
                                                 position.0,
                                                 position.1,
@@ -108,15 +117,18 @@ impl<'a> ModulesManager<'a> {
                                                 order));
                 }
 
-                GenericSpriteType::TEXT => {
+                GenericObjectType::TEXT => {
                     let text_writer = TextWriter::new(0,
                                                       (256, 256),
                                                       (16, 16),
-                                                      0.05,
+                                                      0.1,
                                                       (position.0, position.1),
                                                       &name,
                                                       true, order);
                     result_vec.extend_from_slice(&text_writer.get_string(description.as_str()));
+                }
+                GenericObjectType::STATIC_MESH => {
+
                 }
             }
         }
@@ -138,7 +150,7 @@ impl<'a> ModulesManager<'a> {
 mod tests {
     use super::*;
     use engine::generic_object::GenericObject;
-    use engine::generic_object_type::GenericSpriteType;
+    use engine::generic_object_type::GenericObjectType;
 
     #[derive(Debug)]
     struct ObjTest {
@@ -146,8 +158,8 @@ mod tests {
     }
 
     impl GenericObject for ObjTest {
-        fn get_type(&self) -> GenericSpriteType {
-            GenericSpriteType::SPRITE
+        fn get_type(&self) -> GenericObjectType {
+            GenericObjectType::SPRITE
         }
 
         fn get_position(&self) -> (f32, f32, f32) {

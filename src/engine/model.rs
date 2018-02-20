@@ -5,26 +5,62 @@ use engine::vertex::{Vertex, Normal};
 use engine::graphic_item::GraphicItem;
 use std::u16;
 use self::cgmath::prelude::*;
-use self::cgmath::{Matrix4,Vector3};
+use self::cgmath::{Matrix4, Vector3};
+use std::fmt::Debug;
+use std::sync::mpsc::channel;
+use std::sync::mpsc::Receiver;
+use std::io::BufReader;
+use std::fs::File;
 
-pub trait Model{
-    fn get_buffer(&self, display: &glium::Display) ->  (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>);
+
+
+pub trait Model: Debug {
+    fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>);
     fn set_matrix(&self, matrix: Matrix4<f32>);
     fn get_matrix(&self) -> Matrix4<f32>;
 }
 
 #[derive(Clone, Debug)]
+pub struct Lod {
+    pub level: i8,
+    pub mesh_name: String,
+    pub distance_max: f32,
+    pub distance_min: f32,
+}
+
+impl Lod {
+    pub fn new(mesh_name: String, lod_level: i8, distance_min: f32, distance_max: f32) -> Lod {
+        Lod {
+            mesh_name: mesh_name,
+            distance_max: distance_max,
+            distance_min: distance_min,
+            level: lod_level,
+        }
+    }
+
+    pub fn reset_buffer(self) -> Lod {
+        Lod {
+            mesh_name: self.mesh_name,
+            distance_max: self.distance_max,
+            distance_min: self.distance_min,
+            level: self.level,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Cube {
+    pub lods: Vec<Lod>,
+    pub name: String,
+    pub matrix: Matrix4<f32>,
     pub vertices: Vec<Vertex>,
     pub indices: Vec<u16>,
     pub normals: Vec<Normal>,
-    pub name: String,
-    pub matrix: Matrix4<f32>,
 }
 
-impl Model for Cube{
+impl Model for Cube {
     fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>) {
-        (glium::VertexBuffer::new(display, &self.vertices).unwrap(), glium::VertexBuffer::new(display,&self.normals).unwrap(), glium::IndexBuffer::new(display,glium::index::PrimitiveType::TrianglesList, &self.indices).unwrap())
+        (glium::VertexBuffer::new(display, &self.vertices).unwrap(), glium::VertexBuffer::new(display, &self.normals).unwrap(), glium::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &self.indices).unwrap())
     }
     fn set_matrix(&self, matrix: Matrix4<f32>) {
 //        self.matrix = matrix;
@@ -35,7 +71,6 @@ impl Model for Cube{
 }
 
 impl Cube {
-
     pub fn new(name: String,
                x: f32,
                y: f32,
@@ -43,94 +78,37 @@ impl Cube {
                color: [f32; 4],
                size: (f32, f32, f32)) -> Cube {
         Cube {
-            vertices: vec![
-                Vertex {
-                    position: (1.0, 1.0, -1.0),
-                },
-                Vertex {
-                    position: (-1.0, 1.0, -1.0),
-                },
-                Vertex {
-                    position: (1.0, 1.0, 1.0),
-                },
-                Vertex {
-                    position: (-1.0, 1.0, 1.0),
-                },
-                Vertex {
-                    position: (-1.0, -1.0, 1.0),
-                },
-                Vertex {
-                    position: (-1.0, 1.0, -1.0),
-                },
-                Vertex {
-                    position: (-1.0, -1.0, -1.0),
-                },
-                Vertex {
-                    position: (1.0, 1.0, -1.0),
-                },
-                Vertex {
-                    position: (1.0, -1.0, -1.0),
-                },
-                Vertex {
-                    position: (1.0, 1.0, 1.0),
-                },
-                Vertex {
-                    position: (1.0, -1.0, 1.0),
-                },
-                Vertex {
-                    position: (-1.0, -1.0, 1.0),
-                },
-                Vertex {
-                    position: (1.0, -1.0, -1.0),
-                },
-                Vertex {
-                    position: (-1.0, -1.0, -1.0),
-                }
-            ],
-            normals: vec![
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-                Normal{
-                    normal: (1.0,0.0,0.0)
-                },
-            ],
-            indices: vec![ 0, 1, 2, 0, 2, 3,
-                           4, 5, 6, 4, 6, 7,
-                           3, 2, 5, 3, 5, 4,
-                           2, 1, 6, 2, 6, 5,
-                           1, 7, 6, 1, 0, 7,
-                           0, 3, 4, 0, 4, 7u16
-            ],
+            lods: vec![],
             name: name,
-            matrix: Matrix4::from_translation(Vector3::new(x,y,z)),
+            matrix: Matrix4::from_nonuniform_scale(size.0, size.1, size.2) *
+                Matrix4::from_translation(Vector3::new(x, y, z)),
+            indices: vec![],
+            normals: vec![],
+            vertices: vec![],
         }
     }
 }
 
 pub struct Light {
     pub name: String,
-    pub  intensity: u8,
-    pub position: (f32,f32,f32,f32),
-    pub attenuation: (f32,f32,f32),
-    pub color: (f32,f32,f32),
-    pub radius: f32
+    pub intensity: u8,
+    pub position: (f32, f32, f32, f32),
+    pub attenuation: (f32, f32, f32),
+    pub color: (f32, f32, f32),
+    pub radius: f32,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use engine::model::Lod;
+
+    fn should_empty_buffer() {
+        let lod = Lod {
+            mesh_name: "toto".to_string(),
+        };
+
+        let lod = lod.reset_buffer();
+        assert!(lod.vertices.len() == 0);
+    }
 }

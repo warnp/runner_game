@@ -12,7 +12,10 @@ mod engine;
 use engine::engine_helper::EngineHelper;
 use engine::modules_manager::ModulesManager;
 use game_logic::text::Text;
+use engine::generic_object::GenericObject;
+use engine::generic_object_type::GenericObjectType;
 //use engine::input_manager::InputManager;
+
 
 
 //use glium::DisplayBuild;
@@ -26,6 +29,49 @@ use game_logic::logic_handler::LogicHandler;
 //use std::io::BufReader;
 //use rodio::Source;
 //use std::time::Duration;
+
+struct CubeObj {
+    pub position: (f32,f32,f32),
+    pub name: String,
+    pub texture: i32,
+    pub size: (f32,f32,f32),
+    pub texture_coordinate: ((f32,f32),(f32,f32),(f32,f32),(f32,f32))
+}
+
+
+impl GenericObject for CubeObj {
+    fn get_type(&self) -> GenericObjectType {
+        GenericObjectType::STATIC_MESH
+    }
+
+    fn get_position(&self) -> (f32, f32, f32) {
+        self.position
+    }
+
+    fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    fn get_description(&self) -> String {
+        "a description!".to_string()
+    }
+
+    fn get_texture_id(&self) -> i32 {
+        self.texture
+    }
+
+    fn get_size(&self) -> (f32, f32, f32) {
+        self.size
+    }
+
+    fn get_texture_coordinates(&self) -> ((f32, f32), (f32, f32), (f32, f32), (f32, f32)) {
+        self.texture_coordinate
+    }
+
+    fn get_order(&self) -> u8 {
+        0u8
+    }
+}
 
 fn main() {
     let screen_size = (800, 600);
@@ -66,7 +112,8 @@ fn main() {
 
         let local_keys = key_buf.clone();
         let res = modules_manager.draw(fps_timer.1,
-                                       &vec![Box::new(Text::new("fps".to_string(),[-0.5, 0.8], 255, "Salut".to_string()))],
+                                       &vec![Box::new(Text::new("fps".to_string(),[-0.5, 0.8], 255, "Salut".to_string())),
+                                             Box::new(CubeObj{position:(0.0,0.0,0.0), name:"test".to_string(), texture:0, texture_coordinate:((0.0,0.0),(0.0,1.0),(1.0,1.0),(1.0,0.0)),size:(1.0,1.0,1.0)})],
                                        vec![],
                                        vec![(0.0, 0.0, 1.0)], frames);
 

@@ -1,8 +1,8 @@
-use engine::generic_object_type::GenericSpriteType;
+use engine::generic_object_type::GenericObjectType;
 
 pub trait GenericObject{
     //fn key_reader(&self, key: &str);
-    fn get_type(&self) -> GenericSpriteType;
+    fn get_type(&self) -> GenericObjectType;
     fn get_position(&self) -> (f32,f32,f32);
     fn get_name(&self) -> String;
     fn get_description(&self) -> String;
@@ -15,7 +15,7 @@ pub trait GenericObject{
 impl <F: ?Sized> GenericObject for Box<F>
     where F: GenericObject
 {
-    fn get_type(&self) -> GenericSpriteType {
+    fn get_type(&self) -> GenericObjectType {
         (**self).get_type()
     }
 
