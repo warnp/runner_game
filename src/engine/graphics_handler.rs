@@ -86,7 +86,7 @@ impl GraphicsHandler {
         );
 
         let thirdd_params = glium::DrawParameters {
-                        polygon_mode: PolygonMode::Line,
+//                        polygon_mode: PolygonMode::Line,
 //            draw_primitives: true,
             depth: glium::Depth {
                 test: glium::draw_parameters::DepthTest::IfLessOrEqual,
@@ -119,6 +119,7 @@ impl GraphicsHandler {
 
         for model in models {
             let model_matrix = proj_view.mul(model.get_matrix());
+            let model_matrix = model_matrix * Matrix4::from_scale(10.0);
             let matrix: [[f32; 4]; 4] = array4x4(model_matrix);
 
             let model_uniform = uniform!(

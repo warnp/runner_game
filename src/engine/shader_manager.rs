@@ -35,6 +35,7 @@ pub struct Shaders<'a> {
 
 impl<'a> Shaders<'a> {
     pub fn new(textures: Vec<&'a [u8]>, display: &'a glium::Display) -> Shaders<'a> {
+        Shaders::first_shader_compile();
         let compiled_programs = Shaders::get_shader_from_files(display);
         Shaders::reader_shaders_sources();
 
@@ -48,7 +49,70 @@ impl<'a> Shaders<'a> {
     }
 
 
+    fn first_shader_compile() {
+        println!("1er compilation shader vers fx");
+        let path = Path::new("./content/shader_dev");
+
+        let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
+        let display = glium::HeadlessRenderer::new(context).unwrap();
+        for entry in path.read_dir().unwrap() {
+            println!("toto {:#?}", entry);
+            let file_path = &entry.unwrap().path();
+            let shader_name = file_path.file_stem().unwrap().to_str().unwrap().to_string();
+            let extension = file_path.extension();
+            if extension == Some(OsStr::new("shader")) {
+                let mut file = File::open(file_path.clone());
+                match file {
+                    Ok(file) => {
+                        let mut buff = BufReader::new(file);
+                        let mut raw_shader_data = Vec::new();
+
+                        buff.read_to_end(&mut raw_shader_data);
+
+                        let string_shader_data = str::from_utf8(&raw_shader_data);
+
+                        match string_shader_data {
+                            Ok(string) => {
+                                if string != "" {
+                                    let file_content = String::from(string);
+                                    let shader_source: Vec<&str> = file_content.split("//=================").collect();
+                                    println!("Compilation shaders");
+                                    let program = glium::Program::from_source(&display, shader_source.get(0).unwrap(), shader_source.get(1).unwrap(), None);
+                                    match program {
+                                        Ok(prog) => {
+                                            println!("Compilation shaders réussi!");
+                                            println!("Création du fichier fx");
+                                            let binary = prog.get_binary();
+                                            let mut fx_file_path = "./content/shader/".to_string();
+                                            fx_file_path.push_str(&shader_name);
+                                            let mut fx_file_path = fx_file_path.to_string();
+                                            fx_file_path.push_str(".fx");
+                                            let mut file = File::create(fx_file_path).unwrap();
+                                            BufWriter::new(file).write_all(&binary.unwrap().content);
+                                            println!("Fichier fx créé");
+                                        }
+                                        Err(e) => println!("Error compile : {:#?}", e),
+                                    }
+                                }
+                            }
+                            Err(e) => println!("Erreur dans le fichier")
+                        }
+                    }
+                    Err(e) => println!("Error open shader file : {}", e.description()),
+                }
+            }
+            else{
+
+                println!("Fichier non trouvé {}.{}", shader_name, extension.unwrap().to_str().unwrap());
+            }
+        }
+
+        println!("Initialisation de shader terminé!");
+
+    }
+
     pub fn update_program_list(&mut self) {
+        println!("Update program list");
         match self.receiver.try_recv() {
             Ok(t) => {
                 self.insert_program(t);
