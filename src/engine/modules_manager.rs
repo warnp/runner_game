@@ -1,4 +1,5 @@
 extern crate glium;
+extern crate cgmath;
 
 use engine::sprite::Sprite;
 use engine::shader_manager::Shaders;
@@ -10,11 +11,14 @@ use engine::text_writer::TextWriter;
 use engine::generic_object_type::GenericObjectType;
 use engine::input_manager::InputManager;
 use engine::model::{Cube, Model, Light, Lod};
+use engine::camera::Camera;
 use engine::object_manager::ObjectManager;
 use engine::vertex;
 use engine::teapot;
 use engine::foo_object;
 use std::sync::mpsc::Receiver;
+use self::cgmath::{Matrix4, Vector3};
+use engine::generic_camera::GenericCamera;
 
 
 pub struct ModulesManager<'a> {
@@ -54,8 +58,13 @@ impl<'a> ModulesManager<'a> {
                 delta_time: f64,
                 generics_objects: &Vec<Box<GenericObject>>,
                 generics_controls: Vec<Box<GenericControl>>,
+                generics_cameras: Vec<Box<GenericCamera>>,
                 thirdd_objects: Vec<(f32, f32, f32)>, time: f64)
                 -> (&ModulesManager, Vec<&str>) {
+
+        if generics_cameras.is_empty() {
+            panic!("No camera found!")
+        }
 
         //For debug!
         self.shader_manager.update_program_list();
@@ -64,7 +73,7 @@ impl<'a> ModulesManager<'a> {
 //        let available_objects = self.object_manager.get_objects_availables();
 
         self.object_manager.update_loaded_model_list(generics_objects.iter()
-                .map(|element|element.get_name()).collect::<Vec<String>>());
+            .map(|element| element.get_name()).collect::<Vec<String>>());
 
         self.object_manager.load_models_into_buffer();
 
@@ -74,6 +83,15 @@ impl<'a> ModulesManager<'a> {
 
         //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
 //        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display, &teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display, glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
+        let camera_conf = generics_cameras.get(0).unwrap();
+        let camera = Camera {
+            name: camera_conf.get_name(),
+            position: camera_conf.get_position(),
+            active: camera_conf.get_active(),
+            aspect: camera_conf.get_aspect(),
+            view_angle: camera_conf.get_view_angle(),
+            rotation: Camera::generate_rotation(0.0,0.0,0.0)
+        };
 
         GraphicsHandler::draw(&self.display,
                               bunch_of_generic_sprite_objects,
@@ -84,6 +102,7 @@ impl<'a> ModulesManager<'a> {
                               vec![Light { name: "lumiere".to_string(), intensity: 128, position: (50.0, 10.0, 0.0, 0.0), attenuation: (1.0, 0.00124, 0.00001), color: (1.0, 1.0, 1.0), radius: 200.0 },
 //                                       Light{name: "lumiere".to_string(), intensity:128, position:(-50.0,10.0,0.0,0.0),attenuation:(1.0,0.00124,0.00001), color:(1.0,1.0,1.0),radius:200.0}
                               ],
+                              camera,
                               time);
         (self, vec![])//InputManager::get_input( self.display))
     }
@@ -127,9 +146,7 @@ impl<'a> ModulesManager<'a> {
                                                       true, order);
                     result_vec.extend_from_slice(&text_writer.get_string(description.as_str()));
                 }
-                GenericObjectType::STATIC_MESH => {
-
-                }
+                GenericObjectType::STATIC_MESH => {}
             }
         }
         result_vec.sort_by(|a, b| a.order.cmp(&b.order));

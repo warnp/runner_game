@@ -1,3 +1,4 @@
+
 pub mod vertex;
 // use vertex::Vertex;
 pub mod sprite;
@@ -30,3 +31,4 @@ pub mod matrix_helper;
 pub mod teapot;
 pub mod foo_object;
 pub mod importer;
+pub mod generic_camera;

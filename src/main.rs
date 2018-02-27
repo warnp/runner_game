@@ -2,6 +2,7 @@
 extern crate glium;
 extern crate time;
 extern crate rand;
+extern crate cgmath;
 
 //extern crate rodio;
 
@@ -14,28 +15,17 @@ use engine::modules_manager::ModulesManager;
 use game_logic::text::Text;
 use engine::generic_object::GenericObject;
 use engine::generic_object_type::GenericObjectType;
-//use engine::input_manager::InputManager;
-
-
-
-//use glium::DisplayBuild;
 use game_logic::logic_handler::LogicHandler;
 
-//use std::sync::atomic::Ordering;
-//use std::sync::Arc;
-//use std::thread;
-
-//use std::fs::File;
-//use std::io::BufReader;
-//use rodio::Source;
-//use std::time::Duration;
+use engine::generic_camera::GenericCamera;
+use self::cgmath::{Matrix4, Vector3};
 
 struct CubeObj {
-    pub position: (f32,f32,f32),
+    pub position: (f32, f32, f32),
     pub name: String,
     pub texture: i32,
-    pub size: (f32,f32,f32),
-    pub texture_coordinate: ((f32,f32),(f32,f32),(f32,f32),(f32,f32))
+    pub size: (f32, f32, f32),
+    pub texture_coordinate: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
 }
 
 
@@ -73,6 +63,30 @@ impl GenericObject for CubeObj {
     }
 }
 
+struct CameraExtern {}
+
+impl GenericCamera for CameraExtern {
+    fn get_name(&self) -> String {
+        "first_cam".to_string()
+    }
+
+    fn get_position(&self) -> Matrix4<f32> {
+        Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 200.0 })
+    }
+
+    fn get_active(&self) -> bool {
+        true
+    }
+
+    fn get_aspect(&self) -> f32 {
+        800.0 / 600.0
+    }
+
+    fn get_view_angle(&self) -> f32 {
+        65.0
+    }
+}
+
 fn main() {
     let screen_size = (800, 600);
 
@@ -87,7 +101,7 @@ fn main() {
 
     //-----------Faire un handler pour les controls
     let mut events_loop = glium::glutin::EventsLoop::new();
-    let window = glium::glutin::WindowBuilder::new().with_dimensions(screen_size.0,screen_size.1);
+    let window = glium::glutin::WindowBuilder::new().with_dimensions(screen_size.0, screen_size.1);
     let context = glium::glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &events_loop)
         .unwrap();
@@ -106,15 +120,16 @@ fn main() {
 
 
     while !close {
-
         let fps_timer = engine_helper.get_fps();
 
 
         let local_keys = key_buf.clone();
+        let cam = CameraExtern{};
         let res = modules_manager.draw(fps_timer.1,
-                                       &vec![Box::new(Text::new("fps".to_string(),[-0.5, 0.8], 255, "Salut".to_string())),
-                                             Box::new(CubeObj{position:(0.0,0.0,0.0), name:"test".to_string(), texture:0, texture_coordinate:((0.0,0.0),(0.0,1.0),(1.0,1.0),(1.0,0.0)),size:(1.0,1.0,1.0)})],
+                                       &vec![Box::new(Text::new("fps".to_string(), [-0.5, 0.8], 255, "Salut".to_string())),
+                                             Box::new(CubeObj { position: (0.0, 0.0, 0.0), name: "test".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) })],
                                        vec![],
+                                       vec![Box::new(cam)],
                                        vec![(0.0, 0.0, 1.0)], frames);
 
         if res.1.len() > 0 {

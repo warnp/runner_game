@@ -4,7 +4,7 @@ extern crate time;
 extern crate cgmath;
 
 use std::collections::HashMap;
-use engine::vertex::{Vertex, Normal,TexCoords};
+use engine::vertex::{Vertex, Normal, TexCoords};
 use glium::Surface;
 use glium::PolygonMode;
 use engine::sprite::Sprite;
@@ -23,12 +23,13 @@ pub struct GraphicsHandler;
 
 impl GraphicsHandler {
     pub fn draw(display: &glium::Display,
-                ui_buffers: (glium::VertexBuffer<Vertex>, glium::VertexBuffer<TexCoords>,glium::IndexBuffer<u16>),
+                ui_buffers: (glium::VertexBuffer<Vertex>, glium::VertexBuffer<TexCoords>, glium::IndexBuffer<u16>),
                 objects_textures: &glium::texture::Texture2dArray,
                 programs: &HashMap<String, Box<glium::Program>>,
                 models: Vec<Box<Model>>,
 //                instancied_thirdd_buffers: (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>),
                 lights: Vec<Light>,
+                camera: Camera,
                 time: f64) {
         //--------------------------BUFFER-INIT-----------------------------//
         let ui_texture = &glium::texture::Texture2d::empty_with_format(display,
@@ -73,7 +74,7 @@ impl GraphicsHandler {
         //Rotation
         let world = world.mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
 
-        let proj_view = Camera::fps(65.0, 800.0 / 600.0, 1.0, 2000.0, 0.0, 0.0, 0.0, Vector3 { x: 0.0, y: 0.0, z: 200.0 });
+        let proj_view = camera.fps(1.0, 2000.0);
 
         let matrix = proj_view.mul(world);
 
@@ -228,7 +229,7 @@ impl GraphicsHandler {
 
         match programs.get("sprite_shader") {
             Some(t) => {
-                ui_buffer.draw((&ui_vertex_buffer,&ui_tex_coords_buffer), &ui_index_buffer, &t, &ui_uniform, &ui_params).unwrap();
+                ui_buffer.draw((&ui_vertex_buffer, &ui_tex_coords_buffer), &ui_index_buffer, &t, &ui_uniform, &ui_params).unwrap();
             }
             None => ()
         }
