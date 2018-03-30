@@ -1,6 +1,7 @@
 extern crate glium;
 extern crate cgmath;
 
+use std::collections::HashMap;
 use engine::vertex::{Vertex, Normal};
 use engine::graphic_item::GraphicItem;
 use std::u16;
@@ -15,7 +16,7 @@ use std::fs::File;
 
 
 pub trait Model: Debug {
-    fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>);
+    fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
     fn set_matrix(&self, matrix: Matrix4<f32>);
     fn get_matrix(&self) -> Matrix4<f32>;
 }
@@ -50,17 +51,17 @@ impl Lod {
 
 #[derive(Clone, Debug)]
 pub struct Cube {
-    pub lods: Vec<Lod>,
+    pub lods: HashMap<i8, Lod>,
     pub name: String,
     pub matrix: Matrix4<f32>,
     pub vertices: Vec<Vertex>,
     pub indices: Vec<u16>,
-    pub normals: Vec<Normal>,
 }
 
 impl Model for Cube {
-    fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::VertexBuffer<Normal>, glium::IndexBuffer<u16>) {
-        (glium::VertexBuffer::new(display, &self.vertices).unwrap(), glium::VertexBuffer::new(display, &self.normals).unwrap(), glium::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &self.indices).unwrap())
+    fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>) {
+        (glium::VertexBuffer::new(display, &self.vertices).unwrap(),
+         glium::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &self.indices).unwrap())
     }
     fn set_matrix(&self, matrix: Matrix4<f32>) {
 //        self.matrix = matrix;
@@ -78,15 +79,16 @@ impl Cube {
                color: [f32; 4],
                size: (f32, f32, f32)) -> Cube {
         Cube {
-            lods: vec![],
+            lods: HashMap::new(),
             name: name,
             matrix: Matrix4::from_nonuniform_scale(size.0, size.1, size.2) *
                 Matrix4::from_translation(Vector3::new(x, y, z)),
             indices: vec![],
-            normals: vec![],
             vertices: vec![],
         }
     }
+
+//    pub fn load
 }
 
 pub struct Light {

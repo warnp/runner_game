@@ -33,13 +33,12 @@ impl SpriteManager {
     }
 
 
-    pub fn get_buffers(&self, display: &glium::Display) -> (glium::VertexBuffer<vertex::Vertex>, glium::VertexBuffer<TexCoords>, glium::IndexBuffer<u16>) {
+    pub fn get_buffers(&self, display: &glium::Display) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
         let vertices_array = self.sprite_list_to_vertex_list();
         let index_list = self.sprite_list_to_indices_buffer();
-        let tex_coords_list = self.sprite_list_to_tex_coords_list();
+//        let tex_coords_list = self.sprite_list_to_tex_coords_list();
 
         (glium::VertexBuffer::dynamic(display, &vertices_array).unwrap(),
-         glium::VertexBuffer::new(display, &tex_coords_list).unwrap(),
          glium::index::IndexBuffer::new(display,
                                         glium::index::PrimitiveType::TrianglesList,
                                         &index_list)
@@ -48,7 +47,7 @@ impl SpriteManager {
 
     pub fn add_sprite(&mut self,
                       sprite: Sprite, display: &glium::Display)
-                      -> (glium::VertexBuffer<vertex::Vertex>, glium::VertexBuffer<TexCoords>,glium::IndexBuffer<u16>) {
+                      -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
         self.sprite_list.borrow_mut().push(sprite);
 
         self.get_buffers(display)
@@ -57,7 +56,7 @@ impl SpriteManager {
 
     pub fn delete_sprite(&mut self,
                          sprite_name: &str, display: &glium::Display)
-                         -> (glium::VertexBuffer<vertex::Vertex>, glium::VertexBuffer<TexCoords>,glium::IndexBuffer<u16>) {
+                         -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
         self.sprite_list.borrow_mut().retain(|x| x.name != sprite_name);
 
         self.get_buffers(display)
@@ -68,7 +67,7 @@ impl SpriteManager {
                        name: &str,
                        new_x: f32,
                        new_y: f32, display: &glium::Display)
-                       -> (glium::VertexBuffer<vertex::Vertex>, glium::VertexBuffer<TexCoords>,glium::IndexBuffer<u16>) {
+                       -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
 
         let res = tmp.iter_mut()
@@ -101,7 +100,7 @@ impl SpriteManager {
      name: &str,
      new_x: f32,
      new_y: f32, display: &glium::Display)
-     -> (glium::VertexBuffer<vertex::Vertex>, glium::VertexBuffer<TexCoords>,glium::IndexBuffer<u16>) {
+     -> (glium::VertexBuffer<vertex::Vertex>,glium::IndexBuffer<u16>) {
         let mut tmp = self.sprite_list.borrow_mut().clone();
 
         let mut sp = tmp.iter_mut()
@@ -174,17 +173,17 @@ impl SpriteManager {
         vertices_array
     }
 
-    fn sprite_list_to_tex_coords_list(&self) -> Vec<TexCoords> {
-        let mut tex_coords_array: Vec<TexCoords> = Vec::new();
-        for sprite in &*self.sprite_list.borrow_mut() {
-            tex_coords_array.push(sprite.tex_coords[0]);
-            tex_coords_array.push(sprite.tex_coords[1]);
-            tex_coords_array.push(sprite.tex_coords[2]);
-            tex_coords_array.push(sprite.tex_coords[3]);
-        }
-
-        tex_coords_array
-    }
+//    fn sprite_list_to_tex_coords_list(&self) -> Vec<TexCoords> {
+//        let mut tex_coords_array: Vec<TexCoords> = Vec::new();
+//        for sprite in &*self.sprite_list.borrow_mut() {
+//            tex_coords_array.push(sprite.tex_coords[0]);
+//            tex_coords_array.push(sprite.tex_coords[1]);
+//            tex_coords_array.push(sprite.tex_coords[2]);
+//            tex_coords_array.push(sprite.tex_coords[3]);
+//        }
+//
+//        tex_coords_array
+//    }
 
     fn sprite_list_to_indices_buffer(&self) -> Vec<u16> {
         let mut index_list = Vec::with_capacity(self.sprite_list.borrow_mut().len() * 6);

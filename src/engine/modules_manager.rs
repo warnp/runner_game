@@ -14,10 +14,8 @@ use engine::model::{Cube, Model, Light, Lod};
 use engine::camera::Camera;
 use engine::object_manager::ObjectManager;
 use engine::vertex;
-use engine::teapot;
-use engine::foo_object;
 use std::sync::mpsc::Receiver;
-use self::cgmath::{Matrix4, Vector3};
+use self::cgmath::{Matrix, Matrix4, Vector3};
 use engine::generic_camera::GenericCamera;
 
 
@@ -72,12 +70,8 @@ impl<'a> ModulesManager<'a> {
 
 //        let available_objects = self.object_manager.get_objects_availables();
 
-        self.object_manager.update_loaded_model_list(generics_objects.iter()
-            .map(|element| element.get_name()).collect::<Vec<String>>());
 
-        self.object_manager.load_models_into_buffer();
 
-        let model_to_load = self.object_manager.available_models.iter().map(|x| Box::new(x.clone()) as Box<Model>).collect::<Vec<Box<Model>>>();
         let bunch_of_generic_sprite_objects =
             self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
@@ -92,6 +86,12 @@ impl<'a> ModulesManager<'a> {
             view_angle: camera_conf.get_view_angle(),
             rotation: Camera::generate_rotation(0.0,0.0,0.0)
         };
+//        let dist = camera_position.distance(model_position);
+        self.object_manager.update_loaded_model_list(camera.position.row(2),generics_objects.iter()
+            .map(|element| element.get_name()).collect::<Vec<String>>());
+        self.object_manager.load_models_into_buffer();
+        let model_to_load = self.object_manager.available_models.iter().map(|x| Box::new(x.clone()) as Box<Model>).collect::<Vec<Box<Model>>>();
+
 
         GraphicsHandler::draw(&self.display,
                               bunch_of_generic_sprite_objects,

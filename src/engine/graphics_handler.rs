@@ -17,13 +17,14 @@ use self::cgmath::conv::*;
 use self::cgmath::perspective;
 use self::cgmath::PerspectiveFov;
 use self::cgmath::{Deg, Rad};
+use self::cgmath::MetricSpace;
 use std::ops::Mul;
 
 pub struct GraphicsHandler;
 
 impl GraphicsHandler {
     pub fn draw(display: &glium::Display,
-                ui_buffers: (glium::VertexBuffer<Vertex>, glium::VertexBuffer<TexCoords>, glium::IndexBuffer<u16>),
+                ui_buffers: (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>),
                 objects_textures: &glium::texture::Texture2dArray,
                 programs: &HashMap<String, Box<glium::Program>>,
                 models: Vec<Box<Model>>,
@@ -71,11 +72,10 @@ impl GraphicsHandler {
 
         //--------------------------DIFFUSE-START---------------------------//
         let world = Matrix4::identity();
-        //Rotation
-        let world = world.mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
+
 
         let proj_view = camera.fps(1.0, 2000.0);
-
+        let camera_position = camera.position.row(2);
         let matrix = proj_view.mul(world);
 
         let matrix: [[f32; 4]; 4] = array4x4(matrix);
@@ -119,8 +119,16 @@ impl GraphicsHandler {
         }
 
         for model in models {
-            let model_matrix = proj_view.mul(model.get_matrix());
-            let model_matrix = model_matrix * Matrix4::from_scale(10.0);
+//            let model_position = model.get_matrix().clone().row(2);
+
+//            println!("distance {:#?}", dist);
+//Rotation
+            let model_matrix = model.get_matrix().mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
+            let world = Matrix4::from_angle_y(Rad((time as f32 * 0.001))).invert().unwrap();
+            let model_matrix = proj_view.mul(model_matrix);
+            let model_matrix = model_matrix * Matrix4::from_scale(50.0);
+//            let world = Matrix4::identity();
+            let world: [[f32; 4]; 4] = array4x4(world);
             let matrix: [[f32; 4]; 4] = array4x4(model_matrix);
 
             let model_uniform = uniform!(
@@ -133,7 +141,7 @@ impl GraphicsHandler {
 
             match programs.get("object_shader") {
                 Some(t) => {
-                    output_buffer.draw((&buff.0, &buff.1), &buff.2, &t, &model_uniform, &thirdd_params).unwrap();
+                    output_buffer.draw(&buff.0, &buff.1, &t, &model_uniform, &thirdd_params).unwrap();
                 }
                 None => ()
             }
@@ -160,7 +168,7 @@ impl GraphicsHandler {
                                  0);
 
         let quad_vertex_buffer = glium::VertexBuffer::dynamic(display, &screen.vertices).unwrap();
-        let quad_tex_coords_buffer = glium::VertexBuffer::new(display, &screen.tex_coords).unwrap();
+//        let quad_tex_coords_buffer = glium::VertexBuffer::new(display, &screen.tex_coords).unwrap();
         let quad_index_buffer = glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList,
                                                                &screen.indices)
             .unwrap();
@@ -197,7 +205,7 @@ impl GraphicsHandler {
 
             match programs.get("light_shader") {
                 Some(t) => {
-                    light_buffer.draw((&quad_vertex_buffer, &quad_tex_coords_buffer), &quad_index_buffer, &t, &light_uniform, &light_params).unwrap();
+                    light_buffer.draw(&quad_vertex_buffer, &quad_index_buffer, &t, &light_uniform, &light_params).unwrap();
                 }
                 None => ()
             }
@@ -207,8 +215,8 @@ impl GraphicsHandler {
 
         //--------------------------UI-DRAW-START---------------------------//
         let ui_vertex_buffer = ui_buffers.0;
-        let ui_index_buffer = ui_buffers.2;
-        let ui_tex_coords_buffer = ui_buffers.1;
+        let ui_index_buffer = ui_buffers.1;
+//        let ui_tex_coords_buffer = ui_buffers.1;
         let ui_uniform = uniform! {
                                 matrix: [
                                     [600.0/800.0, 0.0 , 0.0 , 0.0],
@@ -229,7 +237,7 @@ impl GraphicsHandler {
 
         match programs.get("sprite_shader") {
             Some(t) => {
-                ui_buffer.draw((&ui_vertex_buffer, &ui_tex_coords_buffer), &ui_index_buffer, &t, &ui_uniform, &ui_params).unwrap();
+                ui_buffer.draw(&ui_vertex_buffer, &ui_index_buffer, &t, &ui_uniform, &ui_params).unwrap();
             }
             None => ()
         }
@@ -251,7 +259,7 @@ impl GraphicsHandler {
 
         match programs.get("screen_shader") {
             Some(program) => {
-                target.draw((&quad_vertex_buffer, &quad_tex_coords_buffer), &quad_index_buffer, program, &uniforms, &Default::default())
+                target.draw(&quad_vertex_buffer, &quad_index_buffer, program, &uniforms, &Default::default())
                     .unwrap();
             }
             None => ()
