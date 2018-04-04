@@ -52,32 +52,45 @@ impl ObjectManager {
     pub fn update_loaded_model_list(&mut self, camera_position: Vector4<f32>, model_to_load_names: Vec<String>) {
         println!("look for mesh");
 //Trouver l'ensemble des mesh à afficher déjà présent dans le buffer
-        let mut model_to_load = self.available_models.clone().into_iter()
-            .filter(|x| model_to_load_names
-                .contains(&x.name))
-            .collect::<Vec<Cube>>();
+        let mut model_to_load = &mut self.available_models.clone();
+//        let mut model_to_load = &mut self.available_models.clone().into_iter()
+//            .filter(|x| model_to_load_names
+//                .contains(&x.name))
+//            .collect::<Vec<Cube>>();
 
 //        println!("toto {:#?}", model_to_load);
 //Comparer avec la liste de modèles à charger
         let mut path = "./content/objects/{}/{}";
-        for model in model_to_load {
+        for model in model_to_load.iter_mut() {
+
             println!("Begin loading model");
             let (sender, receiver) = mpsc::channel();
             self.models_loader_receiver.push(receiver);
             //TODO Gérer les niveau de details plus haut
-            let object_name = model.name;
+            let object_name = &model.name;
 
-
+            let mut lod_level_to_load = -1;
             let mesh_name = {
-                if camera_position.distance(model.matrix.row(2).clone()) > 200.0 {
-                    &model.lods.get(&0i8).unwrap().mesh_name
-                }else{
-                    &model.lods.get(&0i8).unwrap().mesh_name
+                let distance = camera_position.distance(model.matrix.row(2).clone());
+                println!("distance {}", distance);
+                if distance > 200.0 {
+                    lod_level_to_load = 1i8;
+                    model.lods.get(&1i8).unwrap().clone().mesh_name
+                } else {
+                    lod_level_to_load = 0i8;
+                    model.lods.get(&0i8).unwrap().clone().mesh_name
                 }
             };
 
-            let path_string = format!("./content/objects/{}/{}", object_name, mesh_name);
+            if model.actual_lod == lod_level_to_load {
+                println!("No need to reload model");
+                return;
 
+            }
+
+            model.actual_lod = lod_level_to_load;
+
+            let path_string = format!("./content/objects/{}/{}", object_name, mesh_name);
             println!("model to be loaded {}", path_string);
 
             thread::spawn(move || {
@@ -93,10 +106,7 @@ impl ObjectManager {
 
                     match file {
                         Ok(file) => {
-
                             let mut buff = BufReader::new(file);
-//                            let mut raw_object_data = vec![];
-//                            buff.read_to_end(&mut raw_object_data);
                             let obj_content = ObjImporter::import(buff);
                             sender.send((object_name, obj_content)).unwrap();
                         }
@@ -105,14 +115,15 @@ impl ObjectManager {
                 };
             });
         }
+
+        self.available_models = model_to_load.to_vec();
+
     }
 
     pub fn load_models_into_buffer(&mut self) {
-
         for receiver in &self.models_loader_receiver {
             match receiver.try_recv() {
                 Ok(t) => {
-
                     let mut cubes = self.available_models.iter_mut()
                         .filter(|x| *x.name == t.0.split('_').collect::<Vec<&str>>().get(0).unwrap().to_string())
                         .collect::<Vec<&mut Cube>>();
@@ -127,8 +138,6 @@ impl ObjectManager {
 //                    model.normals = t.1 .2;
 
                     model.matrix = Matrix4::identity();
-
-
                 }
                 Err(e) => {
 //                    println!("Erreur chargement modèle {:#?}", e)

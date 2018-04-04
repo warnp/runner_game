@@ -15,6 +15,7 @@ use engine::camera::Camera;
 use engine::object_manager::ObjectManager;
 use engine::vertex;
 use std::sync::mpsc::Receiver;
+use std::cell::RefCell;
 use self::cgmath::{Matrix, Matrix4, Vector3};
 use engine::generic_camera::GenericCamera;
 
@@ -90,7 +91,10 @@ impl<'a> ModulesManager<'a> {
         self.object_manager.update_loaded_model_list(camera.position.row(2),generics_objects.iter()
             .map(|element| element.get_name()).collect::<Vec<String>>());
         self.object_manager.load_models_into_buffer();
-        let model_to_load = self.object_manager.available_models.iter().map(|x| Box::new(x.clone()) as Box<Model>).collect::<Vec<Box<Model>>>();
+        let model_to_load = self.object_manager.available_models
+            .iter()
+            .map(|x| RefCell::new(Box::new(x.clone())) as RefCell<Box<Model>>)
+            .collect::<Vec<RefCell<Box<Model>>>>();
 
 
         GraphicsHandler::draw(&self.display,

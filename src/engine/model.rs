@@ -56,6 +56,7 @@ pub struct Cube {
     pub matrix: Matrix4<f32>,
     pub vertices: Vec<Vertex>,
     pub indices: Vec<u16>,
+    pub actual_lod: i8
 }
 
 impl Model for Cube {
@@ -85,10 +86,10 @@ impl Cube {
                 Matrix4::from_translation(Vector3::new(x, y, z)),
             indices: vec![],
             vertices: vec![],
+            actual_lod: -1
         }
     }
 
-//    pub fn load
 }
 
 pub struct Light {

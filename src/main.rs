@@ -63,7 +63,10 @@ impl GenericObject for CubeObj {
     }
 }
 
-struct CameraExtern {}
+#[derive(Clone)]
+struct CameraExtern {
+    position: Matrix4<f32>,
+}
 
 impl GenericCamera for CameraExtern {
     fn get_name(&self) -> String {
@@ -71,7 +74,8 @@ impl GenericCamera for CameraExtern {
     }
 
     fn get_position(&self) -> Matrix4<f32> {
-        Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 200.0 })
+        self.position
+//        Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 250.0 })
     }
 
     fn get_active(&self) -> bool {
@@ -118,13 +122,19 @@ fn main() {
     let mut close = false;
     let mut frames = 0.0;
 
+    let cam = CameraExtern { position: Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 250.0 }) };
 
+    let mut pos = 250.0;
     while !close {
+        pos -= 0.1;
+        let mut cam = cam.clone();
+        cam.position = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: pos });
+
         let fps_timer = engine_helper.get_fps();
 
 
         let local_keys = key_buf.clone();
-        let cam = CameraExtern{};
+
         let res = modules_manager.draw(fps_timer.1,
                                        &vec![Box::new(Text::new("fps".to_string(), [-0.5, 0.8], 255, "Salut".to_string())),
                                              Box::new(CubeObj { position: (0.0, 0.0, 0.0), name: "test".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) })],
