@@ -18,7 +18,8 @@ use std::sync::mpsc::Receiver;
 use std::cell::RefCell;
 use self::cgmath::{Matrix, Matrix4, Vector3};
 use engine::generic_camera::GenericCamera;
-
+use engine::controls::key_action::AnyKeyAction;
+use std::rc::Rc;
 
 pub struct ModulesManager<'a> {
     display: &'a glium::Display,
@@ -56,12 +57,13 @@ impl<'a> ModulesManager<'a> {
     pub fn draw(&mut self,
                 delta_time: f64,
                 generics_objects: &Vec<Box<GenericObject>>,
-                generics_controls: Vec<Box<GenericControl>>,
-                generics_cameras: Vec<Box<GenericCamera>>,
+                generics_controls: Vec<Box<AnyKeyAction>>,
+                generics_cameras: RefCell<Vec<Box<GenericCamera>>>,
                 thirdd_objects: Vec<(f32, f32, f32)>, time: f64)
                 -> (&ModulesManager, Vec<&str>) {
 
-        if generics_cameras.is_empty() {
+        let t1 = generics_cameras.borrow();
+        if t1.is_empty() {
             panic!("No camera found!")
         }
 
@@ -71,6 +73,11 @@ impl<'a> ModulesManager<'a> {
 
 //        let available_objects = self.object_manager.get_objects_availables();
 
+        for c in generics_controls {
+            let plop = generics_cameras.borrow();
+            c.execute_action(plop.to_vec());
+        }
+
 
 
         let bunch_of_generic_sprite_objects =
@@ -78,7 +85,8 @@ impl<'a> ModulesManager<'a> {
 
         //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
 //        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display, &teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display, glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
-        let camera_conf = generics_cameras.get(0).unwrap();
+        let plop = generics_cameras.borrow();
+        let camera_conf = plop.get(0).unwrap();
         let camera = Camera {
             name: camera_conf.get_name(),
             position: camera_conf.get_position(),

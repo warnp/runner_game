@@ -16,6 +16,8 @@ use game_logic::text::Text;
 use engine::generic_object::GenericObject;
 use engine::generic_object_type::GenericObjectType;
 use game_logic::logic_handler::LogicHandler;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use engine::generic_camera::GenericCamera;
 use self::cgmath::{Matrix4, Vector3};
@@ -89,6 +91,9 @@ impl GenericCamera for CameraExtern {
     fn get_view_angle(&self) -> f32 {
         65.0
     }
+    fn box_clone(&self) -> Box<GenericCamera> {
+        Box::new((*self).clone())
+    }
 }
 
 fn main() {
@@ -124,9 +129,21 @@ fn main() {
 
     let cam = CameraExtern { position: Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 250.0 }) };
 
+
+
     let mut pos = 250.0;
     while !close {
-        pos -= 0.1;
+
+        let key_press = engine::controls::key_action::KeyAction{
+            key: "A".to_string(),
+            action: move |x| {
+                for cam in x {
+                    println!("camera {}", cam.get_name())
+                }
+            }
+        };
+
+
         let mut cam = cam.clone();
         cam.position = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: pos });
 
@@ -138,8 +155,8 @@ fn main() {
         let res = modules_manager.draw(fps_timer.1,
                                        &vec![Box::new(Text::new("fps".to_string(), [-0.5, 0.8], 255, "Salut".to_string())),
                                              Box::new(CubeObj { position: (0.0, 0.0, 0.0), name: "test".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) })],
-                                       vec![],
-                                       vec![Box::new(cam)],
+                                       vec![Box::new(key_press)],
+                                       RefCell::new(vec![Box::new(cam)]),
                                        vec![(0.0, 0.0, 1.0)], frames);
 
         if res.1.len() > 0 {

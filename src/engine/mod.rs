@@ -30,3 +30,4 @@ pub mod camera;
 pub mod matrix_helper;
 pub mod importer;
 pub mod generic_camera;
+pub mod controls;
