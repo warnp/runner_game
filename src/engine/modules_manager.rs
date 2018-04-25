@@ -26,6 +26,8 @@ pub struct ModulesManager<'a> {
     textures: glium::texture::Texture2dArray,
     shader_manager: Shaders<'a>,
     object_manager: ObjectManager,
+    event_loop: glium::glutin::EventsLoop,
+
 }
 
 impl<'a> ModulesManager<'a> {
@@ -51,6 +53,8 @@ impl<'a> ModulesManager<'a> {
             textures: textures,
             shader_manager: shaders,
             object_manager: objects,
+            event_loop: glium::glutin::EventsLoop::new(),
+
         }
     }
 
@@ -59,9 +63,8 @@ impl<'a> ModulesManager<'a> {
                 generics_objects: &Vec<Box<GenericObject>>,
                 generics_controls: Vec<Box<AnyKeyAction>>,
                 generics_cameras: RefCell<Vec<Box<GenericCamera>>>,
-                thirdd_objects: Vec<(f32, f32, f32)>, time: f64)
-                -> (&ModulesManager, Vec<&str>) {
-
+                thirdd_objects: Vec<(f32, f32, f32)>, time: f64, event_loop: &mut glium::glutin::EventsLoop)
+                -> (&ModulesManager, Vec<&str>, Vec<Box<GenericCamera>>) {
         let t1 = generics_cameras.borrow();
         if t1.is_empty() {
             panic!("No camera found!")
@@ -72,12 +75,29 @@ impl<'a> ModulesManager<'a> {
         self.object_manager.update_realtime_objects_list();
 
 //        let available_objects = self.object_manager.get_objects_availables();
-
+        //Handle controls
+        let mut cams = generics_cameras.borrow().to_vec();
         for c in generics_controls {
-            let plop = generics_cameras.borrow();
-            c.execute_action(plop.to_vec());
-        }
+            event_loop.poll_events(|ev| {
+                match ev {
+                    glium::glutin::Event::WindowEvent {
+                        event, ..
+                    } => match event {
+                        glium::glutin::WindowEvent::KeyboardInput {
+                            input, ..
+                        } => {
+                            println!("{:?}", input);
 
+                            if input.scancode == 72 {
+                                cams = c.execute_action(generics_cameras.borrow().to_vec());
+                            }
+                        }
+                        _ => (),
+                    },
+                    _ => (),
+                }
+            });
+        }
 
 
         let bunch_of_generic_sprite_objects =
@@ -85,18 +105,20 @@ impl<'a> ModulesManager<'a> {
 
         //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
 //        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display, &teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display, glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
-        let plop = generics_cameras.borrow();
-        let camera_conf = plop.get(0).unwrap();
+
+        //Camera handler
+        let cams_clone = cams.clone();
+        let camera_conf = cams_clone.get(0).unwrap();
         let camera = Camera {
             name: camera_conf.get_name(),
             position: camera_conf.get_position(),
             active: camera_conf.get_active(),
             aspect: camera_conf.get_aspect(),
             view_angle: camera_conf.get_view_angle(),
-            rotation: Camera::generate_rotation(0.0,0.0,0.0)
+            rotation: Camera::generate_rotation(0.0, 0.0, 0.0),
         };
-//        let dist = camera_position.distance(model_position);
-        self.object_manager.update_loaded_model_list(camera.position.row(2),generics_objects.iter()
+
+        self.object_manager.update_loaded_model_list(camera.position.row(2), generics_objects.iter()
             .map(|element| element.get_name()).collect::<Vec<String>>());
         self.object_manager.load_models_into_buffer();
         let model_to_load = self.object_manager.available_models
@@ -116,7 +138,7 @@ impl<'a> ModulesManager<'a> {
                               ],
                               camera,
                               time);
-        (self, vec![])//InputManager::get_input( self.display))
+        (self, vec![], cams)//InputManager::get_input( self.display))
     }
 
     pub fn generic_sprite_object_interpretor(&self,

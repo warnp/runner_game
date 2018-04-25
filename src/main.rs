@@ -77,7 +77,10 @@ impl GenericCamera for CameraExtern {
 
     fn get_position(&self) -> Matrix4<f32> {
         self.position
-//        Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 250.0 })
+    }
+
+    fn set_position(&mut self, position: Matrix4<f32>) {
+        self.position = position;
     }
 
     fn get_active(&self) -> bool {
@@ -128,24 +131,31 @@ fn main() {
     let mut frames = 0.0;
 
     let cam = CameraExtern { position: Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 250.0 }) };
-
-
+    let mut cameras = vec![Box::new(cam) as Box<GenericCamera>];
 
     let mut pos = 250.0;
     while !close {
-
-        let key_press = engine::controls::key_action::KeyAction{
+        let key_press = engine::controls::key_action::KeyAction {
             key: "A".to_string(),
             action: move |x| {
-                for cam in x {
-                    println!("camera {}", cam.get_name())
+                let mut plop = vec![];
+                for cam in &x {
+                    let mut camera = cam.clone();
+                    if camera.get_name() == "first_cam" {
+                        let pos = camera.get_position() * Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: -0.5 });
+                        camera.set_position(pos);
+                        plop.push(camera);
+                        continue;
+                    }
                 }
-            }
+
+                plop
+            },
         };
 
 
-        let mut cam = cam.clone();
-        cam.position = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: pos });
+//        let mut cam = cam.clone();
+//        cam.position = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: pos });
 
         let fps_timer = engine_helper.get_fps();
 
@@ -156,9 +166,9 @@ fn main() {
                                        &vec![Box::new(Text::new("fps".to_string(), [-0.5, 0.8], 255, "Salut".to_string())),
                                              Box::new(CubeObj { position: (0.0, 0.0, 0.0), name: "test".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) })],
                                        vec![Box::new(key_press)],
-                                       RefCell::new(vec![Box::new(cam)]),
-                                       vec![(0.0, 0.0, 1.0)], frames);
-
+                                       RefCell::new(cameras),
+                                       vec![(0.0, 0.0, 1.0)], frames, &mut events_loop);
+        cameras = res.2;
         if res.1.len() > 0 {
             key_buf.push(res.1[0].to_string().clone());
         };
@@ -173,25 +183,25 @@ fn main() {
         };
 
         frames = frames + 1.0;
-        events_loop.poll_events(|ev| {
-            match ev {
-                glium::glutin::Event::WindowEvent {
-                    event, ..
-                } => match event {
-                    glium::glutin::WindowEvent::Closed => close = true,
-                    glium::glutin::WindowEvent::KeyboardInput {
-                        input, ..
-                    } => {
-                        println!("{:?}", input);
-
-                        if input.scancode == 1 {
-                            close = true;
-                        }
-                    }
-                    _ => (),
-                },
-                _ => (),
-            }
-        });
+//        events_loop.poll_events(|ev| {
+//            match ev {
+//                glium::glutin::Event::WindowEvent {
+//                    event, ..
+//                } => match event {
+//                    glium::glutin::WindowEvent::Closed => close = true,
+//                    glium::glutin::WindowEvent::KeyboardInput {
+//                        input, ..
+//                    } => {
+//                        println!("{:?}", input);
+//
+//                        if input.scancode == 1 {
+//                            close = true;
+//                        }
+//                    }
+//                    _ => (),
+//                },
+//                _ => (),
+//            }
+//        });
     }
 }
