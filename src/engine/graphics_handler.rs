@@ -111,7 +111,7 @@ impl GraphicsHandler {
         //---------------------------STENCIL-END---------------------------//
 
         //---------------------------DRAW-GEOMETRY-START----------------------//
-        output_buffer.clear_color_and_depth((1.0, 1.0, 1.0, 0.0), 1.0);
+        output_buffer.clear_color_and_depth((0.0, 0.0, 0.0, 0.0), 1.0);
         match programs.get("object_shader") {
             Some(t) => {
 //                output_buffer.draw((&thirdd_vertex_buffer, &thirdd_normal_buffer), &thirdd_index_buffer, &t, &thirdd_uniform, &thirdd_params).unwrap();
@@ -132,9 +132,12 @@ impl GraphicsHandler {
             let world: [[f32; 4]; 4] = array4x4(world);
             let matrix: [[f32; 4]; 4] = array4x4(model_matrix);
 
+//            println!("plop {:#?}", model);
+
             let model_uniform = uniform!(
                 u_matrix: matrix,
                 u_world: world,
+                tex: objects_textures,
 
             );
 
@@ -169,7 +172,6 @@ impl GraphicsHandler {
                                  0);
 
         let quad_vertex_buffer = glium::VertexBuffer::dynamic(display, &screen.vertices).unwrap();
-//        let quad_tex_coords_buffer = glium::VertexBuffer::new(display, &screen.tex_coords).unwrap();
         let quad_index_buffer = glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList,
                                                                &screen.indices)
             .unwrap();
@@ -217,7 +219,6 @@ impl GraphicsHandler {
         //--------------------------UI-DRAW-START---------------------------//
         let ui_vertex_buffer = ui_buffers.0;
         let ui_index_buffer = ui_buffers.1;
-//        let ui_tex_coords_buffer = ui_buffers.1;
         let ui_uniform = uniform! {
                                 matrix: [
                                     [600.0/800.0, 0.0 , 0.0 , 0.0],

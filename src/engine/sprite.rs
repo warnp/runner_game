@@ -11,11 +11,8 @@ extern crate glium;
 pub struct Sprite {
     pub vertices: [Vertex; 4],
     pub indices: [u16; 6],
-    pub name: String, /* pub transform: [[f32; 4]; 4],
-                        * pub display: &glium::glutin::WindowBuilder, */
+    pub name: String,
     pub order: u8,
-//    pub tex_coords: [TexCoords;4],
-//    pub normal: [Normal;4]
 }
 
 impl Sprite {
@@ -33,38 +30,33 @@ impl Sprite {
                            position: (-0.5 * size.0 + x, 0.5 * size.1 + y,0.0),
                            normal: (0.0, 0.0, -1.0),
 //                           color: color,
-                           tex_coords: [tex_coord.0 .0, tex_coord.0 .1],
+                           tex_coords: (tex_coord.0 .0, tex_coord.0 .1),
 //                           i_tex_id: tex_id,
                        },
                        Vertex {
                            position: (0.5 * size.0 + x, 0.5 * size.1 + y,0.0),
                            normal: (0.0, 0.0, -1.0),
 //                           color: color,
-                           tex_coords: [tex_coord.1 .0, tex_coord.1 .1],
+                           tex_coords: (tex_coord.1 .0, tex_coord.1 .1),
 //                           i_tex_id: tex_id,
                        },
                        Vertex {
                            position: (0.5 * size.0 + x, -0.5 * size.1 + y,0.0),
                            normal: (0.0, 0.0, -1.0),
 //                           color: color,
-                           tex_coords: [tex_coord.2 .0, tex_coord.2 .1],
+                           tex_coords: (tex_coord.2 .0, tex_coord.2 .1),
 //                           i_tex_id: tex_id,
                        },
                        Vertex {
                            position: (-0.5 * size.0 + x, -0.5 * size.1 + y,0.0),
                            normal: (0.0, 0.0, -1.0),
 //                           color: color,
-                           tex_coords: [tex_coord.3 .0, tex_coord.3 .1],
+                           tex_coords: (tex_coord.3 .0, tex_coord.3 .1),
 //                           i_tex_id: tex_id,
                        }],
             indices: [0, 1, 2, 0, 2, 3],
             name: name, // transform: transform,
             order: order,
-//            tex_coords: [ TexCoords { tex_coords: (tex_coord.0 .0, tex_coord.0 .1)},
-//                TexCoords { tex_coords: (tex_coord.1 .0, tex_coord.1 .1)},
-//                TexCoords { tex_coords: (tex_coord.2 .0, tex_coord.2 .1)},
-//                TexCoords { tex_coords: (tex_coord.3 .0, tex_coord.3 .1)}],
-//            normal: [Normal {normal:(0.0, 0.0, -1.0)},Normal {normal:(0.0, 0.0, -1.0)},Normal {normal:(0.0, 0.0, -1.0)},Normal {normal:(0.0, 0.0, -1.0)}]
         }
 
     }

@@ -24,6 +24,7 @@ use self::cgmath::conv::*;
 use self::cgmath::perspective;
 use self::cgmath::PerspectiveFov;
 use self::cgmath::{Deg, Rad};
+use engine::RESOURCES_PATH;
 
 extern crate glium;
 
@@ -53,6 +54,7 @@ impl ObjectManager {
         println!("look for mesh");
 //Trouver l'ensemble des mesh à afficher déjà présent dans le buffer
         let mut model_to_load = &mut self.available_models.clone();
+        println!("size {}", model_to_load.len());
 //        let mut model_to_load = &mut self.available_models.clone().into_iter()
 //            .filter(|x| model_to_load_names
 //                .contains(&x.name))
@@ -60,9 +62,14 @@ impl ObjectManager {
 
 //        println!("toto {:#?}", model_to_load);
 //Comparer avec la liste de modèles à charger
-        let mut path = "./content/objects/{}/{}";
+//        let mut path = {
+//            if Path::new("./content/objects").exists() {
+//                "./content/objects/{}/{}"
+//            } else {
+//                "../../content/objects/{}/{}"
+//            }
+//        };
         for model in model_to_load.iter_mut() {
-
             println!("Begin loading model");
             let (sender, receiver) = mpsc::channel();
             self.models_loader_receiver.push(receiver);
@@ -81,16 +88,18 @@ impl ObjectManager {
                     model.lods.get(&0i8).unwrap().clone().mesh_name
                 }
             };
-
+            println!("actual lod {}", model.actual_lod);
+            println!("lod level {}", lod_level_to_load);
             if model.actual_lod == lod_level_to_load {
                 println!("No need to reload model");
                 return;
-
             }
 
             model.actual_lod = lod_level_to_load;
 
-            let path_string = format!("./content/objects/{}/{}", object_name, mesh_name);
+            let path_string = format!("{}/objects/{}/{}", RESOURCES_PATH,object_name, mesh_name);
+
+
             println!("model to be loaded {}", path_string);
 
             thread::spawn(move || {
@@ -117,7 +126,6 @@ impl ObjectManager {
         }
 
         self.available_models = model_to_load.to_vec();
-
     }
 
     pub fn load_models_into_buffer(&mut self) {
@@ -138,6 +146,7 @@ impl ObjectManager {
 //                    model.normals = t.1 .2;
 
                     model.matrix = Matrix4::identity();
+                    println!("hello there {:#?}", model);
                 }
                 Err(e) => {
 //                    println!("Erreur chargement modèle {:#?}", e)
@@ -158,7 +167,8 @@ impl ObjectManager {
     }
 
     pub fn preload_object_list(&mut self) -> Result<(), Error> {
-        let path = Path::new("./content/objects");
+        let p = RESOURCES_PATH.to_string() + "/objects";
+        let path = Path::new(&p);
         if path.is_dir() {
             let content = fs::read_dir(path)?;
             for entry in content {
@@ -202,8 +212,9 @@ impl ObjectManager {
         let thread = thread::spawn(move || {
             let (tx, rx) = channel();
             let mut watcher: RecommendedWatcher = Watcher::new_raw(tx).unwrap();
+            let p = RESOURCES_PATH.to_string() + "/objects";
 
-            let files_watched = watcher.watch(Path::new("./content/objects"), RecursiveMode::Recursive);
+            let files_watched = watcher.watch(Path::new(&p), RecursiveMode::Recursive);
             loop {
                 match rx.recv() {
                     Ok(notify::RawEvent { path: Some(path), op: Ok(op), cookie }) => {

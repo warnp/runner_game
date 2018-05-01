@@ -3,7 +3,7 @@ pub struct Vertex {
     pub position: (f32, f32, f32),
     pub normal: (f32, f32, f32),
     //    pub color: [f32; 4],
-        pub tex_coords: [f32; 2],
+    pub tex_coords: (f32, f32),
     //    pub i_tex_id: u32,
 }
 

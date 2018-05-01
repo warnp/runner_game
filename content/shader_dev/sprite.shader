@@ -1,4 +1,4 @@
-#version 140
+#version 330
 
 in vec3 position;
 in vec3 normal;
@@ -19,7 +19,7 @@ uniform mat4 matrix;
 	//v_tex_id = i_tex_id;
 }
 //=================
-#version 140
+#version 330
 
 in vec4 colorV;
 in vec2 v_tex_coords;

@@ -17,6 +17,7 @@ use std::borrow::Borrow;
 use std::str;
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
+use engine::RESOURCES_PATH;
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct ShaderCouple<'a> {
@@ -51,7 +52,9 @@ impl<'a> Shaders<'a> {
 
     fn first_shader_compile() {
         println!("1er compilation shader vers fx");
-        let path = Path::new("./content/shader_dev");
+        let p = RESOURCES_PATH.to_string()+ "/shader_dev";
+        println!("{}",p);
+        let path = Path::new(&p);
 
         let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
         let display = glium::HeadlessRenderer::new(context).unwrap();
@@ -83,7 +86,8 @@ impl<'a> Shaders<'a> {
                                             println!("Compilation shaders réussi!");
                                             println!("Création du fichier fx");
                                             let binary = prog.get_binary();
-                                            let mut fx_file_path = "./content/shader/".to_string();
+                                            let mut fx_file_path = RESOURCES_PATH.to_string()+"/shader/";
+
                                             fx_file_path.push_str(&shader_name);
                                             let mut fx_file_path = fx_file_path.to_string();
                                             fx_file_path.push_str(".fx");
@@ -100,15 +104,12 @@ impl<'a> Shaders<'a> {
                     }
                     Err(e) => println!("Error open shader file : {}", e.description()),
                 }
-            }
-            else{
-
+            } else {
                 println!("Fichier non trouvé {}.{}", shader_name, extension.unwrap().to_str().unwrap());
             }
         }
 
         println!("Initialisation de shader terminé!");
-
     }
 
     pub fn update_program_list(&mut self) {
@@ -181,7 +182,8 @@ impl<'a> Shaders<'a> {
 
     pub fn get_shader_from_files(display: &glium::Display) -> HashMap<String, Box<glium::Program>> {
         let mut result: HashMap<String, Box<glium::Program>> = HashMap::new();
-        let paths = fs::read_dir("./content/shader/").unwrap();
+        let shader_path = RESOURCES_PATH.to_string() + "/shader/";
+        let paths = fs::read_dir(shader_path).unwrap();
         for path_dir in paths {
             match path_dir {
                 Ok(dir) => {

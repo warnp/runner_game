@@ -22,6 +22,7 @@ use std::rc::Rc;
 use engine::generic_camera::GenericCamera;
 use self::cgmath::{Matrix4, Vector3};
 
+
 struct CubeObj {
     pub position: (f32, f32, f32),
     pub name: String,

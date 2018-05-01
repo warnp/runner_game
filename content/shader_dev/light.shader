@@ -1,4 +1,4 @@
-#version 140
+#version 330
 
 in vec3 position;
 in vec2 tex_coords;
@@ -12,7 +12,7 @@ void main(){
 	gl_Position = matrix * vec4(position,1.0);
 }
 //=================
-#version 140
+#version 330
 
 uniform sampler2D position_texture;
 uniform sampler2D normal_texture;
