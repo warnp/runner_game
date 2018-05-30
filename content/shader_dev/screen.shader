@@ -29,11 +29,11 @@ void main(){
   vec3 lighttex = texture(light_texture, frag_texcoord).rgb;
   vec4 uitex = texture(ui_texture, frag_texcoord).rgba;
 
-	//if(uitex.a > 0.0){
-	//	color = uitex;
+	if(uitex.a > 0.0){
+		color = uitex;
 
-	//}else{
+	}else{
 		//color = vec4(difftex * lighttex, 1.0);
 		color = vec4(difftex , 1.0);
-	//}
+	}
 }

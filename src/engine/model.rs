@@ -12,12 +12,12 @@ use std::sync::mpsc::channel;
 use std::sync::mpsc::Receiver;
 use std::io::BufReader;
 use std::fs::File;
-
+use std::cell::RefCell;
 
 
 pub trait Model: Debug {
     fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
-    fn set_matrix(&self, matrix: Matrix4<f32>);
+    fn set_matrix(&mut self, matrix: Matrix4<f32>);
     fn get_matrix(&self) -> Matrix4<f32>;
 }
 
@@ -50,43 +50,48 @@ impl Lod {
 }
 
 #[derive(Clone, Debug)]
-pub struct Cube {
+pub struct StaticMesh {
     pub lods: HashMap<i8, Lod>,
     pub name: String,
     pub matrix: Matrix4<f32>,
     pub vertices: Vec<Vertex>,
     pub indices: Vec<u16>,
-    pub actual_lod: i8
+    pub actual_lod: i8,
+
 }
 
-impl Model for Cube {
+impl PartialEq for StaticMesh {
+    fn eq(&self, other: &StaticMesh) -> bool {
+        self.name == other.name
+    }
+}
+
+impl Model for StaticMesh {
     fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>) {
         (glium::VertexBuffer::new(display, &self.vertices).unwrap(),
          glium::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &self.indices).unwrap())
     }
-    fn set_matrix(&self, matrix: Matrix4<f32>) {
-//        self.matrix = matrix;
+    fn set_matrix(&mut self, matrix: Matrix4<f32>) {
+        self.matrix = matrix;
     }
     fn get_matrix(&self) -> Matrix4<f32> {
         self.matrix
     }
 }
 
-impl Cube {
+impl StaticMesh {
     pub fn new(name: String,
-               x: f32,
-               y: f32,
-               z: f32,
-               color: [f32; 4],
-               size: (f32, f32, f32)) -> Cube {
-        Cube {
+               matrix: Matrix4<f32>,
+               color: [f32; 4]) -> StaticMesh {
+
+        StaticMesh {
             lods: HashMap::new(),
             name: name,
-            matrix: Matrix4::from_nonuniform_scale(size.0, size.1, size.2) *
-                Matrix4::from_translation(Vector3::new(x, y, z)),
+            matrix: matrix,
             indices: vec![],
             vertices: vec![],
-            actual_lod: -1
+            actual_lod: -1,
+
         }
     }
 

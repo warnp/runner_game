@@ -1,5 +1,7 @@
 use engine::generic_object::GenericObject;
 use engine::generic_object_type::GenericObjectType;
+use std::rc::Rc;
+use cgmath::{Matrix4, Vector3};
 
 #[derive(Clone, Debug)]
 pub struct Actor {
@@ -9,10 +11,17 @@ pub struct Actor {
     size: [f32; 2],
     texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
     order: u8,
+//    parent: Option<Box<GenericObject>>,
 }
 
 impl Actor {
-    pub fn new(name: String, position: [f32; 2], image: i32, size: [f32; 2], texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)), order: u8) -> Actor {
+    pub fn new(name: String,
+               position: [f32; 2],
+               image: i32,
+               size: [f32; 2],
+               texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
+               order: u8,
+               parent: Option<Box<GenericObject>>) -> Actor {
         Actor {
             name: name,
             position: position,
@@ -20,6 +29,7 @@ impl Actor {
             size: size,
             texture_coordinates: texture_coordinates,
             order: order,
+            //parent:parent,
         }
     }
 }
@@ -27,9 +37,6 @@ impl Actor {
 impl GenericObject for Actor {
     fn get_type(&self) -> GenericObjectType {
         GenericObjectType::SPRITE
-    }
-    fn get_position(&self) -> (f32, f32, f32) {
-        (self.position[0], self.position[1], 0.0)
     }
     fn get_name(&self) -> String {
         (&self.name).to_string()
@@ -49,6 +56,20 @@ impl GenericObject for Actor {
     fn get_order(&self) -> u8 {
         self.order
     }
+    fn get_mesh(&self) -> String {
+        unimplemented!()
+    }
+    fn get_matrix(&self) -> Matrix4<f32> {
+
+        Matrix4::from_translation(
+            Vector3{
+                x:self.position[0],
+                y:self.position[1],
+                z:0.0,
+            }
+        )
+
+    }
 }
 
 
@@ -60,7 +81,7 @@ mod tests {
 
 
     fn get_actor() -> Actor {
-        Actor::new("an_actor".to_string(), [0.0, 0.0], 0, [1.0, 1.0], ((), ()), 0)
+        Actor::new("an_actor".to_string(), [0.0, 0.0], 0, [1.0, 1.0], ((), ()), 0, None)
     }
 
     #[test]

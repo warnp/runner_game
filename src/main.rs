@@ -20,25 +20,23 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use engine::generic_camera::GenericCamera;
-use self::cgmath::{Matrix4, Vector3};
+use self::cgmath::{Matrix4, Vector3, Rad};
+use self::cgmath::prelude::*;
 
-
+#[derive(Clone)]
 struct CubeObj {
-    pub position: (f32, f32, f32),
     pub name: String,
     pub texture: i32,
     pub size: (f32, f32, f32),
     pub texture_coordinate: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
+    pub mesh: String,
+    pub matrix: Matrix4<f32>,
 }
 
 
 impl GenericObject for CubeObj {
     fn get_type(&self) -> GenericObjectType {
         GenericObjectType::STATIC_MESH
-    }
-
-    fn get_position(&self) -> (f32, f32, f32) {
-        self.position
     }
 
     fn get_name(&self) -> String {
@@ -63,6 +61,12 @@ impl GenericObject for CubeObj {
 
     fn get_order(&self) -> u8 {
         0u8
+    }
+    fn get_mesh(&self) -> String {
+        self.mesh.clone()
+    }
+    fn get_matrix(&self) -> Matrix4<f32> {
+        self.matrix
     }
 }
 
@@ -135,6 +139,12 @@ fn main() {
     let mut cameras = vec![Box::new(cam) as Box<GenericCamera>];
 
     let mut pos = 250.0;
+
+    let mut titi_pos = (0.0, 0.0, 0.0);
+
+    let mut toto = CubeObj { matrix: Matrix4::identity(), mesh: "test".to_string(), name: "toto".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) };
+    let mut titi = CubeObj { matrix: Matrix4::identity(), mesh: "wheel".to_string(), name: "titi".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) };
+let mut pouet = 10.0;
     while !close {
         let key_press = engine::controls::key_action::KeyAction {
             key: "A".to_string(),
@@ -154,18 +164,36 @@ fn main() {
             },
         };
 
-
-//        let mut cam = cam.clone();
-//        cam.position = Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: pos });
-
         let fps_timer = engine_helper.get_fps();
 
 
         let local_keys = key_buf.clone();
 
+        let toto_matrix = Matrix4::from_translation(Vector3 { x: -100.0, y: -20.0, z: 0.0 });
+
+        let titi_matrix = Matrix4::from_translation(Vector3 { x: -40.0, y: 0.0, z: 25.0 });
+
+        let f = frames;
+
+        let plop = Matrix4::from_angle_y(Rad(pouet * 0.001));
+        pouet = pouet + 1.0;
+        let toto_matrix = toto_matrix * plop;
+
+        let titi_matrix = toto_matrix * titi_matrix;
+
+
+        let mut toto = toto.clone();
+        let mut titi = titi.clone();
+
+        toto.matrix = toto_matrix;
+        titi.matrix = titi_matrix;
+
+        let toto = Box::new(toto);
+        let titi = Box::new(titi);
         let res = modules_manager.draw(fps_timer.1,
-                                       &vec![Box::new(Text::new("fps".to_string(), [-0.5, 0.8], 255, "Salut".to_string())),
-                                             Box::new(CubeObj { position: (0.0, 0.0, 0.0), name: "test".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) })],
+                                       &vec![Box::new(Text::new("fps".to_string(), [0.0, 0.0], 255, "Salut".to_string())),
+//                                             Box::new(CubeObj { position: (0.0, 0.0, 0.0), name: "test".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) }),
+                                             titi, toto],
                                        vec![Box::new(key_press)],
                                        RefCell::new(cameras),
                                        vec![(0.0, 0.0, 1.0)], frames, &mut events_loop);

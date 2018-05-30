@@ -10,7 +10,7 @@ use engine::generic_control::GenericControl;
 use engine::text_writer::TextWriter;
 use engine::generic_object_type::GenericObjectType;
 use engine::input_manager::InputManager;
-use engine::model::{Cube, Model, Light, Lod};
+use engine::model::{StaticMesh, Model, Light, Lod};
 use engine::camera::Camera;
 use engine::object_manager::ObjectManager;
 use engine::vertex;
@@ -43,10 +43,8 @@ impl<'a> ModulesManager<'a> {
 
         let textures = shaders.get_texture_array(&display);
         let mut objects = ObjectManager::new();
-        objects.preload_object_list();
-
-        println!("Models {:#?}", objects.available_models);
-
+        //Ca charge tout les objets disponibles, pas glop
+//        objects.preload_object_list();
 
         ModulesManager {
             display: display,
@@ -103,9 +101,14 @@ impl<'a> ModulesManager<'a> {
         let bunch_of_generic_sprite_objects =
             self.generic_sprite_object_interpretor(generics_objects).get_buffers(self.display);
 
-        //        let bunch_of_thirdd_objects = self.thirdd_object_interpretor(thirdd_objects);
-//        let bunch_of_thirdd_objects = (glium::VertexBuffer::new(self.display, &teapot::VERTICES).unwrap(), glium::VertexBuffer::new(self.display, &teapot::NORMALS).unwrap(), glium::IndexBuffer::new(self.display, glium::index::PrimitiveType::TrianglesList, &teapot::INDICES).unwrap());
+        //Retourne le nom, la position et la texture de l'objet
+        let bunch_of_generic_mesh = generics_objects.iter()
+            .filter(|x| x.get_type() == GenericObjectType::STATIC_MESH)
+            .map(|x| (x.get_name(), x.get_matrix(), x.get_texture_id(), x.get_mesh()))
+            .collect::<Vec<(String, Matrix4<f32>, i32, String)>>();
 
+
+        self.object_manager.update_object_list(bunch_of_generic_mesh);
         //Camera handler
         let cams_clone = cams.clone();
         let camera_conf = cams_clone.get(0).unwrap();
@@ -145,19 +148,22 @@ impl<'a> ModulesManager<'a> {
                                              generic_object: &Vec<Box<GenericObject>>)
                                              -> SpriteManager {
         let mut result_vec = Vec::new();
-        let mut name: String;
-        let mut position: (f32, f32, f32);
-        let mut description: String;
-        let mut texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32));
-        let mut order: u8;
+//        let mut name: String;
+//        let mut position: (f32, f32, f32);
+//        let mut description: String;
+//        let mut texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32));
+//        let mut order: u8;
         //TODO Ajouter un ordonnanceur de sprites
         for i in generic_object {
-            name = i.get_name();
-            position = i.get_position();
-            description = i.get_description();
-            texture_coordinates = i.get_texture_coordinates();
-            order = i.get_order();
+            let name = i.get_name();
 
+            let pos_vec1 = i.get_matrix().row(0);
+            let pos_vec2 = i.get_matrix().row(1);
+
+            let position = (pos_vec1.w, pos_vec2.w, 0.0);
+            let description = i.get_description();
+            let texture_coordinates = i.get_texture_coordinates();
+            let order = i.get_order();
             match i.get_type() {
                 GenericObjectType::SPRITE => {
                     result_vec.push(Sprite::new(name,
@@ -185,15 +191,6 @@ impl<'a> ModulesManager<'a> {
         }
         result_vec.sort_by(|a, b| a.order.cmp(&b.order));
         SpriteManager::new(result_vec)
-    }
-
-    pub fn thirdd_object_interpretor(&self, thirdd_objects: Vec<(f32, f32, f32)>) -> (glium::VertexBuffer<vertex::Vertex>, glium::IndexBuffer<u16>) {
-        let mut result_vec = Vec::new();
-
-        for e in thirdd_objects {
-            result_vec.push(Cube::new("cube".to_string(), e.0, e.1, e.2, [1.0, 0.0, 0.0, 0.0], (1.0, 1.0, 1.0)));
-        }
-        ObjectManager::get_buffers(&self.display, result_vec)
     }
 }
 

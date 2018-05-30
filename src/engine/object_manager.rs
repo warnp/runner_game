@@ -3,7 +3,7 @@ extern crate notify;
 extern crate cgmath;
 
 use std::collections::HashMap;
-use engine::model::{Cube, Lod, Model};
+use engine::model::{StaticMesh, Lod, Model};
 use engine::vertex::{Vertex, Normal};
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
@@ -13,11 +13,11 @@ use std::ffi::OsStr;
 use std::io;
 use std::fs::{self, File, DirEntry};
 use std::path::Path;
+use std::rc::Rc;
 use std::io::prelude::*;
 use std::io::{BufReader, BufWriter, Cursor, Error};
 use self::notify::{RecommendedWatcher, Watcher, RecursiveMode};
 use engine::importer::obj_importer::ObjImporter;
-use std::cell::RefCell;
 use self::cgmath::{Matrix4, Vector3, Vector4, Point3};
 use self::cgmath::prelude::*;
 use self::cgmath::conv::*;
@@ -31,7 +31,7 @@ extern crate glium;
 #[derive(Debug)]
 pub struct ObjectManager {
     receiver: Receiver<(String, BufReader<File>)>,
-    pub available_models: Vec<Cube>,
+    pub available_models: Vec<StaticMesh>,
     pub models_loader_receiver: Vec<Receiver<(String, (Vec<Vertex>, Vec<u16>))>>,
 }
 
@@ -45,9 +45,9 @@ impl ObjectManager {
     }
 
     pub fn update_lod(&mut self, camera_position: Vector3<f32>) {
-        for el in &self.available_models {
+//        for el in &self.available_models.borrow().into_iter() {
 //el.
-        }
+//        }
     }
 
     pub fn update_loaded_model_list(&mut self, camera_position: Vector4<f32>, model_to_load_names: Vec<String>) {
@@ -55,22 +55,9 @@ impl ObjectManager {
 //Trouver l'ensemble des mesh à afficher déjà présent dans le buffer
         let mut model_to_load = &mut self.available_models.clone();
         println!("size {}", model_to_load.len());
-//        let mut model_to_load = &mut self.available_models.clone().into_iter()
-//            .filter(|x| model_to_load_names
-//                .contains(&x.name))
-//            .collect::<Vec<Cube>>();
 
-//        println!("toto {:#?}", model_to_load);
-//Comparer avec la liste de modèles à charger
-//        let mut path = {
-//            if Path::new("./content/objects").exists() {
-//                "./content/objects/{}/{}"
-//            } else {
-//                "../../content/objects/{}/{}"
-//            }
-//        };
         for model in model_to_load.iter_mut() {
-            println!("Begin loading model");
+            println!("Begin loading model {}", model.name);
             let (sender, receiver) = mpsc::channel();
             self.models_loader_receiver.push(receiver);
             //TODO Gérer les niveau de details plus haut
@@ -88,7 +75,6 @@ impl ObjectManager {
                     model.lods.get(&0i8).unwrap().clone().mesh_name
                 }
             };
-            println!("actual lod {}", model.actual_lod);
             println!("lod level {}", lod_level_to_load);
             if model.actual_lod == lod_level_to_load {
                 println!("No need to reload model");
@@ -97,7 +83,7 @@ impl ObjectManager {
 
             model.actual_lod = lod_level_to_load;
 
-            let path_string = format!("{}/objects/{}/{}", RESOURCES_PATH,object_name, mesh_name);
+            let path_string = format!("{}/objects/{}/{}", RESOURCES_PATH, object_name, mesh_name);
 
 
             println!("model to be loaded {}", path_string);
@@ -117,6 +103,7 @@ impl ObjectManager {
                         Ok(file) => {
                             let mut buff = BufReader::new(file);
                             let obj_content = ObjImporter::import(buff);
+                            println!("Obj loaded");
                             sender.send((object_name, obj_content)).unwrap();
                         }
                         Err(e) => println!("Fail to open obj file")
@@ -134,7 +121,7 @@ impl ObjectManager {
                 Ok(t) => {
                     let mut cubes = self.available_models.iter_mut()
                         .filter(|x| *x.name == t.0.split('_').collect::<Vec<&str>>().get(0).unwrap().to_string())
-                        .collect::<Vec<&mut Cube>>();
+                        .collect::<Vec<&mut StaticMesh>>();
 
                     let mut model = match cubes.get_mut(0) {
                         Some(m) => m,
@@ -145,8 +132,7 @@ impl ObjectManager {
                     model.indices = t.1 .1;
 //                    model.normals = t.1 .2;
 
-                    model.matrix = Matrix4::identity();
-                    println!("hello there {:#?}", model);
+//                    model.matrix = Matrix4::identity();
                 }
                 Err(e) => {
 //                    println!("Erreur chargement modèle {:#?}", e)
@@ -159,7 +145,7 @@ impl ObjectManager {
         match self.receiver.try_recv() {
             Ok(mut t) => {
                 let mut line = String::new();
-                println!("{}", t.1.read_line(&mut line).unwrap());
+                println!("hi there {}", t.1.read_line(&mut line).unwrap());
                 //TODO compute mesh (async?)
             }
             Err(e) => {}
@@ -183,7 +169,7 @@ impl ObjectManager {
                         Some(t) => t.to_string(),
                         None => continue,
                     };
-                    let mut cube = Cube::new(dir_name, 0., 0., 0., [0., 0., 0., 0.], (0., 0., 0.));
+                    let mut cube = StaticMesh::new(dir_name, Matrix4::identity(), [0., 0., 0., 0.]);
                     let inner = fs::read_dir(dir_path.clone())?;
                     for file in inner {
                         let f = file?.path();
@@ -243,11 +229,64 @@ impl ObjectManager {
         receiver
     }
 
+    pub fn update_object_list(&mut self, gens: Vec<(String, Matrix4<f32>, i32, String)>) -> Result<(), Error> {
+        let p = RESOURCES_PATH.to_string() + "/objects/";
+        for object_name in &gens {
+
+            //TODO ajouter la suppression d'un modèle
+            if self.available_models.iter().map(|x| x.clone().name).collect::<Vec<String>>().contains(&object_name.3) {
+                //TODO Gérer seulement la cas ou c'est une modification
+                let available_models = self.available_models.iter().filter(|x| x.name == object_name.3).map(|x| x.clone()).collect::<Vec<StaticMesh>>();
+                let model_extracted = available_models.get(0).unwrap();
+                let index = self.available_models.iter().position(|x| x.name == model_extracted.name).unwrap();
+                self.available_models.remove(index);
+
+                let mut mut_model_extracted = model_extracted.clone();
+                let matrix = model_extracted.matrix;
+                mut_model_extracted.matrix = object_name.1;
+                self.available_models.push(mut_model_extracted);
+            } else {
+                let temp_p = &p;
+                let object_path = temp_p.to_string() + &object_name.3;
+                let path = Path::new(&object_path);
+                if path.is_dir() {
+
+//                    let parent_name = match object_name.4 {
+//                        Some(t)=> t,
+//                        None => "".to_string()
+//                    };
+
+                    let mut mesh = StaticMesh::new((&object_name.3).to_string(), object_name.1, [0., 0., 0., 0.]);
+                    let inner = fs::read_dir(path.clone())?;
+                    for file in inner {
+                        let f = file?.path();
+                        let file_stem = match f.file_stem() {
+                            Some(t) => t.to_str().unwrap(),
+                            None => continue,
+                        };
+
+                        let file_name = match f.file_name() {
+                            Some(t) => t.to_str().unwrap(),
+                            None => continue,
+                        };
+
+                        let lod = Lod::new(file_name.clone().to_string(), 0i8, 0.0, 4096.0);
+                        mesh.lods.insert((file_stem.split('_').collect::<Vec<&str>>().get(1).unwrap()).to_string().parse::<i8>().unwrap(), lod);
+                    }
+                    self.available_models.push(mesh);
+                    //ICI on a les bonnes données
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn get_objects_availables(&self) -> Vec<String> {
         self.available_models.clone().into_iter().map(|x| x.name).collect::<Vec<String>>()
     }
 
-    pub fn get_buffers(display: &glium::Display, models: Vec<Cube>) ->
+    pub fn get_buffers(display: &glium::Display, models: Vec<StaticMesh>) ->
     (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>) {
         let mut vertice_array = Vec::new();
         for model in &models {

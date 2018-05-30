@@ -32,7 +32,7 @@ out vec4 position_output;
 
 void main(){
 //	diffuse_output = vec4(1.0,0.0,0.0,1.0);
-	diffuse_output = texture(tex, vec3(v_tex_coords,5.0)).rgba;
+	diffuse_output = texture(tex, vec3(v_tex_coords,1.0)).rgba;
 	position_output = vec4(v_normal,1.0);
 	normal_output = vec4(v_normal,1.0);
 }

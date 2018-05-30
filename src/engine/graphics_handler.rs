@@ -10,7 +10,7 @@ use glium::Surface;
 use glium::PolygonMode;
 use engine::sprite::Sprite;
 use engine::camera::Camera;
-use engine::model::{Cube, Model, Light};
+use engine::model::{StaticMesh, Model, Light};
 use engine::matrix_helper::MatrixHelper;
 use self::cgmath::{Matrix4, Vector3, Point3};
 use self::cgmath::prelude::*;
@@ -120,19 +120,16 @@ impl GraphicsHandler {
         }
 
         for model in models {
-//            let model_position = model.get_matrix().clone().row(2);
 
-//            println!("distance {:#?}", dist);
 //Rotation
-            let model_matrix = model.borrow().get_matrix().mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
-            let world = Matrix4::from_angle_y(Rad((-time as f32 * 0.001))).invert().unwrap();
+//            let model_matrix = model.borrow().get_matrix().mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
+//            let world = Matrix4::from_angle_y(Rad((-time as f32 * 0.001))).invert().unwrap();
+            let model_matrix = model.borrow().get_matrix();
+            let world = Matrix4::identity();
             let model_matrix = proj_view.mul(model_matrix);
             let model_matrix = model_matrix * Matrix4::from_scale(10.0);
-//            let world = Matrix4::identity();
             let world: [[f32; 4]; 4] = array4x4(world);
             let matrix: [[f32; 4]; 4] = array4x4(model_matrix);
-
-//            println!("plop {:#?}", model);
 
             let model_uniform = uniform!(
                 u_matrix: matrix,
@@ -142,6 +139,7 @@ impl GraphicsHandler {
             );
 
             let buff = model.borrow().get_buffer(display);
+
 
             match programs.get("object_shader") {
                 Some(t) => {
@@ -271,4 +269,8 @@ impl GraphicsHandler {
 
         //-------------------DEFFERED-RENDERING-DRAW-END--------------------//
     }
+
+//    fn get_model_matrix(model: Model)-> Matrix4<f32> {
+//        match model.
+//    }
 }

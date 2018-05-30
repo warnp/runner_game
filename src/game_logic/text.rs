@@ -1,5 +1,7 @@
 use engine::generic_object::GenericObject;
 use engine::generic_object_type::GenericObjectType;
+use std::rc::Rc;
+use cgmath::{Matrix4,Vector3};
 
 pub struct Text {
     name: String,
@@ -23,9 +25,6 @@ impl GenericObject for Text {
     fn get_type(&self) -> GenericObjectType {
         GenericObjectType::TEXT
     }
-    fn get_position(&self) -> (f32, f32, f32) {
-        (self.position[0], self.position[1], 0.0)
-    }
     fn get_name(&self) -> String {
         (&self.name).to_string()
     }
@@ -43,6 +42,20 @@ impl GenericObject for Text {
     }
     fn get_order(&self) -> u8 {
         self.order
+    }
+    fn get_mesh(&self) -> String {
+        unimplemented!()
+    }
+    fn get_matrix(&self) -> Matrix4<f32> {
+        let res = Matrix4::from_translation(
+            Vector3{
+                x:self.position[0],
+                y:self.position[1],
+                z:0.0,
+            }
+        );
+
+        res
     }
 }
 
