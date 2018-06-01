@@ -2,9 +2,7 @@ extern crate cgmath;
 
 use self::cgmath::{Matrix4, Vector3, Point3};
 use self::cgmath::prelude::*;
-use self::cgmath::conv::*;
 use self::cgmath::perspective;
-use self::cgmath::PerspectiveFov;
 use self::cgmath::{Deg, Rad};
 use std::ops::Mul;
 

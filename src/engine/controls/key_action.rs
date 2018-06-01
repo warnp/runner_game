@@ -1,4 +1,4 @@
-use engine::generic_camera::GenericCamera;
+use engine::graphic::generic_camera::GenericCamera;
 
 pub trait AnyKeyAction {
     fn execute_action(&self, Vec<Box<GenericCamera>>) -> Vec<Box<GenericCamera>>;

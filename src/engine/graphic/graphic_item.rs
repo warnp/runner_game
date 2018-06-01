@@ -1,4 +1,4 @@
-use engine::layer_type::LayerType;
+use engine::graphic::layer_type::LayerType;
 
 pub trait GraphicItem {
     fn get_position(&self) -> [f32; 2];

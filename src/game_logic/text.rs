@@ -1,6 +1,5 @@
-use engine::generic_object::GenericObject;
-use engine::generic_object_type::GenericObjectType;
-use std::rc::Rc;
+use engine::graphic::generic_object::GenericObject;
+use engine::graphic::generic_object_type::GenericObjectType;
 use cgmath::{Matrix4,Vector3};
 
 pub struct Text {

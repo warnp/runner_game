@@ -1,5 +1,4 @@
-use engine::generic_object_type::GenericObjectType;
-use std::rc::Rc;
+use engine::graphic::generic_object_type::GenericObjectType;
 use cgmath::Matrix4;
 
 pub trait GenericObject{

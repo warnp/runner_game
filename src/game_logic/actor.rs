@@ -1,6 +1,5 @@
-use engine::generic_object::GenericObject;
-use engine::generic_object_type::GenericObjectType;
-use std::rc::Rc;
+use engine::graphic::generic_object::GenericObject;
+use engine::graphic::generic_object_type::GenericObjectType;
 use cgmath::{Matrix4, Vector3};
 
 #[derive(Clone, Debug)]
@@ -11,7 +10,6 @@ pub struct Actor {
     size: [f32; 2],
     texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
     order: u8,
-//    parent: Option<Box<GenericObject>>,
 }
 
 impl Actor {
@@ -20,8 +18,7 @@ impl Actor {
                image: i32,
                size: [f32; 2],
                texture_coordinates: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
-               order: u8,
-               parent: Option<Box<GenericObject>>) -> Actor {
+               order: u8) -> Actor {
         Actor {
             name: name,
             position: position,
@@ -29,7 +26,6 @@ impl Actor {
             size: size,
             texture_coordinates: texture_coordinates,
             order: order,
-            //parent:parent,
         }
     }
 }

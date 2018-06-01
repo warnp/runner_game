@@ -1,25 +1,20 @@
 extern crate glium;
 extern crate cgmath;
 
-use engine::sprite::Sprite;
-use engine::shader_manager::Shaders;
-use engine::sprite_manager::SpriteManager;
-use engine::graphics_handler::GraphicsHandler;
-use engine::generic_object::GenericObject;
-use engine::generic_control::GenericControl;
-use engine::text_writer::TextWriter;
-use engine::generic_object_type::GenericObjectType;
-use engine::input_manager::InputManager;
-use engine::model::{StaticMesh, Model, Light, Lod};
-use engine::camera::Camera;
-use engine::object_manager::ObjectManager;
-use engine::vertex;
-use std::sync::mpsc::Receiver;
+use engine::graphic::sprite::Sprite;
+use engine::graphic::shader_manager::Shaders;
+use engine::graphic::sprite_manager::SpriteManager;
+use engine::graphic::graphics_handler::GraphicsHandler;
+use engine::graphic::generic_object::GenericObject;
+use engine::graphic::text_writer::TextWriter;
+use engine::graphic::generic_object_type::GenericObjectType;
+use engine::graphic::model::{ Model, Light};
+use engine::graphic::camera::Camera;
+use engine::graphic::object_manager::ObjectManager;
 use std::cell::RefCell;
-use self::cgmath::{Matrix, Matrix4, Vector3};
-use engine::generic_camera::GenericCamera;
+use self::cgmath::{Matrix, Matrix4};
+use engine::graphic::generic_camera::GenericCamera;
 use engine::controls::key_action::AnyKeyAction;
-use std::rc::Rc;
 
 pub struct ModulesManager<'a> {
     display: &'a glium::Display,

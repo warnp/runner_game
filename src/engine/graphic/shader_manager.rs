@@ -13,11 +13,10 @@ use std::fs;
 use std::io::prelude::*;
 use std::io::{BufReader, BufWriter, Cursor};
 use std::error::Error;
-use std::borrow::Borrow;
 use std::str;
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
-use engine::RESOURCES_PATH;
+use engine::graphic::RESOURCES_PATH;
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct ShaderCouple<'a> {
@@ -99,7 +98,7 @@ impl<'a> Shaders<'a> {
                                     }
                                 }
                             }
-                            Err(e) => println!("Erreur dans le fichier")
+                            Err(_e) => println!("Erreur dans le fichier")
                         }
                     }
                     Err(e) => println!("Error open shader file : {}", e.description()),
@@ -118,7 +117,7 @@ impl<'a> Shaders<'a> {
             Ok(t) => {
                 self.insert_program(t);
             }
-            Err(e) => ()
+            Err(_e) => ()
         };
     }
 
@@ -145,9 +144,9 @@ impl<'a> Shaders<'a> {
             let (tx, rx) = channel();
             let mut watcher: RecommendedWatcher = Watcher::new_raw(tx).unwrap();
 
-            let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
+//            let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
 
-            let display = glium::HeadlessRenderer::new(context).unwrap();
+//            let display = glium::HeadlessRenderer::new(context).unwrap();
 
 
             let files_watched = watcher.watch(Path::new("./content/shader"), RecursiveMode::Recursive);

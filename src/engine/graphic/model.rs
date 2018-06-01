@@ -2,17 +2,10 @@ extern crate glium;
 extern crate cgmath;
 
 use std::collections::HashMap;
-use engine::vertex::{Vertex, Normal};
-use engine::graphic_item::GraphicItem;
+use engine::graphic::vertex::{Vertex};
 use std::u16;
-use self::cgmath::prelude::*;
-use self::cgmath::{Matrix4, Vector3};
+use self::cgmath::{Matrix4};
 use std::fmt::Debug;
-use std::sync::mpsc::channel;
-use std::sync::mpsc::Receiver;
-use std::io::BufReader;
-use std::fs::File;
-use std::cell::RefCell;
 
 
 pub trait Model: Debug {

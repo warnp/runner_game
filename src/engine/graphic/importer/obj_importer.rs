@@ -1,4 +1,4 @@
-use engine::vertex::{Vertex, Normal};
+use engine::graphic::vertex::{Vertex};
 use std::io::BufReader;
 use std::fs::File;
 use std::io::prelude::*;

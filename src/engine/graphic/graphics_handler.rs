@@ -5,20 +5,14 @@ extern crate cgmath;
 
 use std::cell::RefCell;
 use std::collections::HashMap;
-use engine::vertex::{Vertex, Normal, TexCoords};
+use engine::graphic::vertex::{Vertex};
 use glium::Surface;
-use glium::PolygonMode;
-use engine::sprite::Sprite;
-use engine::camera::Camera;
-use engine::model::{StaticMesh, Model, Light};
-use engine::matrix_helper::MatrixHelper;
-use self::cgmath::{Matrix4, Vector3, Point3};
+use engine::graphic::sprite::Sprite;
+use engine::graphic::camera::Camera;
+use engine::graphic::model::{Model, Light};
+use self::cgmath::{Matrix4};
 use self::cgmath::prelude::*;
 use self::cgmath::conv::*;
-use self::cgmath::perspective;
-use self::cgmath::PerspectiveFov;
-use self::cgmath::{Deg, Rad};
-use self::cgmath::MetricSpace;
 use std::ops::Mul;
 
 pub struct GraphicsHandler;

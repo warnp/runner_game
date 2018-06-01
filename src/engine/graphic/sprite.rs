@@ -1,8 +1,8 @@
 use std::cmp::{Ord, Ordering};
-use engine::vertex::{Vertex, TexCoords, Normal};
-use engine::graphic_item::GraphicItem;
-use engine::collision::CollisionMesh;
-use engine::layer_type::LayerType;
+use engine::graphic::vertex::{Vertex};
+use engine::graphic::graphic_item::GraphicItem;
+use engine::graphic::collision::CollisionMesh;
+use engine::graphic::layer_type::LayerType;
 
 extern crate glium;
 

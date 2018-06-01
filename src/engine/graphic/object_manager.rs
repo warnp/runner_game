@@ -2,29 +2,22 @@ extern crate notify;
 
 extern crate cgmath;
 
-use std::collections::HashMap;
-use engine::model::{StaticMesh, Lod, Model};
-use engine::vertex::{Vertex, Normal};
+use engine::graphic::model::{StaticMesh, Lod};
+use engine::graphic::vertex::{Vertex};
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
 use std::sync::mpsc::channel;
 use std::thread;
 use std::ffi::OsStr;
-use std::io;
-use std::fs::{self, File, DirEntry};
+use std::fs::{self, File};
 use std::path::Path;
-use std::rc::Rc;
 use std::io::prelude::*;
-use std::io::{BufReader, BufWriter, Cursor, Error};
+use std::io::{BufReader, Error};
 use self::notify::{RecommendedWatcher, Watcher, RecursiveMode};
-use engine::importer::obj_importer::ObjImporter;
-use self::cgmath::{Matrix4, Vector3, Vector4, Point3};
+use engine::graphic::importer::obj_importer::ObjImporter;
+use self::cgmath::{Matrix4, Vector3, Vector4};
 use self::cgmath::prelude::*;
-use self::cgmath::conv::*;
-use self::cgmath::perspective;
-use self::cgmath::PerspectiveFov;
-use self::cgmath::{Deg, Rad};
-use engine::RESOURCES_PATH;
+use engine::graphic::RESOURCES_PATH;
 
 extern crate glium;
 

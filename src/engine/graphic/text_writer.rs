@@ -1,4 +1,4 @@
-use engine::sprite::Sprite;
+use engine::graphic::sprite::Sprite;
 
 pub struct TextWriter<'a> {
     pub string_name: &'a str,

@@ -1,8 +1,8 @@
-use engine::sprite::Sprite;
-use engine::vertex::{Vertex, TexCoords};
+use engine::graphic::sprite::Sprite;
+use engine::graphic::vertex::{Vertex};
 use std::cell::RefCell;
 use std::rc::Rc;
-use engine::vertex;
+use engine::graphic::vertex;
 
 extern crate glium;
 extern crate time;
