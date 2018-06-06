@@ -1,5 +1,6 @@
 use engine::graphic::generic_object_type::GenericObjectType;
 use cgmath::Matrix4;
+use std::fmt::Debug;
 
 pub trait GenericObject{
     //fn key_reader(&self, key: &str);
@@ -21,7 +22,6 @@ impl <F: ?Sized> GenericObject for Box<F>
     fn get_type(&self) -> GenericObjectType {
         (**self).get_type()
     }
-
 
     fn get_name(&self) -> String {
         (**self).get_name()

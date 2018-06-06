@@ -152,15 +152,26 @@ fn main() {
 
         let entity = Entity{
             name: "test".to_string(),
+            mesh_name: "test".to_string(),
+            parent: RefCell::new(None),
+            matrix: RefCell::new(mat),
+            children: RefCell::new(vec![])
+        };
+
+        let child_entity = Entity{
+            name: "test_child".to_string(),
+            mesh_name: "wheel".to_string(),
             parent: RefCell::new(None),
             matrix: RefCell::new(mat),
             children: RefCell::new(vec![])
         };
 
         hierarchy_manager.push_new_entity("world",entity);
+//        hierarchy_manager.push_new_entity("test",child_entity);
         hierarchy_manager.update_matrix();
-        println!("{:#?}", hierarchy_manager);
     };
+
+    let entities = hierarchy_manager.get_flat_generic_objects::<CubeObj>();
 
     while !close {
         let key_press = engine::controls::key_action::KeyAction {
@@ -204,10 +215,18 @@ fn main() {
 
         let toto = Box::new(toto);
         let titi = Box::new(titi);
+
+        let mut objects: Vec<Box<GenericObject>> = vec![];
+        objects.push(Box::new(Text::new("fps".to_string(), [0.0, 0.0], 255, "Salut".to_string())));
+        for e in entities.clone() {
+            println!("{}", e.get_mesh());
+            objects.push(Box::new(e.clone()));
+
+        }
+
+
         let res = modules_manager.draw(fps_timer.1,
-                                       &vec![Box::new(Text::new("fps".to_string(), [0.0, 0.0], 255, "Salut".to_string())),
-//                                             Box::new(CubeObj { position: (0.0, 0.0, 0.0), name: "test".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) }),
-                                             titi, toto],
+                                       &objects,
                                        vec![Box::new(key_press)],
                                        RefCell::new(cameras),
                                        vec![(0.0, 0.0, 1.0)], frames, &mut events_loop);

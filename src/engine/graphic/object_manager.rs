@@ -62,12 +62,25 @@ impl ObjectManager {
                 println!("distance {}", distance);
                 if distance > 200.0 {
                     lod_level_to_load = 1i8;
-                    model.lods.get(&1i8).unwrap().clone().mesh_name
+                    if let Some(lod_name) = model.lods.get(&1i8) {
+                        lod_name.clone().mesh_name
+                    }else{
+                        "".to_string()
+                    }
                 } else {
                     lod_level_to_load = 0i8;
-                    model.lods.get(&0i8).unwrap().clone().mesh_name
+                    if let Some(lod_name) = model.lods.get(&0i8) {
+                        lod_name.clone().mesh_name
+                    }else{
+                        "".to_string()
+                    }
                 }
             };
+
+            if mesh_name == "".to_string() {
+                continue;
+            }
+
             println!("lod level {}", lod_level_to_load);
             if model.actual_lod == lod_level_to_load {
                 println!("No need to reload model");
@@ -264,7 +277,13 @@ impl ObjectManager {
                         };
 
                         let lod = Lod::new(file_name.clone().to_string(), 0i8, 0.0, 4096.0);
-                        mesh.lods.insert((file_stem.split('_').collect::<Vec<&str>>().get(1).unwrap()).to_string().parse::<i8>().unwrap(), lod);
+                        if let Some(lod_index_string) = file_stem.split('_').collect::<Vec<&str>>().get(1){
+                            let lod_index = (lod_index_string).to_string().parse::<i8>();
+
+                            if let Ok(mesh_name) = lod_index {
+                                mesh.lods.insert(mesh_name, lod);
+                            }
+                        }
                     }
                     self.available_models.push(mesh);
                     //ICI on a les bonnes données
