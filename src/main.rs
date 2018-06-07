@@ -148,13 +148,13 @@ fn main() {
 
     let entity = {
 
-        let mat = Matrix4::from_translation(Vector3{x:10.0,y:0.0,z:0.0});
+        let mat = Matrix4::from_translation(Vector3{x:-100.0,y:0.0,z:50.0});
 
         let entity = Entity{
             name: "test".to_string(),
             mesh_name: "test".to_string(),
             parent: RefCell::new(None),
-            matrix: RefCell::new(mat),
+            matrix: RefCell::new(Matrix4::identity()),
             children: RefCell::new(vec![])
         };
 
@@ -167,7 +167,7 @@ fn main() {
         };
 
         hierarchy_manager.push_new_entity("world",entity);
-//        hierarchy_manager.push_new_entity("test",child_entity);
+        hierarchy_manager.push_new_entity("test",child_entity);
         hierarchy_manager.update_matrix();
     };
 
@@ -215,13 +215,15 @@ fn main() {
 
         let toto = Box::new(toto);
         let titi = Box::new(titi);
+        let borrowed_entities = hierarchy_manager.get_entity("world".to_string());
+        println!("plop {:#?}", borrowed_entities);
+
+
 
         let mut objects: Vec<Box<GenericObject>> = vec![];
         objects.push(Box::new(Text::new("fps".to_string(), [0.0, 0.0], 255, "Salut".to_string())));
         for e in entities.clone() {
-            println!("{}", e.get_mesh());
             objects.push(Box::new(e.clone()));
-
         }
 
 

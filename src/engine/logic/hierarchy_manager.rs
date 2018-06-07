@@ -153,6 +153,33 @@ impl HierarchyManager {
         }
     }
 
+    pub fn get_entity(&self, entity_name: String) -> Option<Rc<RefCell<Entity>>>{
+
+        for entity in self.entities.borrow().iter() {
+            let option = HierarchyManager::recur_find_entity(entity_name.clone(), entity.clone());
+            print!("option {:#?}", option);
+            if let Some(ent) = option {
+
+                return Some(ent);
+            }
+        }
+        None
+    }
+
+    fn recur_find_entity(entity_name_searched: String, entity: Rc<RefCell<Entity>>) -> Option<Rc<RefCell<Entity>>> {
+        let rc = entity.clone();
+        let local_entity = rc.borrow();
+        if local_entity.name == entity_name_searched {
+            return Some(entity.clone());
+        }
+        for child in local_entity.children.borrow().iter(){
+            if let Some(ent) = HierarchyManager::recur_find_entity(entity_name_searched.clone(), child.clone()) {
+                return Some(ent);
+            }
+        }
+        None
+    }
+
     fn recur_update_matrix(parent_entity: Rc<RefCell<Entity>>) {
         if let Ok(parent_entity_borrowed) = parent_entity.try_borrow() {
             let parent_matrix = parent_entity_borrowed.clone().matrix.into_inner();
