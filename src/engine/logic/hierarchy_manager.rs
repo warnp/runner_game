@@ -15,7 +15,6 @@ pub struct HierarchyManager {
 }
 
 impl HierarchyManager {
-
     /// Construct a new Hierarchy manager with world as root.
     /// world have an identity matrix.
     ///
@@ -26,7 +25,14 @@ impl HierarchyManager {
     /// let manager = HierarchyManager::new();
     /// ```
     pub fn new() -> HierarchyManager {
-        let entities = vec![Rc::new(RefCell::new(Entity { mesh_name: "".to_string(),matrix: RefCell::new(Matrix4::identity()), children: RefCell::new(vec![]), name: "world".to_string(), parent: RefCell::new(None) }))];
+        let entities = vec![Rc::new(RefCell::new(Entity {
+            mesh_name: "".to_string(),
+            matrix: RefCell::new(Matrix4::identity()),
+            local_matrix: Matrix4::identity(),
+            children: RefCell::new(vec![]),
+            name: "world".to_string(),
+            parent: RefCell::new(None),
+        }))];
         HierarchyManager {
             entities: RefCell::new(entities)
         }
@@ -75,8 +81,6 @@ impl HierarchyManager {
                 let mut entities_mut = self.entities.borrow_mut();
                 entities_mut.push(Rc::new(RefCell::new(entity)));
             }
-
-
         }
     }
 
@@ -115,15 +119,15 @@ impl HierarchyManager {
             let local = res.borrow();
             let name = local.name.clone();
             let mesh = local.mesh_name.clone();
-            let generated = GeneratedObj{
+            let generated = GeneratedObj {
                 matrix: *local.matrix.borrow(),
                 name: name,
                 description: String::new(),
-                mesh:mesh,
+                mesh: mesh,
                 order: 0u8,
                 obj_type: GenericObjectType::STATIC_MESH,
-                size: (1.0,1.0,1.0),
-                texture_id:0,
+                size: (1.0, 1.0, 1.0),
+                texture_id: 0,
                 texture_coordinate: ((0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)),
             };
 
@@ -153,17 +157,25 @@ impl HierarchyManager {
         }
     }
 
-    pub fn get_entity(&self, entity_name: String) -> Option<Rc<RefCell<Entity>>>{
-
+    /// Get entity by name
+    pub fn get_entity(&self, entity_name: String) -> Option<Rc<RefCell<Entity>>> {
         for entity in self.entities.borrow().iter() {
             let option = HierarchyManager::recur_find_entity(entity_name.clone(), entity.clone());
-            print!("option {:#?}", option);
             if let Some(ent) = option {
-
                 return Some(ent);
             }
         }
         None
+    }
+
+    pub fn update_children(&self, entity_name: String) {
+        if let Some(entity) = self.get_entity(entity_name) {
+            let cloned_entity = entity.clone();
+            let borrowed_entity = cloned_entity.borrow();
+            for e in borrowed_entity.children.borrow().iter() {
+                HierarchyManager::recur_update_matrix(entity.clone());
+            }
+        }
     }
 
     fn recur_find_entity(entity_name_searched: String, entity: Rc<RefCell<Entity>>) -> Option<Rc<RefCell<Entity>>> {
@@ -172,7 +184,7 @@ impl HierarchyManager {
         if local_entity.name == entity_name_searched {
             return Some(entity.clone());
         }
-        for child in local_entity.children.borrow().iter(){
+        for child in local_entity.children.borrow().iter() {
             if let Some(ent) = HierarchyManager::recur_find_entity(entity_name_searched.clone(), child.clone()) {
                 return Some(ent);
             }
@@ -190,7 +202,8 @@ impl HierarchyManager {
 
                 {
                     let mut mut_actual = x.matrix.borrow_mut();
-                    let plop = *mut_actual;
+                    let plop = x.local_matrix.clone();
+
                     *mut_actual = parent_matrix * plop;
                 }
                 HierarchyManager::recur_update_matrix(entity.clone());
@@ -201,15 +214,15 @@ impl HierarchyManager {
 
 #[derive(Clone)]
 pub struct GeneratedObj {
-    mesh:String,
+    mesh: String,
     obj_type: GenericObjectType,
     name: String,
     description: String,
-    texture_id:i32,
-    size: (f32,f32,f32),
+    texture_id: i32,
+    size: (f32, f32, f32),
     texture_coordinate: ((f32, f32), (f32, f32), (f32, f32), (f32, f32)),
     order: u8,
-    matrix: Matrix4<f32>
+    matrix: Matrix4<f32>,
 }
 
 impl GenericObject for GeneratedObj {

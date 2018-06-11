@@ -113,6 +113,7 @@ impl GraphicsHandler {
             None => ()
         }
 
+        println!("model {}", models.len());
         for model in models {
 
 //Rotation

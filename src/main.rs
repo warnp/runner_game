@@ -148,13 +148,17 @@ fn main() {
 
     let entity = {
 
-        let mat = Matrix4::from_translation(Vector3{x:-100.0,y:0.0,z:50.0});
+        let mat0 = Matrix4::from_translation(Vector3{x:-45.0,y:0.0,z:37.0});
+        let mat1 = Matrix4::from_translation(Vector3{x:-45.0,y:0.0,z:-37.0});
+        let mat2 = Matrix4::from_translation(Vector3{x:45.0,y:0.0,z:37.0});
+        let mat3 = Matrix4::from_translation(Vector3{x:45.0,y:0.0,z:-37.0});
 
         let entity = Entity{
             name: "test".to_string(),
             mesh_name: "test".to_string(),
             parent: RefCell::new(None),
             matrix: RefCell::new(Matrix4::identity()),
+            local_matrix: Matrix4::identity(),
             children: RefCell::new(vec![])
         };
 
@@ -162,16 +166,46 @@ fn main() {
             name: "test_child".to_string(),
             mesh_name: "wheel".to_string(),
             parent: RefCell::new(None),
-            matrix: RefCell::new(mat),
+            matrix: RefCell::new(mat0),
+            local_matrix: mat0,
+            children: RefCell::new(vec![])
+        };
+
+        let child_entity1 = Entity{
+            name: "test_child1".to_string(),
+            mesh_name: "wheel".to_string(),
+            parent: RefCell::new(None),
+            matrix: RefCell::new(mat1),
+            local_matrix: mat1,
+            children: RefCell::new(vec![])
+        };
+
+        let child_entity2 = Entity{
+            name: "test_child2".to_string(),
+            mesh_name: "wheel".to_string(),
+            parent: RefCell::new(None),
+            matrix: RefCell::new(mat2),
+            local_matrix: mat2,
+            children: RefCell::new(vec![])
+        };
+
+        let child_entity3 = Entity{
+            name: "test_child3".to_string(),
+            mesh_name: "wheel".to_string(),
+            parent: RefCell::new(None),
+            matrix: RefCell::new(mat3),
+            local_matrix: mat3,
             children: RefCell::new(vec![])
         };
 
         hierarchy_manager.push_new_entity("world",entity);
         hierarchy_manager.push_new_entity("test",child_entity);
+        hierarchy_manager.push_new_entity("test",child_entity1);
+        hierarchy_manager.push_new_entity("test",child_entity2);
+        hierarchy_manager.push_new_entity("test",child_entity3);
         hierarchy_manager.update_matrix();
     };
 
-    let entities = hierarchy_manager.get_flat_generic_objects::<CubeObj>();
 
     while !close {
         let key_press = engine::controls::key_action::KeyAction {
@@ -215,10 +249,19 @@ fn main() {
 
         let toto = Box::new(toto);
         let titi = Box::new(titi);
-        let borrowed_entities = hierarchy_manager.get_entity("world".to_string());
-        println!("plop {:#?}", borrowed_entities);
+        let borrowed_entity = hierarchy_manager.get_entity("test".to_string());
 
+        if let Some(ent) = borrowed_entity {
+            let rc = ent.clone();
+            let mut ent = rc.borrow_mut();
+            let f = frames as f32;
+            let new_mat = ent.local_matrix * Matrix4::from_angle_y(Rad( f * 0.01));
+            println!("matrixxx {:#?}", ent.matrix);
+            ent.matrix = RefCell::new(new_mat);
+        }
+//        hierarchy_manager.update_children("test".to_string());
 
+        let entities = hierarchy_manager.get_flat_generic_objects::<CubeObj>();
 
         let mut objects: Vec<Box<GenericObject>> = vec![];
         objects.push(Box::new(Text::new("fps".to_string(), [0.0, 0.0], 255, "Salut".to_string())));

@@ -235,25 +235,25 @@ impl ObjectManager {
         receiver
     }
 
-    pub fn update_object_list(&mut self, gens: Vec<(String, Matrix4<f32>, i32, String)>) -> Result<(), Error> {
+    pub fn update_object_list(&mut self, objects_references: Vec<(String, Matrix4<f32>, i32, String)>) -> Result<(), Error> {
         let p = RESOURCES_PATH.to_string() + "/objects/";
-        for object_name in &gens {
+        for object_ref in &objects_references {
 
             //TODO ajouter la suppression d'un modèle
-            if self.available_models.iter().map(|x| x.clone().name).collect::<Vec<String>>().contains(&object_name.3) {
+            if self.available_models.iter().map(|x| x.clone().name).collect::<Vec<String>>().contains(&object_ref.3) {
                 //TODO Gérer seulement la cas ou c'est une modification
-                let available_models = self.available_models.iter().filter(|x| x.name == object_name.3).map(|x| x.clone()).collect::<Vec<StaticMesh>>();
+                let available_models = self.available_models.iter().filter(|x| x.name == object_ref.3).map(|x| x.clone()).collect::<Vec<StaticMesh>>();
                 let model_extracted = available_models.get(0).unwrap();
                 let index = self.available_models.iter().position(|x| x.name == model_extracted.name).unwrap();
                 self.available_models.remove(index);
 
                 let mut mut_model_extracted = model_extracted.clone();
                 let matrix = model_extracted.matrix;
-                mut_model_extracted.matrix = object_name.1;
+                mut_model_extracted.matrix = object_ref.1;
                 self.available_models.push(mut_model_extracted);
             } else {
                 let temp_p = &p;
-                let object_path = temp_p.to_string() + &object_name.3;
+                let object_path = temp_p.to_string() + &object_ref.3;
                 let path = Path::new(&object_path);
                 if path.is_dir() {
 
@@ -262,7 +262,7 @@ impl ObjectManager {
 //                        None => "".to_string()
 //                    };
 
-                    let mut mesh = StaticMesh::new((&object_name.3).to_string(), object_name.1, [0., 0., 0., 0.]);
+                    let mut mesh = StaticMesh::new((&object_ref.3).to_string(), object_ref.1, [0., 0., 0., 0.]);
                     let inner = fs::read_dir(path.clone())?;
                     for file in inner {
                         let f = file?.path();

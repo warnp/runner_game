@@ -116,6 +116,7 @@ impl<'a> ModulesManager<'a> {
             rotation: Camera::generate_rotation(0.0, 0.0, 0.0),
         };
 
+        //We are loading all needed mesh
         self.object_manager.update_loaded_model_list(camera.position.row(2), generics_objects.iter()
             .map(|element| element.get_name()).collect::<Vec<String>>());
         self.object_manager.load_models_into_buffer();
