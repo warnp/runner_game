@@ -8,13 +8,14 @@ use engine::graphic::graphics_handler::GraphicsHandler;
 use engine::graphic::generic_object::GenericObject;
 use engine::graphic::text_writer::TextWriter;
 use engine::graphic::generic_object_type::GenericObjectType;
-use engine::graphic::model::{ Model, Light};
+use engine::graphic::model::{Model, Light};
 use engine::graphic::camera::Camera;
 use engine::graphic::object_manager::ObjectManager;
 use std::cell::RefCell;
 use self::cgmath::{Matrix, Matrix4};
 use engine::graphic::generic_camera::GenericCamera;
 use engine::controls::key_action::AnyKeyAction;
+use std::collections::HashMap;
 
 pub struct ModulesManager<'a> {
     display: &'a glium::Display,
@@ -79,8 +80,6 @@ impl<'a> ModulesManager<'a> {
                         glium::glutin::WindowEvent::KeyboardInput {
                             input, ..
                         } => {
-                            println!("{:?}", input);
-
                             if input.scancode == 72 {
                                 cams = c.execute_action(generics_cameras.borrow().to_vec());
                             }
@@ -116,15 +115,15 @@ impl<'a> ModulesManager<'a> {
             rotation: Camera::generate_rotation(0.0, 0.0, 0.0),
         };
 
+
         //We are loading all needed mesh
         self.object_manager.update_loaded_model_list(camera.position.row(2), generics_objects.iter()
             .map(|element| element.get_name()).collect::<Vec<String>>());
         self.object_manager.load_models_into_buffer();
         let model_to_load = self.object_manager.available_models
             .iter()
-            .map(|x| RefCell::new(Box::new(x.clone())) as RefCell<Box<Model>>)
+            .map(|x| RefCell::new(Box::new(x.1.borrow().clone())) as RefCell<Box<Model>>)
             .collect::<Vec<RefCell<Box<Model>>>>();
-
 
         GraphicsHandler::draw(&self.display,
                               bunch_of_generic_sprite_objects,

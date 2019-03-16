@@ -197,14 +197,14 @@ impl HierarchyManager {
             let parent_matrix = parent_entity_borrowed.clone().matrix.into_inner();
 
             for entity in parent_entity_borrowed.children.borrow().iter() {
-                let rc = entity.clone();
-                let x = rc.borrow();
+                let entity_cloned = entity.clone();
+                let entity_borrowed = entity_cloned.borrow();
 
                 {
-                    let mut mut_actual = x.matrix.borrow_mut();
-                    let plop = x.local_matrix.clone();
+                    let mut mut_actual = entity_borrowed.matrix.borrow_mut();
+                    let local_matrix_clone = entity_borrowed.local_matrix.clone();
 
-                    *mut_actual = parent_matrix * plop;
+                    *mut_actual = parent_matrix * local_matrix_clone;
                 }
                 HierarchyManager::recur_update_matrix(entity.clone());
             }

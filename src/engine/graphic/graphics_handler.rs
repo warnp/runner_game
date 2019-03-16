@@ -113,18 +113,20 @@ impl GraphicsHandler {
             None => ()
         }
 
-        println!("model {}", models.len());
-        for model in models {
 
+
+        for model in models {
 //Rotation
 //            let model_matrix = model.borrow().get_matrix().mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
 //            let world = Matrix4::from_angle_y(Rad((-time as f32 * 0.001))).invert().unwrap();
-            let model_matrix = model.borrow().get_matrix();
+            let model_borrowed = model.borrow();
+            let model_matrix = model_borrowed.get_matrix();
             let world = Matrix4::identity();
             let model_matrix = proj_view.mul(model_matrix);
             let model_matrix = model_matrix * Matrix4::from_scale(10.0);
             let world: [[f32; 4]; 4] = array4x4(world);
             let matrix: [[f32; 4]; 4] = array4x4(model_matrix);
+
 
             let model_uniform = uniform!(
                 u_matrix: matrix,
@@ -133,12 +135,14 @@ impl GraphicsHandler {
 
             );
 
-            let buff = model.borrow().get_buffer(display);
+//            let buff = model_borrowed.get_buffer(display).0;
+
+            let buff = glium::VertexBuffer::new(display, &model_borrowed.get_vertices()).unwrap();
 
 
             match programs.get("object_shader") {
                 Some(t) => {
-                    output_buffer.draw(&buff.0, &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList), &t, &model_uniform, &thirdd_params).unwrap();
+                    output_buffer.draw(&buff, &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList), &t, &model_uniform, &thirdd_params).unwrap();
                 }
                 None => ()
             }

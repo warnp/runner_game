@@ -9,6 +9,7 @@ use std::fmt::Debug;
 
 
 pub trait Model: Debug {
+    fn get_vertices(&self) -> Vec<Vertex>;
     fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>);
     fn set_matrix(&mut self, matrix: Matrix4<f32>);
     fn get_matrix(&self) -> Matrix4<f32>;
@@ -44,6 +45,7 @@ impl Lod {
 
 #[derive(Clone, Debug)]
 pub struct StaticMesh {
+    pub id_name: String,
     pub lods: HashMap<i8, Lod>,
     pub name: String,
     pub matrix: Matrix4<f32>,
@@ -60,6 +62,9 @@ impl PartialEq for StaticMesh {
 }
 
 impl Model for StaticMesh {
+    fn get_vertices(&self) -> Vec<Vertex> {
+        self.vertices.clone()
+    }
     fn get_buffer(&self, display: &glium::Display) -> (glium::VertexBuffer<Vertex>, glium::IndexBuffer<u16>) {
         (glium::VertexBuffer::new(display, &self.vertices).unwrap(),
          glium::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &self.indices).unwrap())
@@ -73,11 +78,14 @@ impl Model for StaticMesh {
 }
 
 impl StaticMesh {
-    pub fn new(name: String,
+    pub fn new(
+                id_name: String,
+                name: String,
                matrix: Matrix4<f32>,
                color: [f32; 4]) -> StaticMesh {
 
         StaticMesh {
+            id_name: id_name,
             lods: HashMap::new(),
             name: name,
             matrix: matrix,

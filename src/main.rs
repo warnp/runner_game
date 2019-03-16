@@ -198,7 +198,6 @@ fn main() {
             children: RefCell::new(vec![])
         };
 
-        hierarchy_manager.push_new_entity("world",entity);
         hierarchy_manager.push_new_entity("test",child_entity);
         hierarchy_manager.push_new_entity("test",child_entity1);
         hierarchy_manager.push_new_entity("test",child_entity2);
@@ -256,7 +255,6 @@ fn main() {
             let mut ent = rc.borrow_mut();
             let f = frames as f32;
             let new_mat = ent.local_matrix * Matrix4::from_angle_y(Rad( f * 0.01));
-            println!("matrixxx {:#?}", ent.matrix);
             ent.matrix = RefCell::new(new_mat);
         }
 //        hierarchy_manager.update_children("test".to_string());

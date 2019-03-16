@@ -52,13 +52,13 @@ impl<'a> Shaders<'a> {
     fn first_shader_compile() {
         println!("1er compilation shader vers fx");
         let p = RESOURCES_PATH.to_string()+ "/shader_dev";
-        println!("{}",p);
+
         let path = Path::new(&p);
 
         let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
         let display = glium::HeadlessRenderer::new(context).unwrap();
         for entry in path.read_dir().unwrap() {
-            println!("toto {:#?}", entry);
+
             let file_path = &entry.unwrap().path();
             let shader_name = file_path.file_stem().unwrap().to_str().unwrap().to_string();
             let extension = file_path.extension();

@@ -402,8 +402,6 @@ mod tests {
                 index = i;
             }
         }
-
-        println!("{}", index);
         assert!(index == 0);
     }
 
