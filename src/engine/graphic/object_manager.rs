@@ -111,8 +111,8 @@ impl ObjectManager {
                     match file {
                         Ok(file) => {
                             let mut buff = BufReader::new(file);
-//                            let obj_content = ObjImporter::import(buff);
-                            let obj_content = (vec![], vec![]);
+                            let obj_content = ObjImporter::import(buff);
+//                            let obj_content = (vec![], vec![]);
                             println!("Obj loaded");
                             sender.send((object_name, obj_content)).unwrap();
                         }
@@ -131,16 +131,9 @@ impl ObjectManager {
 
                     for available_model in self.available_models.values() {
                         if available_model.borrow().name == t.0.split('_').collect::<Vec<&str>>().get(0).unwrap().to_string() {
-                            let path_string = format!("{}/objects/{}/{}.obj", RESOURCES_PATH, available_model.borrow().name, t.0);
-                            let model_path = Path::new(&path_string);
-
-                            let mut file = File::open(model_path.clone()).unwrap();
-
-                            let mut buff = BufReader::new(file);
-                            let obj_content = ObjImporter::import(buff);
 
                             let mut model_mut = available_model.borrow_mut();
-                            let vertex_index_clone = obj_content;
+                            let vertex_index_clone = t.1.clone();
                             model_mut.vertices = vertex_index_clone.0;
                             model_mut.indices = vertex_index_clone.1;
                         }
