@@ -17,6 +17,7 @@ use std::str;
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
 use engine::graphic::RESOURCES_PATH;
+use glium::glutin;
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct ShaderCouple<'a> {
@@ -55,8 +56,9 @@ impl<'a> Shaders<'a> {
 
         let path = Path::new(&p);
 
-        let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
-        let display = glium::HeadlessRenderer::new(context).unwrap();
+        let context_builder = glutin::ContextBuilder::new();
+        let context = glutin::Context::new(&glium::glutin::EventsLoop::new(), context_builder, false).unwrap();
+        let display = glium::backend::glutin::headless::Headless::new(context).unwrap();
         for entry in path.read_dir().unwrap() {
 
             let file_path = &entry.unwrap().path();
@@ -250,9 +252,10 @@ impl<'a> Shaders<'a> {
             let (tx, rx) = channel();
             let mut watcher: RecommendedWatcher = Watcher::new_raw(tx).unwrap();
 
-            let context = glium::glutin::HeadlessRendererBuilder::new(1, 1).build().unwrap();
+            let context_builder = glutin::ContextBuilder::new();
+            let context = glutin::Context::new(&glium::glutin::EventsLoop::new(), context_builder, false).unwrap();
 
-            let display = glium::HeadlessRenderer::new(context).unwrap();
+            let display = glium::backend::glutin::headless::Headless::new(context).unwrap();
 
 
             let files_watched = watcher.watch(Path::new("./content/shader_dev"), RecursiveMode::Recursive);

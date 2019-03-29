@@ -119,7 +119,7 @@ fn main() {
 
     //-----------Faire un handler pour les controls
     let mut events_loop = glium::glutin::EventsLoop::new();
-    let window = glium::glutin::WindowBuilder::new().with_dimensions(screen_size.0, screen_size.1);
+    let window = glium::glutin::WindowBuilder::new().with_dimensions((screen_size.0, screen_size.1).into());
     let context = glium::glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &events_loop)
         .unwrap();

@@ -4,7 +4,7 @@ version = "0.2.0"
 authors = ["romain <assie.romain@gmail.com>"]
 
 [dependencies]
-glium="0.20.0"
+glium="0.23.0"
 image="0.16.0"
 time = "0.1"
 rand = "0.3"
