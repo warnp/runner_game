@@ -112,7 +112,7 @@ impl<'a> Shaders<'a> {
     }
 
     pub fn update_program_list(&mut self) {
-        println!("Update program list");
+//        println!("Update program list");
         match self.receiver.try_recv() {
             Ok(t) => {
                 self.insert_program(t);

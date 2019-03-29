@@ -10,7 +10,7 @@ use glium::Surface;
 use engine::graphic::sprite::Sprite;
 use engine::graphic::camera::Camera;
 use engine::graphic::model::{Model, Light};
-use self::cgmath::{Matrix4};
+use self::cgmath::{Matrix4,Vector3};
 use self::cgmath::prelude::*;
 use self::cgmath::conv::*;
 use std::ops::Mul;
@@ -66,18 +66,18 @@ impl GraphicsHandler {
         let f = 1.0 / (fov / 2.0).tan();
 
         //--------------------------DIFFUSE-START---------------------------//
-        let world = Matrix4::identity();
+        let world_matrix = Matrix4::identity();
 
 
         let proj_view = camera.fps(1.0, 2000.0);
         let camera_position = camera.position.row(2);
-        let matrix = proj_view.mul(world);
+        let world_view_projection_matrix = proj_view.mul(world_matrix);
 
-        let matrix: [[f32; 4]; 4] = array4x4(matrix);
-        let world: [[f32; 4]; 4] = array4x4(world);
+//        let world_view_projection_matrix_array: [[f32; 4]; 4] = array4x4(world_view_projection_matrix);
+        let world_array: [[f32; 4]; 4] = array4x4(world_matrix);
         let thirdd_uniform = uniform!(
-            u_matrix: matrix,
-            u_world: world,
+            u_matrix: array4x4(world_view_projection_matrix),
+            u_world: world_array,
 
         );
 
@@ -115,30 +115,27 @@ impl GraphicsHandler {
 
 
 
-        for model in models {
+        for model in &models {
 //Rotation
 //            let model_matrix = model.borrow().get_matrix().mul(Matrix4::from_angle_y(Rad((time as f32 * 0.001))));
 //            let world = Matrix4::from_angle_y(Rad((-time as f32 * 0.001))).invert().unwrap();
             let model_borrowed = model.borrow();
             let model_matrix = model_borrowed.get_matrix();
-            let world = Matrix4::identity();
-            let model_matrix = proj_view.mul(model_matrix);
+//            let model_matrix = proj_view.mul(model_matrix);
             let model_matrix = model_matrix * Matrix4::from_scale(10.0);
-            let world: [[f32; 4]; 4] = array4x4(world);
-            let matrix: [[f32; 4]; 4] = array4x4(model_matrix);
+            let matrix: [[f32; 4]; 4] = array4x4(model_matrix.invert().unwrap());
 
+            let converted : [f32; 3] = Vector3::new(0.5,0.7,1.0).into();
 
             let model_uniform = uniform!(
-                u_matrix: matrix,
-                u_world: world,
+                model: matrix,
+                u_worldViewProjection: array4x4(world_view_projection_matrix * model_matrix),
+                u_world: world_array,
                 tex: objects_textures,
-
+                reverse_light_direction: converted,
             );
 
-//            let buff = model_borrowed.get_buffer(display).0;
-
             let buff = glium::VertexBuffer::new(display, &model_borrowed.get_vertices()).unwrap();
-
 
             match programs.get("object_shader") {
                 Some(t) => {
@@ -193,14 +190,20 @@ impl GraphicsHandler {
 
         light_buffer.clear_color(0.0, 0.0, 0.0, 0.0);
         for light in lights {
+
             let light_uniform = uniform!(
-                matrix: ortho_matrix,
+                world: world_array,
+                world_view_projection: array4x4(world_view_projection_matrix),
                 position_texture: position_texture,
                 normal_texture: normal_texture,
+                diffuse_texture: diffuse_texture,
+                light_is_distant: light.is_distant,
+                light_direction: light.direction,
                 light_position: light.position,
                 light_attenuation: light.attenuation,
                 light_color: light.color,
                 light_radius: light.radius,
+                viewPos: array4(camera_position),
             );
 
             match programs.get("light_shader") {

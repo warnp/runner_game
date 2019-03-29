@@ -105,6 +105,8 @@ pub struct Light {
     pub attenuation: (f32, f32, f32),
     pub color: (f32, f32, f32),
     pub radius: f32,
+    pub direction: (f32,f32,f32),
+    pub is_distant: bool,
 }
 
 #[cfg(test)]

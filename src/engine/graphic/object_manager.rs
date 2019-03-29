@@ -46,13 +46,13 @@ impl ObjectManager {
     }
 
     pub fn update_loaded_model_list(&mut self, camera_position: Vector4<f32>, model_to_load_names: Vec<String>) {
-        println!("look for mesh");
+//        println!("look for mesh");
 //Trouver l'ensemble des mesh à afficher déjà présent dans le buffer
 
         for model in self.available_models.iter() {
             let model_clone = model.1.clone();
             let model_borrowed = model_clone.borrow();
-            println!("Begin loading model {}", model_borrowed.name);
+//            println!("Begin loading model {}", model_borrowed.name);
             let (sender, receiver) = mpsc::channel();
             self.models_loader_receiver.push(receiver);
             //TODO Gérer les niveau de details plus haut
@@ -61,7 +61,7 @@ impl ObjectManager {
             let mut lod_level_to_load = -1;
             let mesh_name = {
                 let distance = camera_position.distance(model_borrowed.matrix.row(2).clone());
-                println!("distance {}", distance);
+//                println!("distance {}", distance);
                 if distance > 200.0 {
                     lod_level_to_load = 1i8;
                     if let Some(lod_name) = model_borrowed.lods.get(&1i8) {
@@ -83,9 +83,9 @@ impl ObjectManager {
                 continue;
             }
 
-            println!("lod level {}", lod_level_to_load);
+//            println!("lod level {}", lod_level_to_load);
             if model_borrowed.actual_lod == lod_level_to_load {
-                println!("No need to reload model");
+//                println!("No need to reload model");
                 return;
             }
 
@@ -262,10 +262,6 @@ impl ObjectManager {
                 let path = Path::new(&object_path);
                 if path.is_dir() {
 
-//                    let parent_name = match object_name.4 {
-//                        Some(t)=> t,
-//                        None => "".to_string()
-//                    };
 
                     let mut rng = rand::thread_rng();
                     let mut mesh = StaticMesh::new(object_ref.0.clone()+&format!("{}", rng.gen::<u32>()), (&object_ref.3).to_string(), object_ref.1, [0., 0., 0., 0.]);

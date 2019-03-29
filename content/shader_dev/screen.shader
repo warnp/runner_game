@@ -33,7 +33,7 @@ void main(){
 		color = uitex;
 
 	}else{
-		//color = vec4(difftex * lighttex, 1.0);
-		color = vec4(difftex , 1.0);
+		color = vec4(difftex * lighttex, 1.0);
+		//color = vec4(difftex , 1.0);
 	}
 }
