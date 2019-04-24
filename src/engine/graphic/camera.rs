@@ -2,7 +2,7 @@ extern crate cgmath;
 
 use self::cgmath::{Matrix4, Vector3, Point3};
 use self::cgmath::prelude::*;
-use self::cgmath::perspective;
+use self::cgmath::{perspective, ortho};
 use self::cgmath::{Deg, Rad};
 use std::ops::Mul;
 
@@ -47,6 +47,8 @@ impl Camera {
 
     pub fn fps(&self, near: f32, far: f32) -> Matrix4<f32> {
         let proj = perspective(Deg(self.view_angle), self.aspect, near, far);
+//        let w = 100.0;
+//        let proj = ortho(-w,w,-w,w, near, far);
 
         let camera_matrix = self.rotation.mul(self.position);
         let camera_matrix = camera_matrix.invert().unwrap();

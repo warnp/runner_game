@@ -80,7 +80,7 @@ impl<'a> Shaders<'a> {
                                 if string != "" {
                                     let file_content = String::from(string);
                                     let shader_source: Vec<&str> = file_content.split("//=================").collect();
-                                    println!("Compilation shaders");
+                                    println!("Compilation shaders(1) \n{:#?}", file_content);
                                     let program = glium::Program::from_source(&display, shader_source.get(0).unwrap(), shader_source.get(1).unwrap(), None);
                                     match program {
                                         Ok(prog) => {
@@ -184,10 +184,12 @@ impl<'a> Shaders<'a> {
     pub fn get_shader_from_files(display: &glium::Display) -> HashMap<String, Box<glium::Program>> {
         let mut result: HashMap<String, Box<glium::Program>> = HashMap::new();
         let shader_path = RESOURCES_PATH.to_string() + "/shader/";
+        println!("Shader path {}", shader_path);
         let paths = fs::read_dir(shader_path).unwrap();
         for path_dir in paths {
             match path_dir {
                 Ok(dir) => {
+                    println!("Ouverture shader");
                     let path = dir.path();
                     let extension = path.extension();
                     let mut shader_name = path.file_stem().unwrap().to_str().unwrap().to_string();
@@ -199,19 +201,30 @@ impl<'a> Shaders<'a> {
                                 let mut buff = BufReader::new(file);
                                 let mut raw_shader_data = Vec::new();
                                 buff.read_to_end(&mut raw_shader_data);
+                                println!("Lecture binaire shader");
                                 let binary = glium::program::Binary { format: 1, content: raw_shader_data };
                                 if binary.content.len() > 0 {
+                                    println!("Ajout shader à ogl");
                                     let b = glium::program::Binary { content: binary.content, format: 1 };
                                     shader_name.push_str("_shader");
 
-                                    result.insert(shader_name, Box::new(glium::Program::new(display,
-                                                                                            glium::program::ProgramCreationInput::Binary {
-                                                                                                data: b,
-                                                                                                outputs_srgb: true,
-                                                                                                uses_point_size: true,
-                                                                                            }).unwrap()));
-                                    println!("Shader récupéré");
-                                    println!("Shader pool : {:#?}", result);
+                                    match glium::Program::new(display,
+                                                              glium::program::ProgramCreationInput::Binary {
+                                                                  data: b,
+                                                                  outputs_srgb: true,
+                                                                  uses_point_size: true,
+                                                              }) {
+                                        Ok(new_program_added) => {
+                                            result.insert(shader_name, Box::new(new_program_added));
+                                            println!("Shader récupéré");
+                                            println!("Shader pool : {:#?}", result);
+                                        },
+                                        Err(error) => {
+                                            println!("Erreur creation program {:#?}", error);
+
+                                        }
+                                    }
+
                                 }
                             }
                             Err(e) => {
@@ -282,7 +295,7 @@ impl<'a> Shaders<'a> {
                                             if string != "" {
                                                 let file_content = String::from(string);
                                                 let shader_source: Vec<&str> = file_content.split("//=================").collect();
-                                                println!("Compilation shaders");
+                                                println!("Compilation shaders(2)");
                                                 let program = glium::Program::from_source(&display, shader_source.get(0).unwrap(), shader_source.get(1).unwrap(), None);
                                                 match program {
                                                     Ok(prog) => {

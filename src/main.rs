@@ -136,22 +136,23 @@ fn main() {
     let mut close = false;
     let mut frames = 0.0;
 
-    let cam = CameraExtern { position: Matrix4::from_translation(Vector3 { x: 0.0, y: 0.0, z: 250.0 }) };
+    let cam = CameraExtern { position: Matrix4::from_translation(Vector3 { x: 0.0, y: 10.0, z: 25.0 }) };
     let mut cameras = vec![Box::new(cam) as Box<GenericCamera>];
 
 
     let mut toto = CubeObj { matrix: Matrix4::identity(), mesh: "test".to_string(), name: "toto".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) };
     let mut titi = CubeObj { matrix: Matrix4::identity(), mesh: "wheel".to_string(), name: "titi".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) };
+    let mut ground = CubeObj { matrix: Matrix4::identity(), mesh: "ground".to_string(), name: "ground".to_string(), texture: 0, texture_coordinate: ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)), size: (1.0, 1.0, 1.0) };
     let mut pouet = 10.0;
 
     let hierarchy_manager = HierarchyManager::new();
 
     let entity = {
 
-        let mat0 = Matrix4::from_translation(Vector3{x:-45.0,y:0.0,z:55.0}) * Matrix4::from_angle_y(Rad(3.14));
-        let mat1 = Matrix4::from_translation(Vector3{x:-45.0,y:0.0,z:-55.0}) ;
-        let mat2 = Matrix4::from_translation(Vector3{x:110.0,y:0.0,z:55.0}) * Matrix4::from_angle_y(Rad(3.14));
-        let mat3 = Matrix4::from_translation(Vector3{x:110.0,y:0.0,z:-55.0}) ;
+        let mat0 = Matrix4::from_translation(Vector3{x:-4.5,y:0.0,z:5.50}) * Matrix4::from_angle_y(Rad(3.14));
+        let mat1 = Matrix4::from_translation(Vector3{x:-4.50,y:0.0,z:-5.50}) ;
+        let mat2 = Matrix4::from_translation(Vector3{x:10.700,y:0.0,z:5.50}) * Matrix4::from_angle_y(Rad(3.14));
+        let mat3 = Matrix4::from_translation(Vector3{x:10.700,y:0.0,z:-5.50}) ;
 
         let entity = Entity{
             name: "test".to_string(),
@@ -206,6 +207,18 @@ fn main() {
         hierarchy_manager.update_matrix();
     };
 
+    let ground_entity = Entity {
+        name: "ground".to_string(),
+        mesh_name: "ground".to_string(),
+        parent:RefCell::new(None),
+        matrix: RefCell::new(Matrix4::from_translation(Vector3{x:0.0,y:0.0,z:0.0})),
+        local_matrix:Matrix4::identity(),
+        children: RefCell::new(vec![])
+    };
+
+    hierarchy_manager.push_new_entity("",ground_entity);
+
+
 
     while !close {
         let key_press = engine::controls::key_action::KeyAction {
@@ -229,26 +242,28 @@ fn main() {
         let fps_timer = engine_helper.get_fps();
 
 
-        let toto_matrix = Matrix4::from_translation(Vector3 { x: -100.0, y: -20.0, z: 0.0 });
+//        let toto_matrix = Matrix4::from_translation(Vector3 { x: -100.0, y: -20.0, z: 0.0 });
 
-        let titi_matrix = Matrix4::from_translation(Vector3 { x: -40.0, y: 0.0, z: 25.0 });
-
-
-        let plop = Matrix4::from_angle_y(Rad(pouet * 0.001));
-        pouet = pouet + 1.0;
-        let toto_matrix = toto_matrix * plop;
-
-        let titi_matrix = toto_matrix * titi_matrix;
+//        let titi_matrix = Matrix4::from_translation(Vector3 { x: -40.0, y: 0.0, z: 25.0 });
 
 
-        let mut toto = toto.clone();
-        let mut titi = titi.clone();
+//        let plop = Matrix4::from_angle_y(Rad(pouet * 0.001));
+//        pouet = pouet + 1.0;
+//        let toto_matrix = toto_matrix * plop;
 
-        toto.matrix = toto_matrix;
-        titi.matrix = titi_matrix;
+//        let titi_matrix = toto_matrix * titi_matrix;
 
-        let toto = Box::new(toto);
-        let titi = Box::new(titi);
+//        let mut toto = toto.clone();
+//        let mut titi = titi.clone();
+//        let mut ground = ground.clone();
+
+//        toto.matrix = toto_matrix;
+//        titi.matrix = titi_matrix;
+//        ground.matrix = ground_matrix;
+
+
+//        let toto = Box::new(toto);
+//        let titi = Box::new(titi);
         let borrowed_entity = hierarchy_manager.get_entity("test".to_string());
 
         if let Some(ent) = borrowed_entity {

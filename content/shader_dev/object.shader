@@ -19,7 +19,7 @@ void main(){
 	gl_Position = u_worldViewProjection * vec4(position,1.0);
 }
 //=================
-#version 330
+#version 330 core
 
 
 in vec3 v_normal;
